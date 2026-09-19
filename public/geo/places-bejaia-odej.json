@@ -1,0 +1,143 @@
+{
+  "wilayaCode": 6,
+  "wilaya": "Béjaïa",
+  "wilaya_ar": "بجاية",
+  "center": { "lat": 36.7525, "lng": 5.0833 },
+  "generatedAt": "2026-09-19T00:00:00Z",
+  "sourceNote": "Curated seed for Béjaïa (ODEJ/DJS-oriented). Replace by running scripts/fetch_odej_places_bejaia.py with a Google Places API key.",
+  "count": 12,
+  "places": [
+    {
+      "id": "bj-mdj-centre",
+      "name": "Maison de jeunes de Béjaïa",
+      "address": "Centre-ville, Béjaïa",
+      "lat": 36.7525,
+      "lng": 5.0833,
+      "wilayaCode": 6,
+      "structureKind": "maison_jeunes",
+      "authority": "ODEJ",
+      "source": "curated"
+    },
+    {
+      "id": "bj-mdj-amizour",
+      "name": "دار الشباب أميزور",
+      "address": "أميزور، بجاية",
+      "lat": 36.6431,
+      "lng": 4.9069,
+      "wilayaCode": 6,
+      "structureKind": "maison_jeunes",
+      "authority": "ODEJ",
+      "source": "curated"
+    },
+    {
+      "id": "bj-mdj-akbou",
+      "name": "Maison de jeunes d'Akbou",
+      "address": "Akbou, Béjaïa",
+      "lat": 36.46,
+      "lng": 4.534,
+      "wilayaCode": 6,
+      "structureKind": "maison_jeunes",
+      "authority": "ODEJ",
+      "source": "curated"
+    },
+    {
+      "id": "bj-mdj-el-kseur",
+      "name": "Maison de jeunes El Kseur",
+      "address": "El Kseur, Béjaïa",
+      "lat": 36.679,
+      "lng": 4.855,
+      "wilayaCode": 6,
+      "structureKind": "maison_jeunes",
+      "authority": "DJS",
+      "source": "curated"
+    },
+    {
+      "id": "bj-mdj-sidi-aich",
+      "name": "Maison de jeunes Sidi Aïch",
+      "address": "Sidi Aïch, Béjaïa",
+      "lat": 36.612,
+      "lng": 4.69,
+      "wilayaCode": 6,
+      "structureKind": "maison_jeunes",
+      "authority": "ODEJ",
+      "source": "curated"
+    },
+    {
+      "id": "bj-auberge-tichy",
+      "name": "Auberge de jeunesse / structures jeunesse Tichy",
+      "address": "Tichy, Béjaïa",
+      "lat": 36.668,
+      "lng": 5.16,
+      "wilayaCode": 6,
+      "structureKind": "auberge",
+      "authority": "ODEJ",
+      "source": "curated"
+    },
+    {
+      "id": "bj-camp-touja",
+      "name": "مخيم الشباب توجة",
+      "address": "توجة، بجاية",
+      "lat": 36.761,
+      "lng": 4.833,
+      "wilayaCode": 6,
+      "structureKind": "camp",
+      "authority": "ODEJ",
+      "source": "curated"
+    },
+    {
+      "id": "bj-centre-culturel-akbou",
+      "name": "المركز الثقافي أقبو",
+      "address": "أقبو، بجاية",
+      "lat": 36.62,
+      "lng": 4.68,
+      "wilayaCode": 6,
+      "structureKind": "centre_culturel",
+      "authority": "DJS",
+      "source": "curated"
+    },
+    {
+      "id": "bj-terrain-tichy",
+      "name": "ملعب جواري تيشي",
+      "address": "تيشي، بجاية",
+      "lat": 36.748,
+      "lng": 5.057,
+      "wilayaCode": 6,
+      "structureKind": "terrain",
+      "authority": "DJS",
+      "source": "curated"
+    },
+    {
+      "id": "bj-djs",
+      "name": "Direction de la Jeunesse et des Sports — Béjaïa",
+      "address": "Béjaïa",
+      "lat": 36.755,
+      "lng": 5.07,
+      "wilayaCode": 6,
+      "structureKind": "autre",
+      "authority": "DJS",
+      "source": "curated"
+    },
+    {
+      "id": "bj-odej",
+      "name": "Office des établissements de jeunesse — Béjaïa",
+      "address": "Cité El Mouz, Béjaïa",
+      "lat": 36.75,
+      "lng": 5.06,
+      "wilayaCode": 6,
+      "structureKind": "autre",
+      "authority": "ODEJ",
+      "source": "curated"
+    },
+    {
+      "id": "bj-mdj-adekar",
+      "name": "Maison de jeunes Adekar",
+      "address": "Adekar, Béjaïa",
+      "lat": 36.69,
+      "lng": 4.67,
+      "wilayaCode": 6,
+      "structureKind": "maison_jeunes",
+      "authority": "ODEJ",
+      "source": "curated"
+    }
+  ]
+}

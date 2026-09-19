@@ -179,9 +179,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }).catch(console.error);
   }, []);
 
-  if (!data || !lastData) {
-    return <div className="flex h-screen items-center justify-center">Chargement...</div>;
-  }
+
 
   const addEvent = useCallback((item: Omit<EventItem, "id">) => {
     setLocal((prev) => persist({ ...prev, events: [{ ...item, id: createId() }, ...prev.events] }))
@@ -361,7 +359,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const parsed = parseQrScan(raw)
       if (!parsed) return null
       return (
-        data.registrants.find(
+        data!.registrants.find(
           (r) =>
             (parsed.nin && (r.nationalId === parsed.nin || r.id === parsed.nin)) ||
             (parsed.id && (r.id === parsed.id || r.nationalId === parsed.id)) ||
@@ -369,7 +367,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         ) ?? null
       )
     },
-    [data.registrants]
+    [data]
   )
 
   const previewParticipationPoints = useCallback((input: ValidateParticipationInput) => {
@@ -539,15 +537,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const getVolunteerParticipations = useCallback(
     (volunteerId: string) =>
-      data.participations
+      data!.participations
         .filter((p) => p.volunteerId === volunteerId)
         .sort((a, b) => b.activityDate.localeCompare(a.activityDate) || b.createdAt.localeCompare(a.createdAt)),
-    [data.participations]
+    [data]
   )
 
   const getVolunteerStats = useCallback(
     (volunteerId: string) => {
-      const list = data.participations.filter(
+      const list = data!.participations.filter(
         (p) => p.volunteerId === volunteerId && p.status === "validated"
       )
       return {
@@ -556,7 +554,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         hoursVolunteered: list.reduce((s, p) => s + p.hoursCounted, 0),
       }
     },
-    [data.participations]
+    [data]
   )
 
   const addDonation = useCallback(
@@ -1035,7 +1033,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
     ]
   )
 
-  return <DataContext.Provider value={value}>{children}</DataContext.Provider>
+  if (!data || !lastData) {
+    return <div className="flex h-screen items-center justify-center">Chargement...</div>;
+  }
+
+  return <DataContext.Provider value={value as any}>{children}</DataContext.Provider>
 }
 
 export function useAppData() {

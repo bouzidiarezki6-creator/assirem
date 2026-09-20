@@ -18,6 +18,7 @@ export default function Navbar() {
     { name: t("nav.activities"), path: "/activities" },
     { name: t("nav.volunteer"), path: "/benevolat" },
     { name: t("nav.cagnottes"), path: "/cagnottes" },
+    { name: t("nav.associations") || "Associations", path: "/associations" },
     { name: t("nav.sos"), path: "/sos" },
     { name: t("nav.news"), path: "/news" },
   ]

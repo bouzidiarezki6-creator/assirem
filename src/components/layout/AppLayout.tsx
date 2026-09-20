@@ -2,6 +2,7 @@ import Navbar from "./Navbar"
 import Footer from "./Footer"
 import MobileBottomNav from "./MobileBottomNav"
 import PageTransition from "./PageTransition"
+import SiteChatBubble from "@/components/chat/SiteChatBubble"
 import { useI18n } from "@/context/I18nProvider"
 
 export default function AppLayout() {
@@ -15,6 +16,7 @@ export default function AppLayout() {
       </main>
       <Footer />
       <MobileBottomNav />
+      <SiteChatBubble />
     </div>
   )
 }

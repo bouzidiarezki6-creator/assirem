@@ -792,5 +792,19 @@
       "perkTitle": "Reconnaissance spéciale & responsabilités avancées",
       "perkDesc": "Possibilité d'obtenir une reconnaissance particulière et d'accéder à certaines responsabilités ou missions avancées selon l'association."
     }
+  },
+  "chat": {
+    "open": "Ouvrir l'assistant Yed fel yed",
+    "close": "Fermer l'assistant",
+    "title": "Assistant Yed fel yed",
+    "subtitle": "Questions uniquement sur ce site",
+    "welcome": "Bonjour ! Posez une question sur les institutions, activités, inscriptions, cagnottes, SOS ou actualités de Yed fel yed.",
+    "placeholder": "Ex. : comment s'inscrire à un événement ?",
+    "send": "Envoyer",
+    "thinking": "Réflexion…",
+    "errors": {
+      "missingKey": "L'assistant n'est pas configuré (clé Gemini manquante).",
+      "failed": "Impossible d'obtenir une réponse pour le moment. Réessayez."
+    }
   }
 }

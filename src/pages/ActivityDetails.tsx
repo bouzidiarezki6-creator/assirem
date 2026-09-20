@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { ArrowLeft, ArrowRight, Building2, Check, ImageIcon, MapPin, Share2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import PointsLevelTable from "@/components/shared/PointsLevelTable"
 import { useAppData } from "@/context/DataProvider"
 import { useI18n } from "@/context/I18nProvider"
 import { ACTIVITY_CATEGORIES } from "@/lib/categories"
@@ -151,6 +152,10 @@ export default function ActivityDetails() {
               <Link to="/activities">{t("activities.backList")}</Link>
             </Button>
           </div>
+
+          <section className="border-t border-border/60 pt-6">
+            <PointsLevelTable showHeader />
+          </section>
         </article>
       </div>
     </div>

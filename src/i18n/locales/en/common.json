@@ -783,5 +783,19 @@
       "perkTitle": "Special recognition & advanced responsibilities",
       "perkDesc": "Opportunity to receive special recognition and access advanced leadership or coordination responsibilities."
     }
+  },
+  "chat": {
+    "open": "Open Yed fel yed assistant",
+    "close": "Close assistant",
+    "title": "Yed fel yed assistant",
+    "subtitle": "Questions about this site only",
+    "welcome": "Hi! Ask about institutions, activities, registration, crowdfunding, SOS or news on Yed fel yed.",
+    "placeholder": "E.g. how do I register for an event?",
+    "send": "Send",
+    "thinking": "Thinking…",
+    "errors": {
+      "missingKey": "The assistant is not configured (missing Gemini key).",
+      "failed": "Could not get a reply right now. Please try again."
+    }
   }
 }

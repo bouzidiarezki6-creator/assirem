@@ -2,6 +2,7 @@ import { Link, useParams } from "react-router-dom"
 import { ArrowRight, ImageIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import EventMetadata from "@/components/events/EventMetadata"
+import PointsLevelTable from "@/components/shared/PointsLevelTable"
 import { useAppData } from "@/context/DataProvider"
 import { useI18n } from "@/context/I18nProvider"
 
@@ -75,6 +76,10 @@ export default function EventDetails() {
               <Link to="/activities">{t("events.backAnnouncements")}</Link>
             </Button>
           </div>
+
+          <section className="border-t border-border/60 pt-6">
+            <PointsLevelTable showHeader />
+          </section>
         </article>
       </div>
     </div>

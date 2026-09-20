@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import RegistrantQrCode from "@/components/shared/RegistrantQrCode"
 import PointsLevelInfo from "@/components/shared/PointsLevelInfo"
+import PointsLevelTable from "@/components/shared/PointsLevelTable"
 import { useAppData } from "@/context/DataProvider"
 import { useI18n } from "@/context/I18nProvider"
 import type { Registrant } from "@/lib/types"
@@ -97,25 +98,31 @@ export default function Inscription() {
   if (context.kind === "none" || context.kind === "missing") {
     return (
       <div className="page-shell">
-        <Card className="mx-auto max-w-2xl w-full border-border/60 shadow-soft">
-          <CardHeader className={textAlign}>
-            <CardTitle className="type-h2">
-              {context.kind === "missing"
-                ? t("inscription.contextMissing")
-                : t("inscription.chooseFirstTitle")}
-            </CardTitle>
-            <CardDescription>
-              {context.kind === "missing"
-                ? t("inscription.contextMissingHint")
-                : t("inscription.chooseFirstHint")}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className={`flex flex-col sm:flex-row gap-3 ${textAlign}`}>
-            <Button asChild>
-              <Link to="/activities">{t("inscription.browseActivities")}</Link>
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="mx-auto max-w-4xl w-full section-gap">
+          <Card className="border-border/60 shadow-soft">
+            <CardHeader className={textAlign}>
+              <CardTitle className="type-h2">
+                {context.kind === "missing"
+                  ? t("inscription.contextMissing")
+                  : t("inscription.chooseFirstTitle")}
+              </CardTitle>
+              <CardDescription>
+                {context.kind === "missing"
+                  ? t("inscription.contextMissingHint")
+                  : t("inscription.chooseFirstHint")}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className={`flex flex-col sm:flex-row gap-3 ${textAlign}`}>
+              <Button asChild>
+                <Link to="/activities">{t("inscription.browseActivities")}</Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <section className="rounded-3xl border border-border/70 bg-white p-4 sm:p-6 shadow-soft">
+            <PointsLevelTable showHeader />
+          </section>
+        </div>
       </div>
     )
   }
@@ -290,6 +297,10 @@ export default function Inscription() {
           )}
         </CardContent>
       </Card>
+
+      <section className="rounded-3xl border border-border/70 bg-white p-4 sm:p-6 shadow-soft">
+        <PointsLevelTable showHeader points={created ? 0 : undefined} />
+      </section>
       </div>
     </div>
   )

@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { CalendarDays, HandHeart, Building2, Newspaper, Search } from "lucide-react"
+import { CalendarDays, Building2, Newspaper, Search } from "lucide-react"
 import { useAppData } from "@/context/DataProvider"
 import { useI18n } from "@/context/I18nProvider"
 import { cn } from "@/lib/utils"
 
 type SearchHit = {
   id: string
-  kind: "institution" | "activity" | "event" | "news" | "volunteer"
+  kind: "institution" | "activity" | "event" | "news"
   title: string
   subtitle?: string
   to: string
@@ -116,19 +116,7 @@ export default function SiteSearch({
       if (out.length >= 20) break
     }
 
-    for (const v of data.volunteerOpportunities) {
-      if (!v.published) continue
-      const hay = [v.title, v.description, v.location, v.institution].join(" ").toLowerCase()
-      if (!hay.includes(needle)) continue
-      out.push({
-        id: `vol-${v.id}`,
-        kind: "volunteer",
-        title: v.title,
-        subtitle: v.location,
-        to: `/inscription?volunteer=${v.id}`,
-      })
-      if (out.length >= 24) break
-    }
+
 
     return out.slice(0, 10)
   }, [data, query])
@@ -143,8 +131,7 @@ export default function SiteSearch({
         return t("nav.searchKind.event")
       case "news":
         return t("nav.searchKind.news")
-      case "volunteer":
-        return t("nav.searchKind.volunteer")
+
     }
   }
 
@@ -158,8 +145,7 @@ export default function SiteSearch({
         return <CalendarDays className={cls} />
       case "news":
         return <Newspaper className={cls} />
-      case "volunteer":
-        return <HandHeart className={cls} />
+
     }
   }
 

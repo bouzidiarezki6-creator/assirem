@@ -2,10 +2,8 @@ import { useEffect, useMemo, useState, type FormEvent } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import {
   Activity,
-  Award,
   Building2,
   CalendarDays,
-  Handshake,
   LayoutDashboard,
   LogOut,
   Megaphone,
@@ -21,9 +19,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import RegistrantQrCode from "@/components/shared/RegistrantQrCode"
-import VolunteerRecognitionBadge from "@/components/shared/VolunteerRecognitionBadge"
 import QrScanner from "@/components/admin/QrScanner"
-import VolunteerPointsManager from "@/components/admin/VolunteerPointsManager"
 import EventAdminPanel from "@/components/admin/EventAdminPanel"
 import CagnottesAdminPanel from "@/components/admin/CagnottesAdminPanel"
 import SosAdminPanel from "@/components/admin/SosAdminPanel"
@@ -33,7 +29,6 @@ import {
   AnnouncementAdminPanel,
   InstitutionAdminPanel,
   NewsAdminPanel,
-  VolunteerAdminPanel,
 } from "@/components/admin/SiteContentAdmin"
 import { useAppData } from "@/context/DataProvider"
 import { useI18n } from "@/context/I18nProvider"
@@ -48,12 +43,10 @@ type Tab =
   | "events"
   | "institutions"
   | "activities"
-  | "volunteer"
   | "announcements"
   | "news"
   | "crm"
   | "scan"
-  | "points"
   | "cagnottes"
   | "sos"
 
@@ -61,14 +54,12 @@ const tabDefs: { id: Tab; labelKey: string; icon: typeof LayoutDashboard }[] = [
   { id: "overview", labelKey: "admin.tabs.overview", icon: LayoutDashboard },
   { id: "institutions", labelKey: "admin.tabs.institutions", icon: Building2 },
   { id: "activities", labelKey: "admin.tabs.activities", icon: Activity },
-  { id: "volunteer", labelKey: "admin.tabs.volunteer", icon: Handshake },
   { id: "cagnottes", labelKey: "admin.tabs.cagnottes", icon: Wallet },
   { id: "sos", labelKey: "admin.tabs.sos", icon: Siren },
   { id: "announcements", labelKey: "admin.tabs.announcements", icon: Megaphone },
   { id: "news", labelKey: "admin.tabs.news", icon: Newspaper },
   { id: "events", labelKey: "admin.tabs.events", icon: CalendarDays },
   { id: "crm", labelKey: "admin.tabs.crm", icon: Users },
-  { id: "points", labelKey: "admin.tabs.points", icon: Award },
   { id: "scan", labelKey: "admin.tabs.scan", icon: ScanLine },
 ]
 
@@ -77,18 +68,12 @@ export default function Admin() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [tab, setTab] = useState<Tab>("overview")
-  const [pointsVolunteerId, setPointsVolunteerId] = useState<string | null>(null)
   const navigate = useNavigate()
   const { t, dir } = useI18n()
 
   useEffect(() => {
     setAuthed(isAdminAuthenticated())
   }, [])
-
-  function openPointsFor(volunteerId: string) {
-    setPointsVolunteerId(volunteerId)
-    setTab("points")
-  }
 
   if (!authed) {
     return (
@@ -198,16 +183,12 @@ export default function Admin() {
           {tab === "events" && <EventAdminPanel />}
           {tab === "institutions" && <InstitutionAdminPanel />}
           {tab === "activities" && <ActivityAdminPanel />}
-          {tab === "volunteer" && <VolunteerAdminPanel />}
           {tab === "cagnottes" && <CagnottesAdminPanel />}
           {tab === "sos" && <SosAdminPanel />}
           {tab === "announcements" && <AnnouncementAdminPanel />}
           {tab === "news" && <NewsAdminPanel />}
-          {tab === "crm" && <CrmTab onValidatePoints={openPointsFor} />}
-          {tab === "points" && (
-            <VolunteerPointsManager key={pointsVolunteerId ?? "none"} initialVolunteerId={pointsVolunteerId} />
-          )}
-          {tab === "scan" && <ScanTab onValidatePoints={openPointsFor} />}
+          {tab === "crm" && <CrmTab />}
+          {tab === "scan" && <ScanTab />}
         </main>
       </div>
     </div>
@@ -220,7 +201,7 @@ function OverviewTab({ onNavigate }: { onNavigate: (t: Tab) => void }) {
   const stats = [
     { label: t("admin.tabs.institutions"), value: data.institutions.length, tab: "institutions" as Tab },
     { label: t("admin.tabs.activities"), value: data.activities.length, tab: "activities" as Tab },
-    { label: t("admin.tabs.volunteer"), value: data.volunteerOpportunities.length, tab: "volunteer" as Tab },
+
     { label: t("admin.tabs.cagnottes"), value: data.donations.length, tab: "cagnottes" as Tab },
     {
       label: t("admin.tabs.sos"),
@@ -258,12 +239,8 @@ function OverviewTab({ onNavigate }: { onNavigate: (t: Tab) => void }) {
   )
 }
 
-function CrmTab({
-  onValidatePoints,
-}: {
-  onValidatePoints: (id: string) => void
-}) {
-  const { data, deleteRegistrant, getVolunteerStats } = useAppData()
+function CrmTab() {
+  const { data, deleteRegistrant } = useAppData()
   const { t, formatDateTime } = useI18n()
   const [q, setQ] = useState("")
 
@@ -306,11 +283,9 @@ function CrmTab({
         <table className="min-w-full text-sm">
           <thead className="bg-gray-50 text-start text-gray-600">
             <tr>
-              <th className="px-4 py-3 font-medium">{t("admin.crm.recognition")}</th>
               <th className="px-4 py-3 font-medium">{t("admin.crm.member")}</th>
               <th className="px-4 py-3 font-medium">{t("admin.crm.nin")}</th>
               <th className="px-4 py-3 font-medium">{t("admin.crm.birth")}</th>
-              <th className="px-4 py-3 font-medium">{t("admin.crm.contribution")}</th>
               <th className="px-4 py-3 font-medium">{t("admin.crm.announcement")}</th>
               <th className="px-4 py-3 font-medium">{t("admin.crm.qr")}</th>
               <th className="px-4 py-3 font-medium">{t("admin.crm.registeredAt")}</th>
@@ -326,12 +301,8 @@ function CrmTab({
               </tr>
             )}
             {filtered.map((r) => {
-              const stats = getVolunteerStats(r.id)
               return (
                 <tr key={r.id} className="border-t hover:bg-gray-50/80 align-top">
-                  <td className="px-4 py-3">
-                    <VolunteerRecognitionBadge points={r.points ?? 0} />
-                  </td>
                   <td className="px-4 py-3">
                     <p className="font-medium">{r.lastName}</p>
                     <p className="text-gray-600">{r.firstName}</p>
@@ -343,27 +314,7 @@ function CrmTab({
                     <div>{r.birthDate}</div>
                     <div className="text-xs text-gray-500">{r.birthPlace}</div>
                   </td>
-                  <td className="px-4 py-3 min-w-[160px]">
-                    <p className="text-lg font-bold text-primary tabular-nums">
-                      {t("admin.common.pts", { count: stats.totalPoints })}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {t("admin.crm.activitiesHours", {
-                        acts: stats.activityCount,
-                        hours: stats.hoursVolunteered,
-                      })}
-                    </p>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      className="mt-2"
-                      onClick={() => onValidatePoints(r.id)}
-                    >
-                      <Award className="h-3.5 w-3.5" />
-                      {t("admin.crm.validateActivity")}
-                    </Button>
-                  </td>
+
                   <td className="px-4 py-3">
                     {r.announcementId ? announcementMap.get(r.announcementId) ?? "—" : "—"}
                   </td>
@@ -396,8 +347,8 @@ function CrmTab({
   )
 }
 
-function ScanTab({ onValidatePoints }: { onValidatePoints: (id: string) => void }) {
-  const { data, findRegistrantByScan, getVolunteerStats } = useAppData()
+function ScanTab() {
+  const { data, findRegistrantByScan } = useAppData()
   const { t } = useI18n()
   const [manual, setManual] = useState("")
   const [foundId, setFoundId] = useState<string | null>(null)
@@ -410,7 +361,7 @@ function ScanTab({ onValidatePoints }: { onValidatePoints: (id: string) => void 
     [data.registrants, foundId]
   )
 
-  const stats = foundId ? getVolunteerStats(foundId) : null
+
 
   function lookup(raw: string) {
     const text = raw.trim()
@@ -509,32 +460,8 @@ function ScanTab({ onValidatePoints }: { onValidatePoints: (id: string) => void 
                     <p>
                       <span className="text-gray-500">{t("admin.scan.qrLabel")}</span> {found.qrCode}
                     </p>
-                    <p className="pt-2 text-2xl font-bold text-primary">
-                      {t("admin.scan.points", {
-                        count: stats?.totalPoints ?? found.points ?? 0,
-                      })}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {t("admin.scan.activitiesHours", {
-                        acts: stats?.activityCount ?? 0,
-                        hours: stats?.hoursVolunteered ?? 0,
-                      })}
-                    </p>
-                    <VolunteerRecognitionBadge
-                      points={stats?.totalPoints ?? found.points ?? 0}
-                      className="pt-2"
-                    />
                   </div>
                 </div>
-
-                <Button
-                  type="button"
-                  className="w-full bg-primary hover:bg-primary/90"
-                  onClick={() => onValidatePoints(found.id)}
-                >
-                  <Award className="h-4 w-4" />
-                  {t("admin.scan.validate")}
-                </Button>
               </div>
             )}
           </CardContent>

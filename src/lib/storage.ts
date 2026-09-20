@@ -11,10 +11,7 @@ import type {
   Registrant,
   SosCollectionSite,
   SosDamagedSite,
-  VolunteerOpportunityItem,
-  VolunteerParticipation,
 } from "./types"
-import { VOLUNTEER_OPPORTUNITIES } from "./volunteer"
 import { CAGNOTTE_TYPES } from "./cagnottes"
 import { seedAssociationsFromCatalog } from "./associations"
 
@@ -404,9 +401,7 @@ const seedData: AppData = {
       published: true,
     },
   ],
-  volunteerOpportunities: VOLUNTEER_OPPORTUNITIES.map((o) => ({ ...o })),
   registrants: [],
-  participations: [],
   cagnottes: buildSeedCagnottes(),
   donations: [],
   associations: seedAssociationsFromCatalog(),
@@ -475,10 +470,6 @@ function load(): AppData {
 
     const news = parsed.news ?? seedData.news
     if (!parsed.news) changed = true
-
-    const volunteerOpportunities =
-      parsed.volunteerOpportunities ?? seedData.volunteerOpportunities
-    if (!parsed.volunteerOpportunities) changed = true
 
     let cagnottes = parsed.cagnottes ?? []
     if (!parsed.cagnottes || cagnottes.length < CAGNOTTE_TYPES.length * 69) {
@@ -587,9 +578,7 @@ function load(): AppData {
       activities,
       institutions,
       news,
-      volunteerOpportunities,
       registrants,
-      participations: parsed.participations ?? [],
       cagnottes,
       donations,
       associations,
@@ -599,7 +588,7 @@ function load(): AppData {
 
     if (
       changed ||
-      !parsed.participations ||
+
       !parsed.institutions ||
       !parsed.news ||
       !parsed.cagnottes ||
@@ -661,6 +650,4 @@ export type {
   Registrant,
   SosCollectionSite,
   SosDamagedSite,
-  VolunteerOpportunityItem,
-  VolunteerParticipation,
 }

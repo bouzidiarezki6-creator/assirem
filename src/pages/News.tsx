@@ -5,20 +5,13 @@ import EmptyState from "@/components/shared/EmptyState"
 import PageHeader from "@/components/shared/PageHeader"
 import { useAppData } from "@/context/DataProvider"
 import { useI18n } from "@/context/I18nProvider"
+import CategoryFilter from "@/components/shared/CategoryFilter"
 import { cn } from "@/lib/utils"
 
 export default function News() {
   const { data } = useAppData()
   const { t } = useI18n()
-  const [filter, setFilter] = useState("all")
-
-  const filters = [
-    { id: "all", label: t("news.all") },
-    { id: "أخبار", label: "أخبار" },
-    { id: "رياضة", label: "رياضة" },
-    { id: "ثقافة", label: "ثقافة" },
-    { id: "صحة", label: "صحة" },
-  ]
+  const [activeCategory, setActiveCategory] = useState<string>("all")
 
   const published = useMemo(
     () => data.news.filter((n) => n.published).sort((a, b) => b.date.localeCompare(a.date)),
@@ -28,35 +21,22 @@ export default function News() {
   const featured = published.find((n) => n.featured) ?? published[0]
   const grid = published.filter((n) => {
     if (featured && n.id === featured.id) return false
-    if (filter === "all") return true
-    return n.category === filter
+    if (activeCategory === "all") return true
+    return n.category === activeCategory
   })
 
   return (
     <div className="page-shell section-gap">
       <PageHeader title={t("news.title")} description={t("news.subtitle")} />
 
-      <div className="flex justify-center">
-        <div className="flex flex-wrap items-center justify-center gap-1 bg-white/90 p-1.5 rounded-full border border-border/70 shadow-soft max-w-full backdrop-blur-sm">
-          {filters.map((cat) => (
-            <button
-              key={cat.id}
-              type="button"
-              onClick={() => setFilter(cat.id)}
-              className={cn(
-                "px-4 py-2 rounded-full text-sm font-semibold transition-all duration-[var(--duration-micro)] ease-[var(--ease-out)]",
-                filter === cat.id
-                  ? "bg-primary text-primary-foreground shadow-soft"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
+      <div className="flex justify-center mb-8">
+        <CategoryFilter
+          activeCategory={activeCategory}
+          onChange={setActiveCategory}
+        />
       </div>
 
-      {featured && filter === "all" && (
+      {featured && activeCategory === "all" && (
         <article className="bg-white rounded-3xl border border-border/60 shadow-soft overflow-hidden flex flex-col md:flex-row md:min-h-[18rem]">
           <div className="w-full md:w-1/2 p-8 md:p-10 flex flex-col justify-center items-center md:items-start text-center md:text-start space-y-4">
             <span className="inline-flex w-fit rounded-full bg-primary/10 px-3 py-1 text-primary font-semibold text-xs tracking-wide">
@@ -75,7 +55,7 @@ export default function News() {
         </article>
       )}
 
-      {grid.length === 0 && !(featured && filter === "all") ? (
+      {grid.length === 0 && !(featured && activeCategory === "all") ? (
         <EmptyState
           icon={Newspaper}
           title={t("news.empty")}

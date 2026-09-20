@@ -1,30 +1,30 @@
 import type { KeyboardEvent } from "react"
 import { LayoutGrid } from "lucide-react"
 import {
-  VOLUNTEER_CATEGORIES,
-  type VolunteerCategoryId,
-} from "@/lib/volunteer"
+  ACTIVITY_CATEGORIES,
+  type CategoryId,
+} from "@/lib/categories"
 import { cn } from "@/lib/utils"
 import { useI18n } from "@/context/I18nProvider"
 
 type Props = {
-  selected: VolunteerCategoryId | "all"
-  onSelect: (id: VolunteerCategoryId | "all") => void
-  counts?: Partial<Record<VolunteerCategoryId | "all", number>>
+  selected: CategoryId | "all"
+  onSelect: (id: CategoryId | "all") => void
+  counts?: Partial<Record<CategoryId | "all", number>>
   className?: string
 }
 
-export default function VolunteerCategoryFilter({
+export default function CategoryFilter({
   selected,
   onSelect,
   counts,
   className,
 }: Props) {
-  const { t, locale } = useI18n()
+  const { locale } = useI18n()
 
   function onKeyActivate(
     e: KeyboardEvent<HTMLButtonElement>,
-    id: VolunteerCategoryId | "all"
+    id: CategoryId | "all"
   ) {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault()
@@ -35,7 +35,7 @@ export default function VolunteerCategoryFilter({
   return (
     <div
       role="listbox"
-      aria-label={t("volunteer.categoriesAria")}
+      aria-label="Categories"
       className={cn(
         "flex flex-wrap justify-center gap-3",
         className
@@ -63,7 +63,7 @@ export default function VolunteerCategoryFilter({
         >
           <LayoutGrid className="h-5 w-5" aria-hidden />
         </span>
-        <span className="text-sm font-bold leading-tight">{t("volunteer.allShort")}</span>
+        <span className="text-sm font-bold leading-tight">{locale === "ar" ? "الكل" : "Toutes"}</span>
         {locale !== "ar" && (
           <span
             className={cn(
@@ -71,7 +71,7 @@ export default function VolunteerCategoryFilter({
               selected === "all" && "text-white/80"
             )}
           >
-            {t("volunteer.allShortAr")}
+            الكل
           </span>
         )}
         {typeof counts?.all === "number" && (
@@ -86,11 +86,11 @@ export default function VolunteerCategoryFilter({
         )}
       </button>
 
-      {VOLUNTEER_CATEGORIES.map((cat) => {
+      {ACTIVITY_CATEGORIES.map((cat) => {
         const Icon = cat.icon
         const isActive = selected === cat.id
         const count = counts?.[cat.id]
-        const primary = t(`volunteer.category.${cat.id}`)
+        const primary = locale === "ar" ? cat.labelAr : cat.labelFr
         const secondary = locale === "ar" ? cat.labelFr : cat.labelAr
 
         return (

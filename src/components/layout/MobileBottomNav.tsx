@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom"
-import { CalendarDays, HandHeart, HeartHandshake, Home, Siren } from "lucide-react"
+import { CalendarDays, HeartHandshake, Home, Siren } from "lucide-react"
 import { useI18n } from "@/context/I18nProvider"
 import { cn } from "@/lib/utils"
 
@@ -11,7 +11,6 @@ export default function MobileBottomNav() {
     { name: t("nav.home"), path: "/", icon: Home },
     { name: t("nav.activities"), path: "/activities", icon: CalendarDays },
     { name: t("nav.cagnottes"), path: "/cagnottes", icon: HeartHandshake },
-    { name: t("nav.volunteer"), path: "/benevolat", icon: HandHeart },
     { name: t("nav.sos"), path: "/sos", icon: Siren },
   ]
 

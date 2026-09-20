@@ -7,6 +7,7 @@ import EmptyState from "@/components/shared/EmptyState"
 import PageHeader from "@/components/shared/PageHeader"
 import { useAppData } from "@/context/DataProvider"
 import { useI18n } from "@/context/I18nProvider"
+import CategoryFilter from "@/components/shared/CategoryFilter"
 
 export default function Activities() {
   const { data } = useAppData()
@@ -15,14 +16,19 @@ export default function Activities() {
   const iconPos = dir === "rtl" ? "right-3" : "left-3"
   const inputPad = dir === "rtl" ? "px-9" : "pl-9 pr-3"
 
+  const [activeCategory, setActiveCategory] = useState<string>("all")
+
   const activities = useMemo(() => {
-    const published = data.activities.filter((a) => a.published)
+    let published = data.activities.filter((a) => a.published)
+    if (activeCategory !== "all") {
+      published = published.filter((a) => a.categoryId === activeCategory)
+    }
     const needle = query.trim().toLowerCase()
     if (!needle) return published
     return published.filter((a) =>
       [a.title, a.description, a.location, a.institution].join(" ").toLowerCase().includes(needle)
     )
-  }, [data.activities, query])
+  }, [data.activities, query, activeCategory])
 
   const events = useMemo(
     () => data.events.filter((e) => e.published).sort((a, b) => a.date.localeCompare(b.date)),
@@ -47,6 +53,13 @@ export default function Activities() {
           </div>
         </section>
       )}
+
+      <div className="flex justify-center my-6">
+        <CategoryFilter
+          activeCategory={activeCategory}
+          onChange={setActiveCategory}
+        />
+      </div>
 
       <div className="toolbar-center">
         <div className="flex items-center gap-2">
@@ -82,8 +95,8 @@ export default function Activities() {
           icon={CalendarDays}
           title={t("activities.empty")}
           description={t("common.noResults")}
-          actionLabel={t("nav.volunteer")}
-          actionTo="/benevolat"
+          actionLabel={t("nav.news")}
+          actionTo="/news"
         />
       ) : (
         <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">

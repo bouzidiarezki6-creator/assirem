@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link, useLocation } from "react-router-dom"
-import { HandHeart, Menu, X } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import LanguageSwitcher from "./LanguageSwitcher"
 import SiteSearch from "./SiteSearch"
 import WilayaSelector from "./WilayaSelector"
@@ -16,7 +16,6 @@ export default function Navbar() {
     { name: t("nav.home"), path: "/" },
     { name: t("nav.institutions"), path: "/institutions" },
     { name: t("nav.activities"), path: "/activities" },
-    { name: t("nav.volunteer"), path: "/benevolat" },
     { name: t("nav.cagnottes"), path: "/cagnottes" },
     { name: t("nav.sos"), path: "/sos" },
     { name: t("nav.news"), path: "/news" },
@@ -83,14 +82,6 @@ export default function Navbar() {
           <LanguageSwitcher />
 
           <Link
-            to="/benevolat"
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90 active:scale-[0.98] whitespace-nowrap"
-          >
-            <HandHeart className="h-4 w-4" aria-hidden />
-            {t("nav.volunteer")}
-          </Link>
-
-          <Link
             to="/admin"
             className="hidden lg:inline-flex items-center rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground whitespace-nowrap"
           >
@@ -142,13 +133,6 @@ export default function Navbar() {
             </div>
 
             <div className="flex flex-col gap-2 pt-1">
-              <Link
-                to="/benevolat"
-                className="flex items-center justify-center gap-2 rounded-full bg-primary px-3 py-3 text-sm font-semibold text-primary-foreground shadow-soft"
-              >
-                <HandHeart className="h-4 w-4" aria-hidden />
-                {t("nav.volunteer")}
-              </Link>
               <Link
                 to="/admin"
                 className="flex items-center justify-center rounded-full border border-border px-3 py-2.5 text-sm font-semibold text-muted-foreground hover:bg-muted"

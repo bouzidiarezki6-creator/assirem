@@ -26,7 +26,6 @@ export default function Inscription() {
 
   const eventId = searchParams.get("event")
   const activityId = searchParams.get("activity")
-  const volunteerId = searchParams.get("volunteer")
 
   const context = useMemo(() => {
     if (eventId) {
@@ -51,21 +50,8 @@ export default function Inscription() {
         backLabel: t("inscription.backToAnnouncement"),
       }
     }
-    if (volunteerId) {
-      const opp = data.volunteerOpportunities.find(
-        (v) => v.id === volunteerId && v.published
-      )
-      if (!opp) return { kind: "missing" as const }
-      return {
-        kind: "volunteer" as const,
-        id: opp.id,
-        title: opp.title,
-        backTo: "/benevolat",
-        backLabel: t("inscription.backToVolunteer"),
-      }
-    }
     return { kind: "none" as const }
-  }, [activityId, data.activities, data.events, data.volunteerOpportunities, eventId, t, volunteerId])
+  }, [activityId, data.activities, data.events, eventId, t])
 
   const {
     register,
@@ -83,7 +69,7 @@ export default function Inscription() {
   })
 
   const onSubmit = (values: FormValues) => {
-    if (context.kind !== "event" && context.kind !== "activity" && context.kind !== "volunteer") {
+    if (context.kind !== "event" && context.kind !== "activity") {
       return
     }
 
@@ -96,7 +82,6 @@ export default function Inscription() {
       announcementId: null,
       eventId: context.kind === "event" ? context.id : null,
       activityId: context.kind === "activity" ? context.id : null,
-      volunteerOpportunityId: context.kind === "volunteer" ? context.id : null,
     })
     if ("error" in result) {
       alert(result.error.startsWith("errors.") ? t(result.error) : result.error)
@@ -128,9 +113,6 @@ export default function Inscription() {
             <Button asChild>
               <Link to="/activities">{t("inscription.browseActivities")}</Link>
             </Button>
-            <Button asChild variant="outline">
-              <Link to="/benevolat">{t("inscription.browseVolunteer")}</Link>
-            </Button>
           </CardContent>
         </Card>
       </div>
@@ -140,9 +122,7 @@ export default function Inscription() {
   const contextLabel =
     context.kind === "event"
       ? t("inscription.contextEvent")
-      : context.kind === "activity"
-        ? t("inscription.contextActivity")
-        : t("inscription.contextVolunteer")
+      : t("inscription.contextActivity")
 
   return (
     <div className="page-shell">

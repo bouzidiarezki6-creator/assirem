@@ -6,18 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import InstitutionCard from "@/components/shared/InstitutionCard"
 import ActivityCard from "@/components/shared/ActivityCard"
 import NewsCard from "@/components/shared/NewsCard"
-import VolunteerOpportunityCard from "@/components/shared/VolunteerOpportunityCard"
 import { useAppData } from "@/context/DataProvider"
 import { useI18n } from "@/context/I18nProvider"
 import { processAnnouncementImage } from "@/lib/eventImage"
 import { arabicMonthParts } from "@/lib/dates"
-import { VOLUNTEER_CATEGORIES } from "@/lib/volunteer"
 import type {
   Activity,
   Announcement,
   Institution,
   NewsArticle,
-  VolunteerOpportunityItem,
 } from "@/lib/types"
 
 /* ───────── shared shell ───────── */
@@ -413,158 +410,7 @@ export function ActivityAdminPanel() {
   )
 }
 
-/* ───────── Volunteer opportunities ───────── */
 
-const emptyVol: Omit<VolunteerOpportunityItem, "id"> = {
-  title: "",
-  description: "",
-  categoryId: "social",
-  location: "",
-  institution: "",
-  date: "",
-  slots: 10,
-  published: true,
-}
-
-export function VolunteerAdminPanel() {
-  const { t } = useI18n()
-  const { data, addVolunteerOpportunity, updateVolunteerOpportunity, deleteVolunteerOpportunity } =
-    useAppData()
-  const [mode, setMode] = useState<"list" | "form">("list")
-  const [editId, setEditId] = useState<string | null>(null)
-  const [form, setForm] = useState(emptyVol)
-
-  if (mode === "form") {
-    return (
-      <AdminEditorShell
-        title={editId ? t("admin.volunteerContent.edit") : t("admin.volunteerContent.add")}
-        subtitle={t("admin.volunteerContent.formHint")}
-        onBack={() => setMode("list")}
-        form={
-          <form
-            className="space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault()
-              if (!form.title.trim() || !form.date || !form.location.trim()) return
-              if (editId) updateVolunteerOpportunity(editId, form)
-              else addVolunteerOpportunity(form)
-              setMode("list")
-            }}
-          >
-            <Field label={t("admin.fields.title")}>
-              <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
-            </Field>
-            <Field label={t("admin.fields.category")}>
-              <select
-                className="h-9 w-full rounded-md border px-3 text-sm"
-                value={form.categoryId}
-                onChange={(e) =>
-                  setForm({ ...form, categoryId: e.target.value as VolunteerOpportunityItem["categoryId"] })
-                }
-              >
-                {VOLUNTEER_CATEGORIES.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {t(`volunteer.category.${c.id}`)}
-                  </option>
-                ))}
-              </select>
-            </Field>
-            <Field label={t("admin.fields.date")}>
-              <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} required />
-            </Field>
-            <Field label={t("admin.fields.location")}>
-              <Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} required />
-            </Field>
-            <Field label={t("admin.fields.institution")}>
-              <Input
-                value={form.institution}
-                onChange={(e) => setForm({ ...form, institution: e.target.value })}
-                required
-              />
-            </Field>
-            <Field label={t("admin.fields.places")}>
-              <Input
-                type="number"
-                min={1}
-                value={form.slots}
-                onChange={(e) => setForm({ ...form, slots: Number(e.target.value) || 1 })}
-              />
-            </Field>
-            <Field label={t("admin.fields.description")}>
-              <textarea
-                className="w-full min-h-[100px] rounded-md border px-3 py-2 text-sm"
-                value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-                required
-              />
-            </Field>
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={form.published}
-                onChange={(e) => setForm({ ...form, published: e.target.checked })}
-              />
-              {t("admin.fields.published")}
-            </label>
-            <Button type="submit" className="bg-primary hover:bg-primary/90">
-              {t("admin.common.save")}
-            </Button>
-          </form>
-        }
-        preview={
-          <VolunteerOpportunityCard
-            opportunity={{
-              id: editId ?? "preview",
-              ...form,
-              title: form.title || t("admin.volunteerContent.titlePh"),
-              description: form.description || t("admin.volunteerContent.descPh"),
-            }}
-          />
-        }
-      />
-    )
-  }
-
-  return (
-    <div className="space-y-4">
-      <ListHeader
-        title={t("admin.volunteerContent.title")}
-        subtitle={t("admin.volunteerContent.subtitle")}
-        onAdd={() => {
-          setEditId(null)
-          setForm(emptyVol)
-          setMode("form")
-        }}
-      />
-      <div className="space-y-3">
-        {data.volunteerOpportunities.map((item) => (
-          <Row
-            key={item.id}
-            title={item.title}
-            meta={`${item.categoryId} · ${item.date} · ${item.published ? t("admin.common.published") : t("admin.common.hidden")}`}
-            onEdit={() => {
-              setEditId(item.id)
-              setForm({
-                title: item.title,
-                description: item.description,
-                categoryId: item.categoryId,
-                location: item.location,
-                institution: item.institution,
-                date: item.date,
-                slots: item.slots,
-                published: item.published,
-              })
-              setMode("form")
-            }}
-            onDelete={() => {
-              if (confirm(t("admin.common.deleteConfirm"))) deleteVolunteerOpportunity(item.id)
-            }}
-          />
-        ))}
-      </div>
-    </div>
-  )
-}
 
 /* ───────── Inscription announcements ───────── */
 

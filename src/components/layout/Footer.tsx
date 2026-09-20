@@ -36,11 +36,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link className="hover:text-white transition-colors" to="/benevolat">
-                  {t("nav.volunteer")}
-                </Link>
-              </li>
-              <li>
                 <Link className="hover:text-white transition-colors" to="/cagnottes">
                   {t("nav.cagnottes")}
                 </Link>

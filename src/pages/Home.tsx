@@ -50,18 +50,11 @@ export default function Home() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1 w-full sm:w-auto">
               <Link
-                to="/benevolat"
+                to="/activities"
                 className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-soft transition-all hover:bg-primary/90 active:scale-[0.98]"
               >
-                <HandHeart className="h-4 w-4" aria-hidden />
-                {t("nav.volunteer")}
-                <ArrowLeft className={`h-4 w-4 ${dir === "ltr" ? "rotate-180" : ""}`} aria-hidden />
-              </Link>
-              <Link
-                to="/activities"
-                className="inline-flex w-full sm:w-auto items-center justify-center rounded-full border border-primary/25 bg-white/80 px-7 py-3.5 text-sm font-bold text-primary transition-colors hover:bg-white hover:border-primary/40"
-              >
                 {t("home.ctaActivities")}
+                <ArrowLeft className={`h-4 w-4 ${dir === "ltr" ? "rotate-180" : ""}`} aria-hidden />
               </Link>
               <Link
                 to="/institutions"

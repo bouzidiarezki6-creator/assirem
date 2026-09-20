@@ -74,9 +74,6 @@ export default function EventDetails() {
             <Button asChild variant="outline" size="lg">
               <Link to="/activities">{t("events.backAnnouncements")}</Link>
             </Button>
-            <Button asChild variant="ghost" size="lg">
-              <Link to="/benevolat">{t("events.seeVolunteer")}</Link>
-            </Button>
           </div>
         </article>
       </div>

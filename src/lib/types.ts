@@ -1,11 +1,6 @@
 import type { AssociationSectorId } from "./associations"
-import type { VolunteerCategoryId } from "./volunteer"
+import type { CategoryId } from "./categories"
 import type { CagnotteTypeId } from "./cagnottes"
-import type {
-  ActivityTypeId,
-  DurationId,
-  ResponsibilityId,
-} from "./volunteerPoints"
 import type { InstitutionAuthority, StructureKind } from "./wilayas"
 
 export type EventItem = {
@@ -16,6 +11,7 @@ export type EventItem = {
   location: string
   institution: string
   imageDataUrl: string | null
+  categoryId?: CategoryId
   requiresRegistration: boolean
   published: boolean
   /** Optional future multilingual CMS fields — never auto-invented */
@@ -46,6 +42,7 @@ export type Activity = {
   month: string
   location: string
   institution: string
+  categoryId?: CategoryId
   imageDataUrl: string | null
   published: boolean
 }
@@ -71,21 +68,10 @@ export type NewsArticle = {
   title: string
   description: string
   category: string
+  categoryId?: CategoryId
   date: string
   imageDataUrl: string | null
   featured: boolean
-  published: boolean
-}
-
-export type VolunteerOpportunityItem = {
-  id: string
-  title: string
-  description: string
-  categoryId: VolunteerCategoryId
-  location: string
-  institution: string
-  date: string
-  slots: number
   published: boolean
 }
 
@@ -101,38 +87,7 @@ export type Registrant = {
   announcementId: string | null
   eventId?: string | null
   activityId?: string | null
-  volunteerOpportunityId?: string | null
   registeredAt: string
-}
-
-export type ParticipationStatus = "validated" | "cancelled"
-
-export type ParticipationPointChange = {
-  id: string
-  at: string
-  previousPoints: number
-  newPoints: number
-  reason: string
-  adminNote?: string
-}
-
-export type VolunteerParticipation = {
-  id: string
-  fingerprint: string
-  volunteerId: string
-  activityTitle: string
-  activityDate: string
-  categoryId: VolunteerCategoryId
-  activityTypeId: ActivityTypeId
-  durationId: DurationId
-  responsibilityId: ResponsibilityId
-  hoursCounted: number
-  pointsAwarded: number
-  originalPoints: number
-  status: ParticipationStatus
-  createdAt: string
-  updatedAt: string
-  changes: ParticipationPointChange[]
 }
 
 export type AppData = {
@@ -141,9 +96,7 @@ export type AppData = {
   activities: Activity[]
   institutions: Institution[]
   news: NewsArticle[]
-  volunteerOpportunities: VolunteerOpportunityItem[]
   registrants: Registrant[]
-  participations: VolunteerParticipation[]
   cagnottes: Cagnotte[]
   donations: Donation[]
   associations: Association[]

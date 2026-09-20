@@ -4,7 +4,6 @@
     "home": "Home",
     "institutions": "Institutions",
     "activities": "Activities",
-    "volunteer": "Volunteering",
     "cagnottes": "Fundraisers",
     "sos": "SOS",
     "registration": "Registration",
@@ -79,33 +78,6 @@
     "list": "List",
     "search": "Search for an activity...",
     "empty": "No published activities yet"
-  },
-  "volunteer": {
-    "title": "Volunteering",
-    "subtitle": "Choose a category to discover volunteering opportunities. Filter, explore, then register.",
-    "categories": "Categories",
-    "activeSelection": "Active selection",
-    "allCategories": "All categories",
-    "resetFilter": "Reset filter",
-    "opportunities": "Opportunities",
-    "search": "Search an opportunity...",
-    "emptyTitle": "No opportunities found",
-    "emptyHint": "Try another category or change your search.",
-    "apply": "Apply / Register",
-    "places": "{{count}} spots",
-    "badge": "Volunteering",
-    "categoriesAria": "Volunteer categories",
-    "allShort": "All",
-    "allShortAr": "الكل",
-    "category": {
-      "social": "Social",
-      "educatif": "Educational",
-      "sante": "Health",
-      "environnemental": "Environmental",
-      "urgences": "Emergencies",
-      "evenementiel": "Events",
-      "scoutisme": "Scouting"
-    }
   },
   "cagnottes": {
     "title": "Solidarity fundraisers",
@@ -249,15 +221,12 @@
     "nationalIdPlaceholder": "18 digits",
     "contextEvent": "Event registration",
     "contextActivity": "Activity registration",
-    "contextVolunteer": "Volunteer registration",
     "backToAnnouncement": "Back to announcement",
-    "backToVolunteer": "Back to volunteering",
     "chooseFirstTitle": "Choose an announcement first",
     "chooseFirstHint": "Browse an activity, event, or volunteering opportunity, then click Register in the announcement.",
     "contextMissing": "Announcement not found",
     "contextMissingHint": "This registration link is no longer valid. Please choose another announcement.",
-    "browseActivities": "Browse activities",
-    "browseVolunteer": "Browse volunteering"
+    "browseActivities": "Browse activities"
   },
   "news": {
     "title": "News & updates",
@@ -275,7 +244,6 @@
     "registerVolunteer": "Register / Volunteer",
     "register": "Register",
     "backAnnouncements": "Back to announcements",
-    "seeVolunteer": "See volunteering",
     "imagePlaceholder": "Announcement image",
     "previewBadge": "Public preview",
     "titlePlaceholder": "Event title",

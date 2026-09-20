@@ -8,7 +8,6 @@ import News from "./pages/News"
 import Activities from "./pages/Activities"
 import Institutions from "./pages/Institutions"
 import Inscription from "./pages/Inscription"
-import Volunteer from "./pages/Volunteer"
 import Cagnottes from "./pages/Cagnottes"
 import Sos from "./pages/Sos"
 import EventDetails from "./pages/EventDetails"
@@ -31,7 +30,6 @@ function App() {
                 <Route path="activities/:id" element={<ActivityDetails />} />
                 <Route path="events/:id" element={<EventDetails />} />
                 <Route path="inscription" element={<Inscription />} />
-                <Route path="benevolat" element={<Volunteer />} />
                 <Route path="cagnottes" element={<Cagnottes />} />
                 <Route path="sos" element={<Sos />} />
               </Route>

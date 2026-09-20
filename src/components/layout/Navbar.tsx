@@ -41,13 +41,17 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-white/75 text-foreground shadow-soft backdrop-blur-xl supports-[backdrop-filter]:bg-white/65">
       <div className="content-width flex h-16 items-center justify-between gap-3 sm:h-[4.25rem]">
-        <Link to="/" className="flex min-w-0 items-center gap-2.5 shrink-0">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-soft">
-            <span className="text-[10px] font-extrabold tracking-wide">YFY</span>
-          </div>
-          <span className="truncate text-base font-extrabold text-foreground sm:text-lg">
-            {t("brand")}
-          </span>
+        <Link to="/" className="flex min-w-0 items-center gap-2 sm:gap-3 shrink-0 group">
+          <img
+            src="/LOGO.png"
+            alt="Logo"
+            className="h-9 sm:h-11 w-auto object-contain shrink-0 transition-transform duration-300 group-hover:scale-105 drop-shadow-sm"
+          />
+          <img
+            src="/logo-text.png"
+            alt="Yed Fi Yed"
+            className="h-6 sm:h-8 w-auto object-contain shrink-0 drop-shadow-sm"
+          />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1" aria-label="Main">

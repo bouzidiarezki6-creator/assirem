@@ -9,12 +9,18 @@ export default function Footer() {
       <div className="content-width py-12 md:py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 text-center sm:text-start">
           <div className="space-y-4 sm:col-span-2 lg:col-span-2 flex flex-col items-center sm:items-start">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 text-[10px] font-extrabold">
-                YFY
-              </div>
-              <h3 className="font-extrabold text-lg">{t("brand")}</h3>
-            </div>
+            <Link to="/" className="inline-flex items-center gap-2.5 bg-white/95 px-3.5 py-2 rounded-2xl shadow-soft hover:bg-white transition-all group">
+              <img
+                src="/LOGO.png"
+                alt="Logo"
+                className="h-9 w-auto object-contain shrink-0 transition-transform duration-300 group-hover:scale-105"
+              />
+              <img
+                src="/logo-text.png"
+                alt="Yed Fi Yed"
+                className="h-6 w-auto object-contain shrink-0"
+              />
+            </Link>
             <p className="text-sm text-white/75 max-w-md leading-relaxed">{t("footer.about")}</p>
           </div>
           <div className="flex flex-col items-center sm:items-start">

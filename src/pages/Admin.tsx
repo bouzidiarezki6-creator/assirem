@@ -131,9 +131,11 @@ export default function Admin() {
       <header className="sticky top-0 z-40 border-b border-border/60 bg-white/90 backdrop-blur-md shadow-soft">
         <div className="mx-auto flex h-14 max-w-[100rem] items-center justify-between px-4 sm:px-6 lg:px-10">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-primary text-xs font-bold text-primary-foreground shadow-soft">
-              ADM
-            </div>
+            <img
+              src="/LOGO.png"
+              alt="Logo"
+              className="h-8 w-auto object-contain shrink-0"
+            />
             <div>
               <p className="font-bold leading-none">{t("admin.brand")}</p>
               <p className="text-xs text-muted-foreground mt-0.5">{t("admin.brandSub")}</p>

@@ -9,7 +9,6 @@ const originalTypes = [
   { id: "aid_adha", defaultGoal: 500000 },
   { id: "aid_fitr", defaultGoal: 300000 },
   { id: "ramadan", defaultGoal: 400000 },
-  { id: "rentree", defaultGoal: 350000 },
   { id: "associations", defaultGoal: 250000 }
 ]
 

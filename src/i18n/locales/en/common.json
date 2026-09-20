@@ -145,15 +145,13 @@
       "aid_adha": "Eid al-Adha",
       "aid_fitr": "Eid al-Fitr",
       "ramadan": "Ramadan basket",
-      "rentree": "Back to school",
       "associations": "Associations"
     },
     "typesDesc": {
       "aid_adha": "Collection to support families during Eid al-Adha.",
       "aid_fitr": "Collection to support families at Eid al-Fitr.",
       "ramadan": "Food baskets for the month of Ramadan.",
-      "rentree": "Supplies and support for the school year.",
-      "associations": "Choose an association (orphans, disability, cancer…) then transfer your donation."
+      "associations": "General fund dedicated to partner associations."
     },
     "errors": {
       "amount": "Minimum amount: 100 DZD",

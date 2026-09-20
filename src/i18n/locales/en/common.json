@@ -1,5 +1,5 @@
 {
-  "brand": "ODEJ Algeria",
+  "brand": "Yed fel yed",
   "nav": {
     "home": "Home",
     "institutions": "Institutions",
@@ -25,14 +25,14 @@
     }
   },
   "footer": {
-    "about": "Youth Institutions Office of Béjaïa. A space for creativity, development and youth engagement.",
+    "about": "Yed fel yed. A space for creativity, mutual aid, solidarity and civic engagement.",
     "quickLinks": "Quick links",
     "contact": "Contact us",
     "address": "El Mouz district, Béjaïa, Algeria",
-    "rights": "© 2026 Youth Institutions Office — People's Democratic Republic of Algeria. All rights reserved."
+    "rights": "© 2026 Yed fel yed. All rights reserved."
   },
   "home": {
-    "badge": "Youth Institutions Office — 69 wilayas",
+    "badge": "Yed fel yed — 69 wilayas",
     "titleLine1": "A space for youth…",
     "titleLine2": "creativity, participation and growth",
     "subtitle": "Discover youth institutions nationwide, join events, and connect with your community.",
@@ -40,11 +40,11 @@
     "ctaInstitutions": "Explore institutions",
     "mapTitle": "Explore Algeria — 69 wilayas",
     "mapHint": "Hover or click a wilaya to discover youth facilities.",
-    "mapHelp": "Interactive map of the 69 wilayas — select one to filter ODEJ / DJS facilities.",
+    "mapHelp": "Interactive map of the 69 wilayas — select one to filter facilities.",
     "mapPlaceholder": "Map of Algeria",
     "directorTitle": "Director's message",
     "directorQuote": "\"We strive to provide a safe and motivating environment for the youth of Béjaïa, where they can develop skills, discover talents and contribute to their community.\"",
-    "directorRole": "Director of the Youth Institutions Office",
+    "directorRole": "Director of Yed fel yed",
     "directorScope": "Nationwide — 69 wilayas",
     "mediaPlaceholder": "Image or video",
     "servicesTitle": "Our institutions serve you",
@@ -152,7 +152,7 @@
     "formTitle": "Add a site",
     "submit": "Save site",
     "successTitle": "Site saved",
-    "successHint": "Keep your reference. The ODEJ team will process this site.",
+    "successHint": "Keep your reference. The Yed fel yed team will process this site.",
     "newRequest": "Add another site",
     "useMyGps": "My GPS position",
     "gpsLocating": "Locating…",
@@ -286,7 +286,7 @@
     "title": "Dashboard",
     "seeSite": "View site",
     "logout": "Log out",
-    "brand": "ODEJ Admin",
+    "brand": "Yed fel yed Admin",
     "brandSub": "Control and CRM",
     "login": {
       "title": "Admin Dashboard",
@@ -474,7 +474,7 @@
       "resume": "Resume",
       "pausedHint": "Scanner paused — click Resume to scan another member.",
       "manualLabel": "Or enter NIN / QR code",
-      "manualPlaceholder": "18-digit NIN or ODEJ-...",
+      "manualPlaceholder": "18-digit NIN or YFY-...",
       "search": "Search",
       "profile": "Member profile",
       "noScan": "No scan yet",
@@ -712,23 +712,23 @@
   "map": {
     "loadError": "Unable to load the map.",
     "reset": "Reset",
-    "selectedHint": "{{count}} ODEJ / DJS facility(ies) in this wilaya",
-    "facilitiesTitle": "Youth facilities (ODEJ / DJS)",
-    "facilitiesSubtitle": "Youth houses, hostels, homes and similar facilities — filtered by wilaya.",
+    "selectedHint": "{{count}} facility(ies) in this wilaya",
+    "facilitiesTitle": "Youth facilities",
+    "facilitiesSubtitle": "Youth houses, hostels, centers and similar facilities — filtered by wilaya.",
     "allKinds": "All types",
     "listTitle": "Selected facilities",
-    "seeAll": "See all institutions",
+    "seeAll": "View all institutions",
     "noMarkers": "No geolocated markers for this filter.",
-    "markerCount": "{{count}} on the map",
+    "markerCount": "{{count}} on map",
     "kinds": {
       "maison_jeunes": "Youth house",
       "auberge": "Youth hostel",
-      "foyer": "Youth home",
+      "foyer": "Youth center",
       "centre_culturel": "Cultural center",
-      "terrain": "Sports field / complex",
+      "terrain": "Sports pitch / complex",
       "camp": "Camp / seasonal hostel",
       "autre": "Other"
     },
-    "bejaiaFocus": "Béjaïa focus — youth houses, hostels and ODEJ/DJS facilities."
+    "bejaiaFocus": "Béjaïa focus — youth houses, hostels and local facilities."
   }
 }

@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "fetch:bejaia-places": "python scripts/fetch_odej_places_bejaia.py"
+    "fetch:bejaia-places": "python scripts/fetch_places_bejaia.py"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",

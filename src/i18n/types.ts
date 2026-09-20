@@ -19,4 +19,4 @@ export const LOCALES: {
 
 /** Default for Algeria youth platform */
 export const DEFAULT_LOCALE: Locale = "ar"
-export const LOCALE_STORAGE_KEY = "odej-locale"
+export const LOCALE_STORAGE_KEY = "yfy-locale"

@@ -1,13 +1,13 @@
 """
-Fetch DJS / ODEJ youth facilities for Wilaya de Béjaïa via Google Places API.
+Fetch DJS / Yed fel yed youth facilities for Wilaya de Béjaïa via Google Places API.
 
 Usage:
   1. pip install googlemaps
   2. set GOOGLE_MAPS_API_KEY=your_key   (or pass --api-key)
-  3. python scripts/fetch_odej_places_bejaia.py
+  3. python scripts/fetch_places_bejaia.py
 
 Output:
-  public/geo/places-bejaia-odej.json
+  public/geo/places-bejaia.json
 """
 
 from __future__ import annotations
@@ -39,7 +39,7 @@ QUERIES = [
     "Centre culturel jeunesse Béjaïa",
     "Direction de la Jeunesse et des Sports Béjaïa",
     "DJS Béjaïa",
-    "ODEJ Béjaïa",
+    "Yed fel yed Béjaïa",
     "Foyer de jeunes Béjaïa",
     "Camp de jeunes Béjaïa",
 ]
@@ -64,11 +64,9 @@ def infer_kind(name: str) -> str:
 
 def infer_authority(name: str) -> str:
     n = (name or "").upper()
-    if "ODEJ" in n or "ديوان" in (name or ""):
-        return "ODEJ"
     if "DJS" in n or "DIRECTION" in n:
         return "DJS"
-    return "ODEJ"
+    return "Yed fel yed"
 
 
 def fetch_places(api_key: str) -> list[dict]:
@@ -129,7 +127,7 @@ def to_app_places(raw: list[dict]) -> list[dict]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Fetch ODEJ/DJS places for Béjaïa")
+    parser = argparse.ArgumentParser(description="Fetch Yed fel yed/DJS places for Béjaïa")
     parser.add_argument(
         "--api-key",
         default=os.environ.get("GOOGLE_MAPS_API_KEY") or os.environ.get("VITE_GOOGLE_MAPS_API_KEY"),
@@ -137,7 +135,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--out",
-        default=str(Path(__file__).resolve().parents[1] / "public" / "geo" / "places-bejaia-odej.json"),
+        default=str(Path(__file__).resolve().parents[1] / "public" / "geo" / "places-bejaia.json"),
     )
     args = parser.parse_args()
 

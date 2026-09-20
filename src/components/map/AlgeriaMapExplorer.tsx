@@ -20,7 +20,7 @@ type ExternalPlace = {
   lng: number
   wilayaCode: number
   structureKind?: StructureKind
-  authority?: "ODEJ" | "DJS"
+  authority?: "Yed fel yed" | "DJS"
   source?: string
   rating?: number
 }
@@ -38,7 +38,7 @@ function placeToInstitution(p: ExternalPlace): Institution {
     lat: p.lat,
     lng: p.lng,
     structureKind: p.structureKind ?? "autre",
-    authority: p.authority ?? "ODEJ",
+    authority: p.authority ?? "Yed fel yed",
   }
 }
 
@@ -86,7 +86,7 @@ export default function AlgeriaMapExplorer() {
 
   useEffect(() => {
     let cancelled = false
-    fetch("/geo/places-bejaia-odej.json")
+    fetch("/geo/places-bejaia.json")
       .then((r) => r.json())
       .then((payload: { places?: ExternalPlace[] }) => {
         if (cancelled) return

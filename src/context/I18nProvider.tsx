@@ -35,9 +35,9 @@ type I18nContextValue = {
 const I18nContext = createContext<I18nContextValue | null>(null)
 
 const DOCUMENT_TITLES: Record<Locale, string> = {
-  ar: "ODEJ الجزائر",
-  fr: "ODEJ Algérie",
-  en: "ODEJ Algeria",
+  ar: "يد في يد",
+  fr: "Yed fel yed",
+  en: "Yed fel yed",
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {

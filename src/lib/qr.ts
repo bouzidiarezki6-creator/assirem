@@ -7,7 +7,7 @@ export function buildQrPayload(
   const nin = registrant.nationalId || registrant.id
   return JSON.stringify({
     v: 2,
-    org: "ODEJ",
+    org: "Yed fel yed",
     id: nin,
     nin,
     code: registrant.qrCode,
@@ -17,7 +17,7 @@ export function buildQrPayload(
 
 export function createQrCode(nin: string): string {
   const suffix = nin.slice(-6) || crypto.randomUUID().replace(/-/g, "").slice(0, 6)
-  return `ODEJ-${suffix}`
+  return `YFY-${suffix}`
 }
 
 export function parseQrScan(raw: string): { nin?: string; code?: string; id?: string } | null {
@@ -38,9 +38,9 @@ export function parseQrScan(raw: string): { nin?: string; code?: string; id?: st
       id: data.id ? String(data.id) : undefined,
     }
   } catch {
-    // Plain NIN or ODEJ code pasted/scanned as text
+    // Plain NIN or YFY code pasted/scanned as text
     if (/^\d{18}$/.test(text)) return { nin: text, id: text }
-    if (/^ODEJ-/i.test(text)) return { code: text.toUpperCase() }
+    if (/^(YFY|ODEJ)-/i.test(text)) return { code: text.toUpperCase() }
     return { id: text, nin: text }
   }
 }

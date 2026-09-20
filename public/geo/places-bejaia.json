@@ -4,7 +4,7 @@
   "wilaya_ar": "بجاية",
   "center": { "lat": 36.7525, "lng": 5.0833 },
   "generatedAt": "2026-09-19T00:00:00Z",
-  "sourceNote": "Curated seed for Béjaïa (ODEJ/DJS-oriented). Replace by running scripts/fetch_odej_places_bejaia.py with a Google Places API key.",
+  "sourceNote": "Curated seed for Béjaïa (Yed fel yed / DJS).",
   "count": 12,
   "places": [
     {
@@ -15,7 +15,7 @@
       "lng": 5.0833,
       "wilayaCode": 6,
       "structureKind": "maison_jeunes",
-      "authority": "ODEJ",
+      "authority": "Yed fel yed",
       "source": "curated"
     },
     {
@@ -26,7 +26,7 @@
       "lng": 4.9069,
       "wilayaCode": 6,
       "structureKind": "maison_jeunes",
-      "authority": "ODEJ",
+      "authority": "Yed fel yed",
       "source": "curated"
     },
     {
@@ -37,7 +37,7 @@
       "lng": 4.534,
       "wilayaCode": 6,
       "structureKind": "maison_jeunes",
-      "authority": "ODEJ",
+      "authority": "Yed fel yed",
       "source": "curated"
     },
     {
@@ -59,7 +59,7 @@
       "lng": 4.69,
       "wilayaCode": 6,
       "structureKind": "maison_jeunes",
-      "authority": "ODEJ",
+      "authority": "Yed fel yed",
       "source": "curated"
     },
     {
@@ -70,7 +70,7 @@
       "lng": 5.16,
       "wilayaCode": 6,
       "structureKind": "auberge",
-      "authority": "ODEJ",
+      "authority": "Yed fel yed",
       "source": "curated"
     },
     {
@@ -81,7 +81,7 @@
       "lng": 4.833,
       "wilayaCode": 6,
       "structureKind": "camp",
-      "authority": "ODEJ",
+      "authority": "Yed fel yed",
       "source": "curated"
     },
     {
@@ -118,14 +118,14 @@
       "source": "curated"
     },
     {
-      "id": "bj-odej",
-      "name": "Office des établissements de jeunesse — Béjaïa",
+      "id": "bj-yfy",
+      "name": "Siège Yed fel yed — Béjaïa",
       "address": "Cité El Mouz, Béjaïa",
       "lat": 36.75,
       "lng": 5.06,
       "wilayaCode": 6,
       "structureKind": "autre",
-      "authority": "ODEJ",
+      "authority": "Yed fel yed",
       "source": "curated"
     },
     {
@@ -136,7 +136,7 @@
       "lng": 4.67,
       "wilayaCode": 6,
       "structureKind": "maison_jeunes",
-      "authority": "ODEJ",
+      "authority": "Yed fel yed",
       "source": "curated"
     }
   ]

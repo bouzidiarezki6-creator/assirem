@@ -17,7 +17,7 @@ async function test() {
       description: "Testing API",
       date: "2026-09-20",
       location: "Bejaia",
-      institution: "ODEJ",
+      institution: "Yed fel yed",
       image_data_url: null,
       requires_registration: false,
       published: true

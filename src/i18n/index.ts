@@ -58,7 +58,7 @@ export function translate(
 
 export function detectInitialLocale(): Locale {
   try {
-    const saved = localStorage.getItem(LOCALE_STORAGE_KEY)
+    const saved = localStorage.getItem(LOCALE_STORAGE_KEY) || localStorage.getItem("odej-locale")
     if (saved === "fr" || saved === "en" || saved === "ar") return saved
     // migrate former kabyle preference
     if (saved === "kab") return "ar"

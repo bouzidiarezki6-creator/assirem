@@ -6,12 +6,12 @@ import PageHeader from "@/components/shared/PageHeader"
 import { useAppData } from "@/context/DataProvider"
 import { useI18n } from "@/context/I18nProvider"
 import CategoryFilter from "@/components/shared/CategoryFilter"
-import { cn } from "@/lib/utils"
+import type { CategoryId } from "@/lib/categories"
 
 export default function News() {
   const { data } = useAppData()
   const { t } = useI18n()
-  const [activeCategory, setActiveCategory] = useState<string>("all")
+  const [activeCategory, setActiveCategory] = useState<CategoryId | "all">("all")
 
   const published = useMemo(
     () => data.news.filter((n) => n.published).sort((a, b) => b.date.localeCompare(a.date)),
@@ -31,8 +31,8 @@ export default function News() {
 
       <div className="flex justify-center mb-8">
         <CategoryFilter
-          activeCategory={activeCategory}
-          onChange={setActiveCategory}
+          selected={activeCategory}
+          onSelect={setActiveCategory}
         />
       </div>
 

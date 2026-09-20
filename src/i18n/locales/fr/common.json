@@ -1,5 +1,5 @@
 {
-  "brand": "ODEJ Algérie",
+  "brand": "Yed fel yed",
   "nav": {
     "home": "Accueil",
     "institutions": "Institutions",
@@ -34,14 +34,14 @@
     }
   },
   "footer": {
-    "about": "Office des établissements de jeunesse de la wilaya de Béjaïa. Un espace pour la créativité, le développement et l'engagement des jeunes.",
+    "about": "Yed fel yed. Un espace pour la créativité, l'entraide, le développement et l'engagement citoyen et solidaire.",
     "quickLinks": "Liens rapides",
     "contact": "Contact",
     "address": "Cité El Mouz, Béjaïa, Algérie",
-    "rights": "© 2026 Office des établissements de jeunesse — République Algérienne Démocratique et Populaire. Tous droits réservés."
+    "rights": "© 2026 Yed fel yed. Tous droits réservés."
   },
   "home": {
-    "badge": "Office des établissements de jeunesse — 69 wilayas",
+    "badge": "Yed fel yed — 69 wilayas",
     "titleLine1": "Un espace pour les jeunes…",
     "titleLine2": "créativité, participation et développement",
     "subtitle": "Découvrez les institutions de jeunesse dans tout le pays, participez aux événements et rejoignez votre communauté.",
@@ -49,11 +49,11 @@
     "ctaInstitutions": "Explorer les institutions",
     "mapTitle": "Explorer l'Algérie — 69 wilayas",
     "mapHint": "Survolez ou cliquez sur une wilaya pour découvrir les structures de jeunesse.",
-    "mapHelp": "Carte interactive des 69 wilayas — sélectionnez une wilaya pour filtrer les établissements ODEJ / DJS.",
+    "mapHelp": "Carte interactive des 69 wilayas — sélectionnez une wilaya pour filtrer les établissements.",
     "mapPlaceholder": "Carte de l'Algérie",
     "directorTitle": "Mot du directeur",
     "directorQuote": "\"Nous œuvrons à offrir un environnement sûr et stimulant aux jeunes de la wilaya de Béjaïa, pour développer leurs compétences, découvrir leurs talents et contribuer à leur société.\"",
-    "directorRole": "Directeur de l'Office des établissements de jeunesse",
+    "directorRole": "Directeur de Yed fel yed",
     "directorScope": "À l'échelle nationale — 69 wilayas",
     "mediaPlaceholder": "Image ou vidéo",
     "servicesTitle": "Nos institutions à votre service",
@@ -161,7 +161,7 @@
     "formTitle": "Ajouter un local",
     "submit": "Enregistrer le lieu",
     "successTitle": "Lieu enregistré",
-    "successHint": "Conservez votre référence. L'équipe ODEJ traitera ce local.",
+    "successHint": "Conservez votre référence. L'équipe Yed fel yed traitera ce local.",
     "newRequest": "Ajouter un autre lieu",
     "useMyGps": "Ma position GPS",
     "gpsLocating": "Localisation…",
@@ -295,7 +295,7 @@
     "title": "Tableau de bord",
     "seeSite": "Voir le site",
     "logout": "Déconnexion",
-    "brand": "ODEJ Admin",
+    "brand": "Yed fel yed Admin",
     "brandSub": "Contrôle et CRM",
     "login": {
       "title": "Tableau de bord Admin",
@@ -483,7 +483,7 @@
       "resume": "Relancer",
       "pausedHint": "Scanner en pause — cliquez Relancer pour scanner un autre adhérent.",
       "manualLabel": "Ou saisir NIN / code QR",
-      "manualPlaceholder": "18 chiffres NIN ou ODEJ-...",
+      "manualPlaceholder": "18 chiffres NIN ou YFY-...",
       "search": "Chercher",
       "profile": "Fiche adhérent",
       "noScan": "Aucun scan pour le moment",
@@ -721,8 +721,8 @@
   "map": {
     "loadError": "Impossible de charger la carte.",
     "reset": "Réinitialiser",
-    "selectedHint": "{{count}} structure(s) ODEJ / DJS dans cette wilaya",
-    "facilitiesTitle": "Structures de jeunesse (ODEJ / DJS)",
+    "selectedHint": "{{count}} structure(s) dans cette wilaya",
+    "facilitiesTitle": "Structures de jeunesse",
     "facilitiesSubtitle": "Maisons de jeunes, auberges, foyers et équipements similaires — filtrés par wilaya.",
     "allKinds": "Tous les types",
     "listTitle": "Établissements sélectionnés",
@@ -738,6 +738,6 @@
       "camp": "Camp / auberge saisonnière",
       "autre": "Autre"
     },
-    "bejaiaFocus": "Focus Béjaïa — maisons de jeunes, auberges et structures ODEJ/DJS."
+    "bejaiaFocus": "Focus Béjaïa — maisons de jeunes, auberges et structures locales."
   }
 }

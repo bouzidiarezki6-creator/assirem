@@ -32,15 +32,15 @@ const DUMMY_NEWS = [
 ].map(n => ({ id: randId(), ...n, image_data_url: randomImg(), published: true }))
 
 const DUMMY_EVENTS = [
-  { title: "Festival de la Jeunesse", description: "Trois jours de célébration avec musique, théâtre et expositions.", date: "2026-10-01", location: "Stade Municipal", institution: "ODEJ Centrale" },
+  { title: "Festival de la Jeunesse", description: "Trois jours de célébration avec musique, théâtre et expositions.", date: "2026-10-01", location: "Stade Municipal", institution: "Yed fel yed Centrale" },
   { title: "Conférence sur l'Entrepreneuriat", description: "Rencontre avec des jeunes entrepreneurs et experts pour partager leurs expériences.", date: "2026-10-15", location: "Salle des Fêtes", institution: "Maison de jeunes El-Amal" },
   { title: "Journée de Nettoyage", description: "Une initiative communautaire pour nettoyer les plages et les forêts.", date: "2026-10-20", location: "Plage Centre", institution: "Association Verte" },
   { title: "Soirée Astronomie", description: "Observation des étoiles avec des télescopes professionnels.", date: "2026-11-05", location: "Montagne d'Akfadou", institution: "Club Scientifique" },
-  { title: "Foire de l'Artisanat", description: "Exposition des créations artisanales locales par les jeunes de la région.", date: "2026-11-12", location: "Place du Marché", institution: "ODEJ" }
+  { title: "Foire de l'Artisanat", description: "Exposition des créations artisanales locales par les jeunes de la région.", date: "2026-11-12", location: "Place du Marché", institution: "Yed fel yed" }
 ].map(e => ({ id: randId(), ...e, image_data_url: randomImg(), requires_registration: true, published: true }))
 
 const DUMMY_ACTIVITIES = [
-  { title: "Plantation d'arbres (Akbou)", description: "Reboisement de la forêt touchée par les récents incendies.", date: "2026-10-10", category: "Écologie", institution: "ODEJ Béjaia", wilaya_code: 6 },
+  { title: "Plantation d'arbres (Akbou)", description: "Reboisement de la forêt touchée par les récents incendies.", date: "2026-10-10", category: "Écologie", institution: "Yed fel yed Béjaia", wilaya_code: 6 },
   { title: "Distribution de repas chauds", description: "Distribution de repas pour les personnes sans-abri.", date: "2026-10-12", category: "Solidarité", institution: "Croissant Rouge", wilaya_code: 16 },
   { title: "Soutien Scolaire", description: "Accompagnement des enfants en difficulté scolaire.", date: "2026-10-14", category: "Éducation", institution: "Association Espoir", wilaya_code: 19 },
   { title: "Nettoyage des quartiers", description: "Grand nettoyage collectif des rues principales.", date: "2026-10-16", category: "Environnement", institution: "APC", wilaya_code: 31 },

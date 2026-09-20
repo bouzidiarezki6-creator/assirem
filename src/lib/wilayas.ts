@@ -7,7 +7,7 @@ export type StructureKind =
   | "camp"
   | "autre"
 
-export type InstitutionAuthority = "ODEJ" | "DJS"
+export type InstitutionAuthority = "Yed fel yed" | "DJS"
 
 export type WilayaMeta = {
   code: number

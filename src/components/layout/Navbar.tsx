@@ -43,7 +43,7 @@ export default function Navbar() {
       <div className="content-width flex h-16 items-center justify-between gap-3 sm:h-[4.25rem]">
         <Link to="/" className="flex min-w-0 items-center gap-2.5 shrink-0">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-soft">
-            <span className="text-[10px] font-extrabold tracking-wide">ODEJ</span>
+            <span className="text-[10px] font-extrabold tracking-wide">YFY</span>
           </div>
           <span className="truncate text-base font-extrabold text-foreground sm:text-lg">
             {t("brand")}

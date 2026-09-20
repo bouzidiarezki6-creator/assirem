@@ -9,7 +9,7 @@ import {
 } from "react"
 import type { WilayaMeta } from "@/lib/wilayas"
 
-const STORAGE_KEY = "odej-selected-wilaya"
+const STORAGE_KEY = "yfy-selected-wilaya"
 
 type LocationFilterContextValue = {
   wilayas: WilayaMeta[]
@@ -23,7 +23,7 @@ const LocationFilterContext = createContext<LocationFilterContextValue | null>(n
 
 function readStoredCode(): number | null {
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY)
+    const raw = sessionStorage.getItem(STORAGE_KEY) ?? sessionStorage.getItem("odej-selected-wilaya")
     if (raw === null || raw === "") return null
     const n = Number(raw)
     return Number.isFinite(n) && n >= 1 && n <= 69 ? n : null

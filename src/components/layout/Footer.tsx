@@ -11,7 +11,7 @@ export default function Footer() {
           <div className="space-y-4 sm:col-span-2 lg:col-span-2 flex flex-col items-center sm:items-start">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 text-[10px] font-extrabold">
-                ODEJ
+                YFY
               </div>
               <h3 className="font-extrabold text-lg">{t("brand")}</h3>
             </div>
@@ -51,7 +51,7 @@ export default function Footer() {
             <h4 className="font-bold mb-4 text-white/95">{t("footer.contact")}</h4>
             <ul className="space-y-2.5 text-sm text-white/75">
               <li>{t("footer.address")}</li>
-              <li>contact@odejbejaia.dz</li>
+              <li>contact@yedfelyed.dz</li>
               <li dir="ltr">+213 34 21 45 00</li>
             </ul>
           </div>

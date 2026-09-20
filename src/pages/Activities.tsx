@@ -8,6 +8,7 @@ import PageHeader from "@/components/shared/PageHeader"
 import { useAppData } from "@/context/DataProvider"
 import { useI18n } from "@/context/I18nProvider"
 import CategoryFilter from "@/components/shared/CategoryFilter"
+import type { CategoryId } from "@/lib/categories"
 
 export default function Activities() {
   const { data } = useAppData()
@@ -16,7 +17,7 @@ export default function Activities() {
   const iconPos = dir === "rtl" ? "right-3" : "left-3"
   const inputPad = dir === "rtl" ? "px-9" : "pl-9 pr-3"
 
-  const [activeCategory, setActiveCategory] = useState<string>("all")
+  const [activeCategory, setActiveCategory] = useState<CategoryId | "all">("all")
 
   const activities = useMemo(() => {
     let published = data.activities.filter((a) => a.published)
@@ -56,8 +57,8 @@ export default function Activities() {
 
       <div className="flex justify-center my-6">
         <CategoryFilter
-          activeCategory={activeCategory}
-          onChange={setActiveCategory}
+          selected={activeCategory}
+          onSelect={setActiveCategory}
         />
       </div>
 

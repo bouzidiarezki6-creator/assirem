@@ -14,7 +14,7 @@ type Props = {
 export default function QrScanner({ onScan, active = true }: Props) {
   const { t } = useI18n()
   const regionId = useId().replace(/:/g, "")
-  const readerId = `odej-qr-reader-${regionId}`
+  const readerId = `yfy-qr-reader-${regionId}`
 
   const [running, setRunning] = useState(false)
   const [facing, setFacing] = useState<Facing>("environment")

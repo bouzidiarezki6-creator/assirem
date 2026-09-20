@@ -15,8 +15,8 @@ import type {
 import { CAGNOTTE_TYPES } from "./cagnottes"
 import { seedAssociationsFromCatalog } from "./associations"
 
-const STORAGE_KEY = "odej-akbou-data-v3"
-const AUTH_KEY = "odej-akbou-admin"
+const STORAGE_KEY = "yfy-akbou-data-v3"
+const AUTH_KEY = "yfy-akbou-admin"
 
 function uid() {
   return crypto.randomUUID()
@@ -50,7 +50,7 @@ const seedData: AppData = {
       description: "تظاهرة شبابية تجمع المؤسسات الشبانية لولاية بجاية.",
       date: "2026-06-25",
       location: "بجاية",
-      institution: "ديوان مؤسسات الشباب",
+      institution: "يد في يد",
       imageDataUrl: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&q=80",
       requiresRegistration: true,
       published: true,
@@ -150,7 +150,7 @@ const seedData: AppData = {
       lat: 36.7525,
       lng: 5.0833,
       structureKind: "maison_jeunes",
-      authority: "ODEJ",
+      authority: "Yed fel yed",
     },
     {
       id: uid(),
@@ -164,7 +164,7 @@ const seedData: AppData = {
       lat: 36.6431,
       lng: 4.9069,
       structureKind: "maison_jeunes",
-      authority: "ODEJ",
+      authority: "Yed fel yed",
     },
     {
       id: uid(),
@@ -178,7 +178,7 @@ const seedData: AppData = {
       lat: 36.761,
       lng: 4.833,
       structureKind: "camp",
-      authority: "ODEJ",
+      authority: "Yed fel yed",
     },
     {
       id: uid(),
@@ -234,7 +234,7 @@ const seedData: AppData = {
       lat: 36.743,
       lng: 3.067,
       structureKind: "maison_jeunes",
-      authority: "ODEJ",
+      authority: "Yed fel yed",
     },
     {
       id: uid(),
@@ -248,7 +248,7 @@ const seedData: AppData = {
       lat: 36.791,
       lng: 3.05,
       structureKind: "auberge",
-      authority: "ODEJ",
+      authority: "Yed fel yed",
     },
     {
       id: uid(),
@@ -276,7 +276,7 @@ const seedData: AppData = {
       lat: 35.697,
       lng: -0.634,
       structureKind: "maison_jeunes",
-      authority: "ODEJ",
+      authority: "Yed fel yed",
     },
     {
       id: uid(),
@@ -290,7 +290,7 @@ const seedData: AppData = {
       lat: 35.74,
       lng: -0.58,
       structureKind: "auberge",
-      authority: "ODEJ",
+      authority: "Yed fel yed",
     },
     {
       id: uid(),
@@ -304,7 +304,7 @@ const seedData: AppData = {
       lat: 36.365,
       lng: 6.6147,
       structureKind: "maison_jeunes",
-      authority: "ODEJ",
+      authority: "Yed fel yed",
     },
     {
       id: uid(),
@@ -332,7 +332,7 @@ const seedData: AppData = {
       lat: 36.9,
       lng: 7.767,
       structureKind: "maison_jeunes",
-      authority: "ODEJ",
+      authority: "Yed fel yed",
     },
     {
       id: uid(),
@@ -346,7 +346,7 @@ const seedData: AppData = {
       lat: 36.47,
       lng: 2.828,
       structureKind: "maison_jeunes",
-      authority: "ODEJ",
+      authority: "Yed fel yed",
     },
   ],
   news: [
@@ -411,7 +411,10 @@ const seedData: AppData = {
 
 function load(): AppData {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    let raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) {
+      raw = localStorage.getItem("odej-akbou-data-v3")
+    }
     if (!raw) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(seedData))
       return structuredClone(seedData)
@@ -424,7 +427,7 @@ function load(): AppData {
       let localChanged = false
       if (!next.qrCode) {
         const part = (next.nationalId || next.id).replace(/-/g, "").slice(0, 10).toUpperCase()
-        next = { ...next, qrCode: `ODEJ-${part}` }
+        next = { ...next, qrCode: `YFY-${part}` }
         localChanged = true
       }
       if (typeof next.points !== "number") {
@@ -622,7 +625,7 @@ export function createId() {
 }
 
 export function isAdminAuthenticated(): boolean {
-  return sessionStorage.getItem(AUTH_KEY) === "1"
+  return sessionStorage.getItem(AUTH_KEY) === "1" || sessionStorage.getItem("odej-akbou-admin") === "1"
 }
 
 export function loginAdmin(password: string): boolean {

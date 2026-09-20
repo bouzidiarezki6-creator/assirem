@@ -5,17 +5,19 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-const newTypes = [
-  { id: "orphans", defaultGoal: 600000 },
-  { id: "cancer", defaultGoal: 1000000 },
-  { id: "disability", defaultGoal: 400000 }
+const originalTypes = [
+  { id: "aid_adha", defaultGoal: 500000 },
+  { id: "aid_fitr", defaultGoal: 300000 },
+  { id: "ramadan", defaultGoal: 400000 },
+  { id: "rentree", defaultGoal: 350000 },
+  { id: "associations", defaultGoal: 250000 }
 ]
 
 async function insertCagnottes() {
   const toInsert = []
   
   for (let code = 1; code <= 69; code++) {
-    for (const type of newTypes) {
+    for (const type of originalTypes) {
       const variance = ((code * 17 + type.id.length * 31) % 40) / 100
       const goal = Math.round(type.defaultGoal * (0.85 + variance))
       const raised = Math.round(goal * (((code * 13 + type.id.charCodeAt(0)) % 55) / 100))

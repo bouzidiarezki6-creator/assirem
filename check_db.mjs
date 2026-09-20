@@ -6,12 +6,11 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 async function test() {
-  const tables = ['events', 'news', 'activities', 'institutions']
-  for (const t of tables) {
-    const { data, error } = await supabase.from(t).select('id')
-    if (error) console.error(t, error)
-    else console.log(`${t} count:`, data.length)
+  const { data, error } = await supabase.from('cagnottes').select('type_id')
+  if (error) console.error(error)
+  else {
+    const types = new Set(data.map(d => d.type_id))
+    console.log("Cagnottes in DB:", Array.from(types))
   }
 }
-
 test()

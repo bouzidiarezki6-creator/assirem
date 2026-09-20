@@ -11,7 +11,6 @@ import Inscription from "./pages/Inscription"
 import Volunteer from "./pages/Volunteer"
 import Cagnottes from "./pages/Cagnottes"
 import Sos from "./pages/Sos"
-import Associations from "./pages/Associations"
 import EventDetails from "./pages/EventDetails"
 import ActivityDetails from "./pages/ActivityDetails"
 import Admin from "./pages/Admin"
@@ -35,7 +34,6 @@ function App() {
                 <Route path="benevolat" element={<Volunteer />} />
                 <Route path="cagnottes" element={<Cagnottes />} />
                 <Route path="sos" element={<Sos />} />
-                <Route path="associations" element={<Associations />} />
               </Route>
             </Routes>
           </Router>

@@ -145,16 +145,22 @@
     "types": {
       "aid_adha": "Aïd el-Adha",
       "aid_fitr": "Aïd el-Fitr",
-      "ramadan": "قفة رمضان",
+      "ramadan": "Couffin de Ramadan",
       "rentree": "Rentrée scolaire",
+      "orphans": "Fonds Orphelins",
+      "cancer": "Fonds Cancer",
+      "disability": "Fonds Handicap",
       "associations": "Associations"
     },
     "typesDesc": {
       "aid_adha": "Collecte pour soutenir les familles durant Aïd el-Adha.",
-      "aid_fitr": "Collecte pour accompagner les familles à Aïd el-Fitr.",
-      "ramadan": "قفة رمضان — paniers alimentaires pour le mois de Ramadan.",
-      "rentree": "Fournitures et aide pour la rentrée scolaire.",
-      "associations": "Choisissez une association (orphelins, handicapés, cancer…) puis transférez votre don."
+      "aid_fitr": "Soutien pour la fête de l'Aïd el-Fitr.",
+      "ramadan": "Distribution de couffins alimentaires pendant le mois sacré.",
+      "rentree": "Aide pour l'achat de fournitures scolaires.",
+      "orphans": "Soutien scolaire, alimentaire et accompagnement pour les orphelins.",
+      "cancer": "Aide médicale, psychologique et logistique pour les malades du cancer.",
+      "disability": "Aides techniques et inclusion des personnes en situation de handicap.",
+      "associations": "Fonds général pour les associations humanitaires."
     },
     "errors": {
       "amount": "Montant minimum : 100 DZD",

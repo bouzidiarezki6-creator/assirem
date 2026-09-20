@@ -6,6 +6,9 @@ export type CagnotteTypeId =
   | "aid_fitr"
   | "ramadan"
   | "rentree"
+  | "orphans"
+  | "cancer"
+  | "disability"
   | "associations"
 
 export type CagnotteTypeDef = {
@@ -40,6 +43,24 @@ export const CAGNOTTE_TYPES: CagnotteTypeDef[] = [
     icon: GraduationCap,
     accent: "bg-sky-50 text-sky-700",
     defaultGoal: 350_000,
+  },
+  {
+    id: "orphans",
+    icon: Gift,
+    accent: "bg-fuchsia-50 text-fuchsia-700",
+    defaultGoal: 600_000,
+  },
+  {
+    id: "cancer",
+    icon: HandCoins,
+    accent: "bg-red-50 text-red-700",
+    defaultGoal: 1_000_000,
+  },
+  {
+    id: "disability",
+    icon: Building2,
+    accent: "bg-blue-50 text-blue-700",
+    defaultGoal: 400_000,
   },
   {
     id: "associations",

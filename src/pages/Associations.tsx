@@ -1,6 +1,6 @@
 import { useAppData } from "@/context/DataProvider"
 import { useI18n } from "@/context/I18nProvider"
-import { getAssociationSector, formatCcpDisplay, ASSOCIATION_SECTORS } from "@/lib/associations"
+import { formatCcpDisplay, ASSOCIATION_SECTORS } from "@/lib/associations"
 import { HeartHandshake } from "lucide-react"
 import { cn } from "@/lib/utils"
 

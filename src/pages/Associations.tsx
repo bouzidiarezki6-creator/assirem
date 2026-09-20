@@ -1,6 +1,6 @@
 import { useAppData } from "@/context/DataProvider"
 import { useI18n } from "@/context/I18nProvider"
-import { getAssociationSector, formatCcpDisplay } from "@/lib/associations"
+import { getAssociationSector, formatCcpDisplay, ASSOCIATION_SECTORS } from "@/lib/associations"
 import { HeartHandshake } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -9,6 +9,12 @@ export default function Associations() {
   const { t, dir } = useI18n()
 
   const publishedAssocs = data.associations.filter((a) => a.published)
+
+  // Group associations by sector
+  const assocsBySector = ASSOCIATION_SECTORS.map((sector) => ({
+    ...sector,
+    associations: publishedAssocs.filter((a) => a.sectorId === sector.id)
+  })).filter((group) => group.associations.length > 0)
 
   return (
     <div className="w-full">
@@ -22,68 +28,75 @@ export default function Associations() {
               {t("nav.associations") || "Associations Partenaires"}
             </h1>
             <p className="mt-4 text-lg text-muted-foreground">
-              Découvrez les associations partenaires qui œuvrent pour le bien-être de notre communauté.
+              Découvrez les associations partenaires classées par catégorie de service (orphelins, malades, etc.)
             </p>
           </div>
         </div>
       </section>
 
       <section className="content-width py-12">
-        {publishedAssocs.length === 0 ? (
+        {assocsBySector.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/60 bg-muted/30 p-12 text-center">
             <HeartHandshake className="mb-4 h-12 w-12 text-muted-foreground/50" />
             <h3 className="text-lg font-bold text-foreground">Aucune association</h3>
             <p className="mt-2 text-muted-foreground">Les associations apparaîtront ici prochainement.</p>
           </div>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {publishedAssocs.map((assoc) => {
-              const sectorDef = getAssociationSector(assoc.sectorId)
-              const SectorIcon = sectorDef?.icon || HeartHandshake
+          <div className="flex flex-col gap-12">
+            {assocsBySector.map((group) => {
+              const SectorIcon = group.icon
+              const sectorName = t(`nav.sectors.${group.id}`) || group.id
 
               return (
-                <div
-                  key={assoc.id}
-                  className="group relative flex flex-col overflow-hidden rounded-3xl bg-white shadow-soft ring-1 ring-border/50 transition-all hover:shadow-hover hover:ring-primary/20"
-                >
-                  <div className="flex h-32 w-full items-center justify-center bg-muted/30">
-                    {assoc.logoDataUrl ? (
-                      <img
-                        src={assoc.logoDataUrl}
-                        alt={assoc.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <HeartHandshake className="h-10 w-10 text-muted-foreground/30" />
-                    )}
+                <div key={group.id} className="space-y-6">
+                  <div className="flex items-center gap-3 border-b border-border/50 pb-2">
+                    <div className={cn("p-2 rounded-xl", group.accent)}>
+                      <SectorIcon className="h-6 w-6" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-foreground capitalize">
+                      {sectorName}
+                    </h2>
+                    <span className="ml-auto flex h-6 items-center rounded-full bg-muted px-2.5 text-xs font-bold text-muted-foreground">
+                      {group.associations.length}
+                    </span>
                   </div>
-                  
-                  <div className="flex flex-1 flex-col p-5">
-                    <div className="mb-3 flex items-start justify-between gap-2">
-                      <h3 className="font-bold text-foreground leading-tight" dir={dir}>
-                        {assoc.name}
-                      </h3>
-                      {sectorDef && (
-                        <div
-                          className={cn(
-                            "flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider",
-                            sectorDef.accent
+
+                  <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {group.associations.map((assoc) => (
+                      <div
+                        key={assoc.id}
+                        className="group relative flex flex-col overflow-hidden rounded-3xl bg-white shadow-soft ring-1 ring-border/50 transition-all hover:shadow-hover hover:ring-primary/20"
+                      >
+                        <div className="flex h-32 w-full items-center justify-center bg-muted/30">
+                          {assoc.logoDataUrl ? (
+                            <img
+                              src={assoc.logoDataUrl}
+                              alt={assoc.name}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <HeartHandshake className="h-10 w-10 text-muted-foreground/30" />
                           )}
-                          title="Secteur"
-                        >
-                          <SectorIcon className="h-3 w-3" />
                         </div>
-                      )}
-                    </div>
-                    
-                    <div className="mt-auto pt-4 flex flex-col gap-1 border-t border-border/50">
-                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                        Compte CCP
-                      </span>
-                      <span className="font-mono text-sm font-medium text-foreground">
-                        {formatCcpDisplay(assoc.ccpAccount)}
-                      </span>
-                    </div>
+                        
+                        <div className="flex flex-1 flex-col p-5">
+                          <div className="mb-3 flex items-start justify-between gap-2">
+                            <h3 className="font-bold text-foreground leading-tight" dir={dir}>
+                              {assoc.name}
+                            </h3>
+                          </div>
+                          
+                          <div className="mt-auto pt-4 flex flex-col gap-1 border-t border-border/50">
+                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                              Compte CCP
+                            </span>
+                            <span className="font-mono text-sm font-medium text-foreground">
+                              {formatCcpDisplay(assoc.ccpAccount)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )

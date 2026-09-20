@@ -24,6 +24,14 @@
       "event": "فعالية",
       "news": "خبر",
       "volunteer": "تطوع"
+    },
+    "sectors": {
+      "orphans": "الأيتام",
+      "disability": "ذوي الإعاقة",
+      "cancer": "مرضى السرطان",
+      "elderly": "كبار السن",
+      "widows": "الأرامل",
+      "children": "الطفولة"
     }
   },
   "footer": {

@@ -24,6 +24,14 @@
       "event": "Événement",
       "news": "Actualité",
       "volunteer": "Bénévolat"
+    },
+    "sectors": {
+      "orphans": "Orphelins",
+      "disability": "Handicap",
+      "cancer": "Malades du Cancer",
+      "elderly": "Personnes Âgées",
+      "widows": "Veuves",
+      "children": "Enfance"
     }
   },
   "footer": {

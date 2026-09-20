@@ -453,6 +453,7 @@ const seedData: AppData = {
     },
   ],
   registrants: [],
+  participations: [],
   cagnottes: buildSeedCagnottes(),
   donations: [],
   associations: seedAssociationsFromCatalog(),
@@ -631,6 +632,11 @@ function load(): AppData {
     })
     if (!parsed.sosDamagedSites) changed = true
 
+    const participations = (parsed.participations ?? []).map((p) => ({
+      ...p,
+      changes: Array.isArray(p.changes) ? p.changes : [],
+    }))
+
     const next: AppData = {
       events,
       announcements: parsed.announcements ?? seedData.announcements,
@@ -638,6 +644,7 @@ function load(): AppData {
       institutions,
       news,
       registrants,
+      participations,
       cagnottes,
       donations,
       associations,
@@ -647,6 +654,7 @@ function load(): AppData {
 
     if (
       changed ||
+      !parsed.participations ||
 
       !parsed.institutions ||
       !parsed.news ||

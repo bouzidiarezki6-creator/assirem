@@ -2,6 +2,7 @@ import type { AssociationSectorId } from "./associations"
 import type { CategoryId } from "./categories"
 import type { CagnotteTypeId } from "./cagnottes"
 import type { InstitutionAuthority, StructureKind } from "./wilayas"
+import type { ActivityTypeId, DurationId, ResponsibilityId } from "./volunteerPoints"
 
 export type EventItem = {
   id: string
@@ -91,6 +92,36 @@ export type Registrant = {
   registeredAt: string
 }
 
+export type ParticipationStatus = "validated" | "cancelled"
+
+export type ParticipationPointChange = {
+  id: string
+  at: string
+  previousPoints: number
+  newPoints: number
+  reason: string
+  adminNote?: string
+}
+
+export type VolunteerParticipation = {
+  id: string
+  fingerprint: string
+  volunteerId: string
+  activityTitle: string
+  activityDate: string
+  categoryId: CategoryId
+  activityTypeId: ActivityTypeId
+  durationId: DurationId
+  responsibilityId: ResponsibilityId
+  hoursCounted: number
+  pointsAwarded: number
+  originalPoints: number
+  status: ParticipationStatus
+  createdAt: string
+  updatedAt: string
+  changes: ParticipationPointChange[]
+}
+
 export type AppData = {
   events: EventItem[]
   announcements: Announcement[]
@@ -98,6 +129,7 @@ export type AppData = {
   institutions: Institution[]
   news: NewsArticle[]
   registrants: Registrant[]
+  participations: VolunteerParticipation[]
   cagnottes: Cagnotte[]
   donations: Donation[]
   associations: Association[]

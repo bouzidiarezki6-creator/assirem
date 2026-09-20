@@ -22,13 +22,34 @@ import {
   type SosCollectionSite,
   type SosDamagedSite,
 } from "@/lib/storage"
-import type { SosAidCategoryId, SosRequestStatus } from "@/lib/types"
+import type { SosAidCategoryId, SosRequestStatus, VolunteerParticipation } from "@/lib/types"
 import { isValidGps } from "@/lib/sos"
 import { createQrCode, parseQrScan } from "@/lib/qr"
 import type { AssociationSectorId } from "@/lib/associations"
 import { isValidCcp, normalizeCcp } from "@/lib/associations"
+import type { CategoryId } from "@/lib/categories"
+import {
+  calculateVolunteerPoints,
+  participationFingerprint,
+  type ActivityTypeId,
+  type DurationId,
+  type ResponsibilityId,
+  type PointsInput,
+  type PointsBreakdown,
+} from "@/lib/volunteerPoints"
 
-
+export type ValidateParticipationInput = {
+  volunteerId: string
+  activityTitle: string
+  activityDate: string
+  categoryId: CategoryId
+  activityTypeId?: ActivityTypeId
+  durationId?: DurationId
+  responsibilityId?: ResponsibilityId
+  customPoints?: number
+  hoursCounted?: number
+  adminNote?: string
+}
 
 type DataContextValue = {
   data: AppData
@@ -52,6 +73,12 @@ type DataContextValue = {
   ) => Registrant | { error: string }
   deleteRegistrant: (id: string) => void
   findRegistrantByScan: (raw: string) => Registrant | null
+  previewParticipationPoints: (input: PointsInput) => PointsBreakdown | null
+  validateParticipation: (input: ValidateParticipationInput) => { ok: true; participation: VolunteerParticipation } | { ok: false; error: string }
+  cancelParticipation: (participationId: string, reason: string) => { ok: true } | { ok: false; error: string }
+  modifyParticipationPoints: (participationId: string, newPoints: number, reason: string) => { ok: true } | { ok: false; error: string }
+  getVolunteerParticipations: (volunteerId: string) => VolunteerParticipation[]
+  getVolunteerStats: (volunteerId: string) => { totalPoints: number; activityCount: number; hoursVolunteered: number }
   addDonation: (input: {
     cagnotteId: string
     amount: number
@@ -262,11 +289,24 @@ export function DataProvider({ children }: { children: ReactNode }) {
     []
   )
 
+  function syncVolunteerPoints(d: AppData, volunteerId: string): AppData {
+    const points = (d.participations || [])
+      .filter((p) => p.volunteerId === volunteerId && p.status === "validated")
+      .reduce((sum, p) => sum + p.pointsAwarded, 0)
+    return {
+      ...d,
+      registrants: d.registrants.map((r) =>
+        r.id === volunteerId ? { ...r, points } : r
+      ),
+    }
+  }
+
   const deleteRegistrant = useCallback((id: string) => {
     setLocal((prev) =>
       persist({
         ...prev,
         registrants: prev.registrants.filter((r) => r.id !== id),
+        participations: (prev.participations || []).filter((p) => p.volunteerId !== id),
       })
     )
   }, [])
@@ -283,6 +323,233 @@ export function DataProvider({ children }: { children: ReactNode }) {
             (parsed.code && r.qrCode.toUpperCase() === parsed.code.toUpperCase())
         ) ?? null
       )
+    },
+    [data]
+  )
+
+  const previewParticipationPoints = useCallback((input: PointsInput) => {
+    return calculateVolunteerPoints(input)
+  }, [])
+
+  const validateParticipation = useCallback((input: ValidateParticipationInput) => {
+    const title = input.activityTitle.trim()
+    if (!title) return { ok: false as const, error: "errors.activityTitleRequired" }
+    if (!input.activityDate) return { ok: false as const, error: "errors.dateRequired" }
+
+    const current = data || lastData
+    if (!current) return { ok: false as const, error: "errors.volunteerNotFound" }
+
+    const volunteer = current.registrants.find(
+      (r) => r.id === input.volunteerId || r.nationalId === input.volunteerId
+    )
+    if (!volunteer) return { ok: false as const, error: "errors.volunteerNotFound" }
+
+    const activityTypeId = input.activityTypeId || "standard"
+    const durationId = input.durationId || "h2_4"
+    const responsibilityId = input.responsibilityId || "participant"
+
+    const fingerprint = participationFingerprint({
+      volunteerId: volunteer.id,
+      activityTitle: title,
+      activityDate: input.activityDate,
+      categoryId: input.categoryId,
+      activityTypeId,
+    })
+
+    const existing = current.participations?.find(
+      (p) => p.fingerprint === fingerprint && p.status === "validated"
+    )
+    if (existing) {
+      return {
+        ok: false as const,
+        error: "errors.duplicateParticipation",
+      }
+    }
+
+    let finalPoints = 0
+    let hoursCounted = input.hoursCounted ?? 0
+
+    if (typeof input.customPoints === "number" && input.customPoints >= 0) {
+      finalPoints = Math.round(input.customPoints)
+    } else {
+      const breakdown = calculateVolunteerPoints({
+        categoryId: input.categoryId,
+        activityTypeId,
+        durationId,
+        responsibilityId,
+      })
+      finalPoints = breakdown.finalPoints
+      hoursCounted = breakdown.hoursCounted
+    }
+
+    const now = new Date().toISOString()
+    const participation: VolunteerParticipation = {
+      id: createId(),
+      fingerprint,
+      volunteerId: volunteer.id,
+      activityTitle: title,
+      activityDate: input.activityDate,
+      categoryId: input.categoryId,
+      activityTypeId,
+      durationId,
+      responsibilityId,
+      hoursCounted,
+      pointsAwarded: finalPoints,
+      originalPoints: finalPoints,
+      status: "validated",
+      createdAt: now,
+      updatedAt: now,
+      changes: input.adminNote
+        ? [
+            {
+              id: createId(),
+              at: now,
+              previousPoints: 0,
+              newPoints: finalPoints,
+              reason: "Attribution initiale",
+              adminNote: input.adminNote,
+            },
+          ]
+        : [],
+    }
+
+    setLocal((prev) => {
+      const next: AppData = {
+        ...prev,
+        participations: [participation, ...(prev.participations || [])],
+      }
+      return persist(syncVolunteerPoints(next, volunteer.id))
+    })
+
+    return { ok: true as const, participation }
+  }, [data])
+
+  const cancelParticipation = useCallback((participationId: string, reason: string) => {
+    const note = reason.trim()
+    if (!note) return { ok: false as const, error: "errors.cancelReasonRequired" }
+
+    let volunteerId = ""
+    setLocal((prev) => {
+      const target = (prev.participations || []).find((p) => p.id === participationId)
+      if (!target || target.status === "cancelled") return prev
+      volunteerId = target.volunteerId
+      const now = new Date().toISOString()
+      const next: AppData = {
+        ...prev,
+        participations: prev.participations.map((p) =>
+          p.id === participationId
+            ? {
+                ...p,
+                status: "cancelled" as const,
+                pointsAwarded: 0,
+                updatedAt: now,
+                changes: [
+                  ...p.changes,
+                  {
+                    id: createId(),
+                    at: now,
+                    previousPoints: p.pointsAwarded,
+                    newPoints: 0,
+                    reason: "Annulation",
+                    adminNote: note,
+                  },
+                ],
+              }
+            : p
+        ),
+      }
+      return persist(syncVolunteerPoints(next, volunteerId))
+    })
+
+    if (!volunteerId) return { ok: false as const, error: "errors.participationNotFound" }
+    return { ok: true as const }
+  }, [])
+
+  const modifyParticipationPoints = useCallback(
+    (participationId: string, newPoints: number, reason: string) => {
+      const note = reason.trim()
+      if (!note) return { ok: false as const, error: "errors.modifyReasonRequired" }
+      if (!Number.isFinite(newPoints) || newPoints < 0) {
+        return { ok: false as const, error: "errors.invalidPoints" }
+      }
+      const rounded = Math.round(newPoints)
+
+      let volunteerId = ""
+      let error: string | null = null
+
+      setLocal((prev) => {
+        const target = (prev.participations || []).find((p) => p.id === participationId)
+        if (!target) {
+          error = "errors.participationMissing"
+          return prev
+        }
+        if (target.status !== "validated") {
+          error = "errors.onlyValidatedEditable"
+          return prev
+        }
+        if (target.pointsAwarded === rounded) {
+          error = "errors.noChangeIdentical"
+          return prev
+        }
+        volunteerId = target.volunteerId
+        const now = new Date().toISOString()
+        const next: AppData = {
+          ...prev,
+          participations: prev.participations.map((p) =>
+            p.id === participationId
+              ? {
+                  ...p,
+                  pointsAwarded: rounded,
+                  updatedAt: now,
+                  changes: [
+                    ...p.changes,
+                    {
+                      id: createId(),
+                      at: now,
+                      previousPoints: p.pointsAwarded,
+                      newPoints: rounded,
+                      reason: "errors.adminModification",
+                      adminNote: note,
+                    },
+                  ],
+                }
+              : p
+          ),
+        }
+        return persist(syncVolunteerPoints(next, volunteerId))
+      })
+
+      if (error) return { ok: false as const, error }
+      return { ok: true as const }
+    },
+    []
+  )
+
+  const getVolunteerParticipations = useCallback(
+    (volunteerId: string) => {
+      const current = data || lastData
+      if (!current) return []
+      return (current.participations || [])
+        .filter((p: VolunteerParticipation) => p.volunteerId === volunteerId)
+        .sort((a: VolunteerParticipation, b: VolunteerParticipation) =>
+          b.activityDate.localeCompare(a.activityDate) || b.createdAt.localeCompare(a.createdAt)
+        )
+    },
+    [data]
+  )
+
+  const getVolunteerStats = useCallback(
+    (volunteerId: string) => {
+      const current = data || lastData
+      if (!current) return { totalPoints: 0, activityCount: 0, hoursVolunteered: 0 }
+      const list = (current.participations || []).filter(
+        (p: VolunteerParticipation) => p.volunteerId === volunteerId && p.status === "validated"
+      )
+      return {
+        totalPoints: list.reduce((s: number, p: VolunteerParticipation) => s + p.pointsAwarded, 0),
+        activityCount: list.length,
+        hoursVolunteered: list.reduce((s: number, p: VolunteerParticipation) => s + p.hoursCounted, 0),
+      }
     },
     [data]
   )
@@ -701,6 +968,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
       addRegistrant,
       deleteRegistrant,
       findRegistrantByScan,
+      previewParticipationPoints,
+      validateParticipation,
+      cancelParticipation,
+      modifyParticipationPoints,
+      getVolunteerParticipations,
+      getVolunteerStats,
       addDonation,
       cancelDonation,
       addAssociation,
@@ -733,6 +1006,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
       addRegistrant,
       deleteRegistrant,
       findRegistrantByScan,
+      previewParticipationPoints,
+      validateParticipation,
+      cancelParticipation,
+      modifyParticipationPoints,
+      getVolunteerParticipations,
+      getVolunteerStats,
       addDonation,
       cancelDonation,
       addAssociation,

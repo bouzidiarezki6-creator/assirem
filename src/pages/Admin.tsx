@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import {
   Activity,
+  Award,
   Building2,
   CalendarDays,
   LayoutDashboard,
@@ -26,6 +27,7 @@ import QrScanner from "@/components/admin/QrScanner"
 import EventAdminPanel from "@/components/admin/EventAdminPanel"
 import CagnottesAdminPanel from "@/components/admin/CagnottesAdminPanel"
 import SosAdminPanel from "@/components/admin/SosAdminPanel"
+import VolunteerPointsManager from "@/components/admin/VolunteerPointsManager"
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher"
 import {
   ActivityAdminPanel,
@@ -49,6 +51,7 @@ type Tab =
   | "announcements"
   | "news"
   | "crm"
+  | "points"
   | "scan"
   | "cagnottes"
   | "sos"
@@ -63,6 +66,7 @@ const tabDefs: { id: Tab; labelKey: string; icon: typeof LayoutDashboard }[] = [
   { id: "news", labelKey: "admin.tabs.news", icon: Newspaper },
   { id: "events", labelKey: "admin.tabs.events", icon: CalendarDays },
   { id: "crm", labelKey: "admin.tabs.crm", icon: Users },
+  { id: "points", labelKey: "admin.points.title", icon: Award },
   { id: "scan", labelKey: "admin.tabs.scan", icon: ScanLine },
 ]
 
@@ -71,6 +75,7 @@ export default function Admin() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [tab, setTab] = useState<Tab>("overview")
+  const [selectedVolunteerForPoints, setSelectedVolunteerForPoints] = useState<string | null>(null)
   const navigate = useNavigate()
   const { t, dir } = useI18n()
 
@@ -192,8 +197,25 @@ export default function Admin() {
           {tab === "sos" && <SosAdminPanel />}
           {tab === "announcements" && <AnnouncementAdminPanel />}
           {tab === "news" && <NewsAdminPanel />}
-          {tab === "crm" && <CrmTab />}
-          {tab === "scan" && <ScanTab />}
+          {tab === "crm" && (
+            <CrmTab
+              onAwardPoints={(id) => {
+                setSelectedVolunteerForPoints(id)
+                setTab("points")
+              }}
+            />
+          )}
+          {tab === "points" && (
+            <VolunteerPointsManager initialVolunteerId={selectedVolunteerForPoints} />
+          )}
+          {tab === "scan" && (
+            <ScanTab
+              onAwardPoints={(id) => {
+                setSelectedVolunteerForPoints(id)
+                setTab("points")
+              }}
+            />
+          )}
         </main>
       </div>
     </div>
@@ -244,7 +266,7 @@ function OverviewTab({ onNavigate }: { onNavigate: (t: Tab) => void }) {
   )
 }
 
-function CrmTab() {
+function CrmTab({ onAwardPoints }: { onAwardPoints: (id: string) => void }) {
   const { data, deleteRegistrant } = useAppData()
   const { t, formatDateTime } = useI18n()
   const [q, setQ] = useState("")
@@ -321,7 +343,7 @@ function CrmTab() {
                     <div>{r.birthDate}</div>
                     <div className="text-xs text-gray-500">{r.birthPlace}</div>
                   </td>
-                  <td className="px-4 py-3 min-w-[140px]">
+                  <td className="px-4 py-3 min-w-[150px]">
                     <div className="flex items-center gap-1.5">
                       <span className="font-bold text-primary tabular-nums">
                         {r.points ?? 0} pts
@@ -332,6 +354,16 @@ function CrmTab() {
                       <span>{tier.icon}</span>
                       <span>{t(`pointsInfo.level${tier.level}.status`)}</span>
                     </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="mt-2 h-7 text-[11px] gap-1 border-primary/30 text-primary hover:bg-primary/10 w-full justify-center rounded-lg"
+                      onClick={() => onAwardPoints(r.id)}
+                    >
+                      <Award className="h-3.5 w-3.5" />
+                      {t("admin.points.validate")}
+                    </Button>
                   </td>
 
                   <td className="px-4 py-3">
@@ -366,7 +398,7 @@ function CrmTab() {
   )
 }
 
-function ScanTab() {
+function ScanTab({ onAwardPoints }: { onAwardPoints: (id: string) => void }) {
   const { data, findRegistrantByScan } = useAppData()
   const { t } = useI18n()
   const [manual, setManual] = useState("")
@@ -497,6 +529,14 @@ function ScanTab() {
                         </div>
                       </div>
                       <LevelProgressBar points={found.points ?? 0} />
+                      <Button
+                        type="button"
+                        className="w-full bg-primary hover:bg-primary/90 text-white font-semibold text-xs gap-1.5 mt-2 h-9 rounded-xl"
+                        onClick={() => onAwardPoints(found.id)}
+                      >
+                        <Award className="h-4 w-4" />
+                        {t("admin.points.validate")}
+                      </Button>
                     </div>
                   </div>
                 </div>

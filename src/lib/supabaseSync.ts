@@ -1,5 +1,5 @@
 import { supabase } from "./supabase"
-import type { AppData, EventItem, Announcement, Activity, Institution, NewsArticle, Registrant, Cagnotte, Donation, Association, SosCollectionSite, SosDamagedSite } from "./types"
+import type { AppData, EventItem, Announcement, Activity, Institution, NewsArticle, Registrant, VolunteerParticipation, Cagnotte, Donation, Association, SosCollectionSite, SosDamagedSite } from "./types"
 
 export async function loadFromSupabase(): Promise<AppData> {
   const [
@@ -13,7 +13,8 @@ export async function loadFromSupabase(): Promise<AppData> {
     { data: associations },
     { data: donations },
     { data: sos_collection_sites },
-    { data: sos_damaged_sites }
+    { data: sos_damaged_sites },
+    { data: participations }
   ] = await Promise.all([
     supabase.from('events').select('*'),
     supabase.from('announcements').select('*'),
@@ -25,7 +26,8 @@ export async function loadFromSupabase(): Promise<AppData> {
     supabase.from('associations').select('*'),
     supabase.from('donations').select('*'),
     supabase.from('sos_collection_sites').select('*'),
-    supabase.from('sos_damaged_sites').select('*')
+    supabase.from('sos_damaged_sites').select('*'),
+    supabase.from('participations').select('*')
   ])
 
   return {
@@ -68,6 +70,23 @@ export async function loadFromSupabase(): Promise<AppData> {
       activityId: r.activity_id,
       registeredAt: r.registered_at
     })) as Registrant[],
+
+    participations: (participations || []).map(p => ({
+      ...p,
+      volunteerId: p.volunteer_id,
+      activityTitle: p.activity_title,
+      activityDate: p.activity_date,
+      categoryId: p.category_id,
+      activityTypeId: p.activity_type_id,
+      durationId: p.duration_id,
+      responsibilityId: p.responsibility_id,
+      hoursCounted: p.hours_counted,
+      pointsAwarded: p.points_awarded,
+      originalPoints: p.original_points,
+      createdAt: p.created_at,
+      updatedAt: p.updated_at,
+      changes: Array.isArray(p.changes) ? p.changes : []
+    })) as VolunteerParticipation[],
 
     cagnottes: (cagnottes || []).map(c => ({
       ...c,
@@ -269,6 +288,32 @@ export async function syncToSupabase(prev: AppData, next: AppData) {
         birth_date: updated.birthDate, birth_place: updated.birthPlace, national_id: updated.nationalId,
         points: updated.points, announcement_id: updated.announcementId, event_id: updated.eventId,
         activity_id: updated.activityId
+      }).eq('id', updated.id)
+    }
+  }
+
+  // Participations
+  if (prev.participations !== next.participations) {
+    const added = next.participations.find(n => !prev.participations.some(p => p.id === n.id))
+    const removed = prev.participations.find(p => !next.participations.some(n => n.id === p.id))
+    const updated = next.participations.find(n => {
+      const p = prev.participations.find(x => x.id === n.id)
+      return p && p !== n
+    })
+
+    if (added) {
+      await supabase.from('participations').insert({
+        id: added.id, fingerprint: added.fingerprint, volunteer_id: added.volunteerId,
+        activity_title: added.activityTitle, activity_date: added.activityDate, category_id: added.categoryId,
+        activity_type_id: added.activityTypeId, duration_id: added.durationId, responsibility_id: added.responsibilityId,
+        hours_counted: added.hoursCounted, points_awarded: added.pointsAwarded, original_points: added.originalPoints,
+        status: added.status, changes: added.changes
+      })
+    } else if (removed) {
+      await supabase.from('participations').delete().eq('id', removed.id)
+    } else if (updated) {
+      await supabase.from('participations').update({
+        points_awarded: updated.pointsAwarded, status: updated.status, changes: updated.changes
       }).eq('id', updated.id)
     }
   }

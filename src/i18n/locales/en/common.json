@@ -739,5 +739,49 @@
       "autre": "Other"
     },
     "bejaiaFocus": "Béjaïa focus — youth houses, hostels and local facilities."
+  },
+  "pointsInfo": {
+    "buttonAria": "Information about levels and rewards",
+    "dialogTitle": "Level System & Volunteer Recognition",
+    "dialogSubtitle": "Discover the point milestones and opportunities offered by the association.",
+    "colLevel": "Level",
+    "colPoints": "Required points",
+    "colStatus": "Status",
+    "colPerks": "Benefit / Recognition",
+    "currentLevelBadge": "Your current level",
+    "disclaimer": "Benefits and participation depend on eligibility criteria, availability, and association approval.",
+    "pointsRange": "{{min}}–{{max}} pts",
+    "pointsPlus": "{{min}}+ pts",
+    "levelName": "Level {{level}}",
+    "level0": {
+      "status": "New volunteer",
+      "perkTitle": "Onboarding & discovery",
+      "perkDesc": "Welcome into the team and participation in initial volunteer initiatives."
+    },
+    "level1": {
+      "status": "Engaged volunteer",
+      "perkTitle": "Certificate of recognition",
+      "perkDesc": "Upon reaching this level, the participant may receive a certificate recognizing their volunteer commitment."
+    },
+    "level2": {
+      "status": "Active volunteer",
+      "perkTitle": "Participation in excursions",
+      "perkDesc": "The participant may be eligible for select excursions organized by the association."
+    },
+    "level3": {
+      "status": "Confirmed volunteer",
+      "perkTitle": "Participation in summer camps",
+      "perkDesc": "The participant may be eligible to participate in select summer camps organized or supervised by the association."
+    },
+    "level4": {
+      "status": "Exemplary volunteer",
+      "perkTitle": "Facilitation of summer camps",
+      "perkDesc": "The participant may be selected to contribute to the animation and supervision of holiday camps, based on association criteria."
+    },
+    "level5": {
+      "status": "Volunteer ambassador",
+      "perkTitle": "Special recognition & advanced responsibilities",
+      "perkDesc": "Opportunity to receive special recognition and access advanced leadership or coordination responsibilities."
+    }
   }
 }

@@ -1,5 +1,6 @@
 import { useI18n } from "@/context/I18nProvider"
 import { getLevelProgress } from "@/lib/levels"
+import PointsLevelInfo from "./PointsLevelInfo"
 import { cn } from "@/lib/utils"
 
 type Props = {
@@ -15,9 +16,12 @@ export default function LevelProgressBar({ points, className, compact = false }:
   return (
     <div className={cn("min-w-[160px] space-y-1.5", className)}>
       <div className="flex items-center justify-between gap-2 text-xs">
-        <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 font-bold text-primary">
-          {t("levels.level", { n: progress.level })}
-        </span>
+        <div className="inline-flex items-center gap-1.5">
+          <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 font-bold text-primary">
+            {t("levels.level", { n: progress.level })}
+          </span>
+          <PointsLevelInfo points={points} />
+        </div>
         {!compact && (
           <span className="text-gray-500 tabular-nums">
             {t("levels.progress", {

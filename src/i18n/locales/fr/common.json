@@ -748,5 +748,49 @@
       "autre": "Autre"
     },
     "bejaiaFocus": "Focus Béjaïa — maisons de jeunes, auberges et structures locales."
+  },
+  "pointsInfo": {
+    "buttonAria": "Informations sur les niveaux et avantages",
+    "dialogTitle": "Système de niveaux & reconnaissance",
+    "dialogSubtitle": "Découvrez les paliers de points et les opportunités proposées par l'association.",
+    "colLevel": "Niveau",
+    "colPoints": "Points requis",
+    "colStatus": "Statut",
+    "colPerks": "Avantage / Reconnaissance",
+    "currentLevelBadge": "Votre niveau actuel",
+    "disclaimer": "Les avantages et participations dépendent des critères d'éligibilité, des disponibilités et de la validation de l'association.",
+    "pointsRange": "{{min}}–{{max}} pts",
+    "pointsPlus": "{{min}}+ pts",
+    "levelName": "Niveau {{level}}",
+    "level0": {
+      "status": "Nouveau bénévole",
+      "perkTitle": "Intégration & découverte",
+      "perkDesc": "Accueil au sein de l'équipe et participation aux premières actions bénévoles."
+    },
+    "level1": {
+      "status": "Bénévole engagé",
+      "perkTitle": "Attestation de reconnaissance",
+      "perkDesc": "Après avoir atteint ce niveau, le participant peut recevoir une attestation reconnaissant son engagement bénévole."
+    },
+    "level2": {
+      "status": "Bénévole actif",
+      "perkTitle": "Participation aux excursions",
+      "perkDesc": "Le participant peut être éligible à certaines excursions organisées par l'association."
+    },
+    "level3": {
+      "status": "Bénévole confirmé",
+      "perkTitle": "Participation aux colonies de vacances",
+      "perkDesc": "Le participant peut être éligible à participer à certaines colonies de vacances organisées ou encadrées par l'association."
+    },
+    "level4": {
+      "status": "Bénévole exemplaire",
+      "perkTitle": "Animation des colonies de vacances",
+      "perkDesc": "Le participant peut être sélectionné pour contribuer à l'animation et à l'encadrement des colonies de vacances, selon les besoins et les critères de l'association."
+    },
+    "level5": {
+      "status": "Ambassadeur du bénévolat",
+      "perkTitle": "Reconnaissance spéciale & responsabilités avancées",
+      "perkDesc": "Possibilité d'obtenir une reconnaissance particulière et d'accéder à certaines responsabilités ou missions avancées selon l'association."
+    }
   }
 }

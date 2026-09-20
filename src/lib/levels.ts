@@ -65,3 +65,39 @@ export function getLevelProgress(totalPoints: number): LevelProgress {
     remaining: Math.max(0, need - remainingPool),
   }
 }
+
+export type VolunteerTierId =
+  | "nouveau"
+  | "engage"
+  | "actif"
+  | "confirme"
+  | "exemplaire"
+  | "ambassadeur"
+
+export interface VolunteerTier {
+  level: number
+  id: VolunteerTierId
+  minPoints: number
+  maxPoints: number | null
+  icon: string
+}
+
+export const VOLUNTEER_TIERS: VolunteerTier[] = [
+  { level: 0, id: "nouveau", minPoints: 0, maxPoints: 49, icon: "🌱" },
+  { level: 1, id: "engage", minPoints: 50, maxPoints: 149, icon: "🎖️" },
+  { level: 2, id: "actif", minPoints: 150, maxPoints: 299, icon: "🏞️" },
+  { level: 3, id: "confirme", minPoints: 300, maxPoints: 499, icon: "🏕️" },
+  { level: 4, id: "exemplaire", minPoints: 500, maxPoints: 999, icon: "🎤" },
+  { level: 5, id: "ambassadeur", minPoints: 1000, maxPoints: null, icon: "⭐" },
+]
+
+export function getVolunteerTier(points: number = 0): VolunteerTier {
+  const pts = Math.max(0, Math.floor(points) || 0)
+  for (let i = VOLUNTEER_TIERS.length - 1; i >= 0; i--) {
+    if (pts >= VOLUNTEER_TIERS[i].minPoints) {
+      return VOLUNTEER_TIERS[i]
+    }
+  }
+  return VOLUNTEER_TIERS[0]
+}
+

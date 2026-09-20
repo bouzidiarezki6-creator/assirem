@@ -19,6 +19,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import RegistrantQrCode from "@/components/shared/RegistrantQrCode"
+import PointsLevelInfo from "@/components/shared/PointsLevelInfo"
+import LevelProgressBar from "@/components/shared/LevelProgressBar"
+import { getVolunteerTier } from "@/lib/levels"
 import QrScanner from "@/components/admin/QrScanner"
 import EventAdminPanel from "@/components/admin/EventAdminPanel"
 import CagnottesAdminPanel from "@/components/admin/CagnottesAdminPanel"
@@ -288,6 +291,7 @@ function CrmTab() {
               <th className="px-4 py-3 font-medium">{t("admin.crm.member")}</th>
               <th className="px-4 py-3 font-medium">{t("admin.crm.nin")}</th>
               <th className="px-4 py-3 font-medium">{t("admin.crm.birth")}</th>
+              <th className="px-4 py-3 font-medium">{t("pointsInfo.colPoints")}</th>
               <th className="px-4 py-3 font-medium">{t("admin.crm.announcement")}</th>
               <th className="px-4 py-3 font-medium">{t("admin.crm.qr")}</th>
               <th className="px-4 py-3 font-medium">{t("admin.crm.registeredAt")}</th>
@@ -303,6 +307,7 @@ function CrmTab() {
               </tr>
             )}
             {filtered.map((r) => {
+              const tier = getVolunteerTier(r.points ?? 0)
               return (
                 <tr key={r.id} className="border-t hover:bg-gray-50/80 align-top">
                   <td className="px-4 py-3">
@@ -315,6 +320,18 @@ function CrmTab() {
                   <td className="px-4 py-3">
                     <div>{r.birthDate}</div>
                     <div className="text-xs text-gray-500">{r.birthPlace}</div>
+                  </td>
+                  <td className="px-4 py-3 min-w-[140px]">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold text-primary tabular-nums">
+                        {r.points ?? 0} pts
+                      </span>
+                      <PointsLevelInfo points={r.points ?? 0} />
+                    </div>
+                    <div className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                      <span>{tier.icon}</span>
+                      <span>{t(`pointsInfo.level${tier.level}.status`)}</span>
+                    </div>
                   </td>
 
                   <td className="px-4 py-3">
@@ -462,6 +479,25 @@ function ScanTab() {
                     <p>
                       <span className="text-gray-500">{t("admin.scan.qrLabel")}</span> {found.qrCode}
                     </p>
+                    <div className="pt-3 border-t border-border/60 space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-semibold text-gray-500">
+                            {t("pointsInfo.colPoints")}:
+                          </span>
+                          <span className="text-base font-bold text-primary tabular-nums">
+                            {found.points ?? 0} pts
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs font-medium text-foreground">
+                            {getVolunteerTier(found.points ?? 0).icon} {t(`pointsInfo.level${getVolunteerTier(found.points ?? 0).level}.status`)}
+                          </span>
+                          <PointsLevelInfo points={found.points ?? 0} />
+                        </div>
+                      </div>
+                      <LevelProgressBar points={found.points ?? 0} />
+                    </div>
                   </div>
                 </div>
               </div>

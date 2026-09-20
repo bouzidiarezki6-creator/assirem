@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import RegistrantQrCode from "@/components/shared/RegistrantQrCode"
+import PointsLevelInfo from "@/components/shared/PointsLevelInfo"
 import { useAppData } from "@/context/DataProvider"
 import { useI18n } from "@/context/I18nProvider"
 import type { Registrant } from "@/lib/types"
@@ -167,6 +168,13 @@ export default function Inscription() {
                 size={180}
                 downloadLabel={t("inscription.downloadQr")}
               />
+
+              <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3.5 py-1.5 text-xs text-primary font-medium">
+                <span>🌱 {t("pointsInfo.level0.status")}</span>
+                <span className="text-primary/30">•</span>
+                <span>0 pts</span>
+                <PointsLevelInfo points={0} />
+              </div>
               <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                 <Button type="button" onClick={() => setCreated(null)}>
                   {t("inscription.registerAnother")}

@@ -148,6 +148,7 @@ const seedData: AppData = {
       month: "جوان",
       location: "بجاية",
       institution: "بيت الشباب بجاية",
+      categoryId: "educatif",
       imageDataUrl: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80",
       published: true,
     },
@@ -160,6 +161,7 @@ const seedData: AppData = {
       month: "جوان",
       location: "تيزي وزو",
       institution: "المركب الرياضي تيزي وزو",
+      categoryId: "social",
       imageDataUrl: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80",
       published: true,
     },
@@ -172,6 +174,7 @@ const seedData: AppData = {
       month: "جويلية",
       location: "توجة",
       institution: "مخيم الشباب توجة",
+      categoryId: "scoutisme",
       imageDataUrl: "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?w=800&q=80",
       published: true,
     },
@@ -184,6 +187,7 @@ const seedData: AppData = {
       month: "جويلية",
       location: "أميزور",
       institution: "بيت الشباب أميزور",
+      categoryId: "educatif",
       imageDataUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80",
       published: true,
     },
@@ -512,12 +516,18 @@ function load(): AppData {
       return next
     })
 
-    const activities = (parsed.activities ?? seedData.activities).map((a) => {
-      if (a.imageDataUrl === undefined) {
+    const activities = (parsed.activities ?? seedData.activities).map((a, idx) => {
+      let next = { ...a }
+      if (next.imageDataUrl === undefined) {
         changed = true
-        return { ...a, imageDataUrl: null }
+        next = { ...next, imageDataUrl: null }
       }
-      return a
+      if (!next.categoryId) {
+        const cats: CategoryId[] = ["educatif", "social", "scoutisme", "environnemental", "sante"]
+        next = { ...next, categoryId: cats[idx % cats.length] }
+        changed = true
+      }
+      return next
     })
 
     let institutions = parsed.institutions ?? seedData.institutions

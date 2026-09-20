@@ -1,5 +1,6 @@
+import { useState } from "react"
 import { Card, CardContent } from "../ui/card"
-import { MapPin, Building2 } from "lucide-react"
+import { MapPin, Building2, ImageIcon } from "lucide-react"
 
 interface ActivityCardProps {
   image?: string;
@@ -9,20 +10,38 @@ interface ActivityCardProps {
   description: string;
   location: string;
   institution: string;
+  categoryName?: string;
 }
 
-export default function ActivityCard({ image, day, month, title, description, location, institution }: ActivityCardProps) {
+export default function ActivityCard({ image, day, month, title, description, location, institution, categoryName }: ActivityCardProps) {
+  const [imgError, setImgError] = useState(false)
+  const hasImage = Boolean(image && !imgError)
+
   return (
     <Card className="overflow-hidden border-border/60 relative group h-full interactive-lift">
       <div className="absolute top-4 end-4 z-10 bg-primary text-primary-foreground w-12 h-14 rounded-2xl flex flex-col items-center justify-center shadow-soft font-bold leading-none">
         <span className="text-xl">{day}</span>
         <span className="text-[10px] uppercase tracking-wide opacity-90">{month}</span>
       </div>
+      {categoryName && (
+        <div className="absolute top-4 start-4 z-10 bg-white/95 backdrop-blur-md text-foreground px-3 py-1 rounded-full text-xs font-semibold shadow-soft border border-border/60">
+          {categoryName}
+        </div>
+      )}
       <div className="aspect-[16/10] w-full bg-muted relative overflow-hidden rounded-t-2xl">
-        {image ? (
-          <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+        {hasImage ? (
+          <img
+            src={image}
+            alt={title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+            onError={() => setImgError(true)}
+          />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-primary/10 to-muted group-hover:scale-105 transition-transform duration-500" />
+          <div className="w-full h-full bg-gradient-to-br from-primary/10 via-primary/5 to-muted group-hover:scale-105 transition-transform duration-500 flex flex-col items-center justify-center gap-1.5 text-primary/40">
+            <ImageIcon className="h-8 w-8" />
+            <span className="text-[11px] font-semibold tracking-wider uppercase opacity-70">Yed fel yed</span>
+          </div>
         )}
       </div>
       <CardContent className="p-5 space-y-3">

@@ -10,6 +10,7 @@ import { useAppData } from "@/context/DataProvider"
 import { useI18n } from "@/context/I18nProvider"
 import { processAnnouncementImage } from "@/lib/eventImage"
 import { arabicMonthParts } from "@/lib/dates"
+import { ACTIVITY_CATEGORIES, type CategoryId } from "@/lib/categories"
 import type {
   Activity,
   Announcement,
@@ -276,12 +277,13 @@ const emptyAct = {
   date: "",
   location: "",
   institution: "",
+  categoryId: "social" as CategoryId,
   imageDataUrl: null as string | null,
   published: true,
 }
 
 export function ActivityAdminPanel() {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const { data, addActivity, updateActivity, deleteActivity } = useAppData()
   const [mode, setMode] = useState<"list" | "form">("list")
   const [editId, setEditId] = useState<string | null>(null)
@@ -295,6 +297,9 @@ export function ActivityAdminPanel() {
       month: parts.month,
     }
   }
+
+  const activeCat = ACTIVITY_CATEGORIES.find((c) => c.id === form.categoryId)
+  const catLabel = activeCat ? (locale === "ar" ? activeCat.labelAr : activeCat.labelFr) : ""
 
   if (mode === "form") {
     return (
@@ -317,6 +322,21 @@ export function ActivityAdminPanel() {
             <Field label={t("admin.fields.title")}>
               <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
             </Field>
+
+            <Field label={t("categories.title") || "Catégorie"}>
+              <select
+                className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                value={form.categoryId}
+                onChange={(e) => setForm({ ...form, categoryId: e.target.value as CategoryId })}
+              >
+                {ACTIVITY_CATEGORIES.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.labelFr} / {cat.labelAr}
+                  </option>
+                ))}
+              </select>
+            </Field>
+
             <Field label={t("admin.fields.date")}>
               <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} required />
             </Field>
@@ -361,6 +381,7 @@ export function ActivityAdminPanel() {
               month={parts.month || "—"}
               location={form.location || t("admin.activitiesPanel.locationPh")}
               institution={form.institution || t("admin.activitiesPanel.institutionPh")}
+              categoryName={catLabel}
               image={form.imageDataUrl || undefined}
             />
           </div>
@@ -381,30 +402,35 @@ export function ActivityAdminPanel() {
         }}
       />
       <div className="space-y-3">
-        {data.activities.map((item) => (
-          <Row
-            key={item.id}
-            title={item.title}
-            meta={`${item.date} · ${item.location} · ${item.published ? t("admin.common.published") : t("admin.common.hidden")}`}
-            thumb={item.imageDataUrl}
-            onEdit={() => {
-              setEditId(item.id)
-              setForm({
-                title: item.title,
-                description: item.description,
-                date: item.date,
-                location: item.location,
-                institution: item.institution,
-                imageDataUrl: item.imageDataUrl,
-                published: item.published,
-              })
-              setMode("form")
-            }}
-            onDelete={() => {
-              if (confirm(t("admin.common.deleteConfirm"))) deleteActivity(item.id)
-            }}
-          />
-        ))}
+        {data.activities.map((item) => {
+          const itemCat = ACTIVITY_CATEGORIES.find((c) => c.id === item.categoryId)
+          const catText = itemCat ? (locale === "ar" ? itemCat.labelAr : itemCat.labelFr) : ""
+          return (
+            <Row
+              key={item.id}
+              title={item.title}
+              meta={`${item.date} · ${item.location}${catText ? ` · ${catText}` : ""} · ${item.published ? t("admin.common.published") : t("admin.common.hidden")}`}
+              thumb={item.imageDataUrl}
+              onEdit={() => {
+                setEditId(item.id)
+                setForm({
+                  title: item.title,
+                  description: item.description,
+                  date: item.date,
+                  location: item.location,
+                  institution: item.institution,
+                  categoryId: item.categoryId || "social",
+                  imageDataUrl: item.imageDataUrl,
+                  published: item.published,
+                })
+                setMode("form")
+              }}
+              onDelete={() => {
+                if (confirm(t("admin.common.deleteConfirm"))) deleteActivity(item.id)
+              }}
+            />
+          )
+        })}
       </div>
     </div>
   )

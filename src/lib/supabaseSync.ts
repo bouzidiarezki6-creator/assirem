@@ -34,7 +34,8 @@ export async function loadFromSupabase(): Promise<AppData> {
     events: (events || []).map(e => ({
       ...e,
       imageDataUrl: e.image_data_url,
-      requiresRegistration: e.requires_registration
+      requiresRegistration: e.requires_registration,
+      categoryId: e.category_id || e.categoryId || undefined,
     })) as EventItem[],
     announcements: (announcements || []).map(a => ({
       ...a,
@@ -44,7 +45,8 @@ export async function loadFromSupabase(): Promise<AppData> {
     })) as Announcement[],
     activities: (activities || []).map(a => ({
       ...a,
-      imageDataUrl: a.image_data_url
+      imageDataUrl: a.image_data_url,
+      categoryId: a.category_id || a.categoryId || undefined,
     })) as Activity[],
     institutions: (institutions || []).map(i => ({
       ...i,
@@ -150,7 +152,8 @@ export async function syncToSupabase(prev: AppData, next: AppData) {
       await supabase.from('events').insert({
         id: added.id, title: added.title, description: added.description, date: added.date,
         location: added.location, institution: added.institution, image_data_url: added.imageDataUrl,
-        requires_registration: added.requiresRegistration, published: added.published
+        requires_registration: added.requiresRegistration, published: added.published,
+        category_id: added.categoryId || null
       })
     } else if (removed) {
       await supabase.from('events').delete().eq('id', removed.id)
@@ -158,7 +161,8 @@ export async function syncToSupabase(prev: AppData, next: AppData) {
       await supabase.from('events').update({
         title: updated.title, description: updated.description, date: updated.date,
         location: updated.location, institution: updated.institution, image_data_url: updated.imageDataUrl,
-        requires_registration: updated.requiresRegistration, published: updated.published
+        requires_registration: updated.requiresRegistration, published: updated.published,
+        category_id: updated.categoryId || null
       }).eq('id', updated.id)
     }
   }
@@ -200,7 +204,8 @@ export async function syncToSupabase(prev: AppData, next: AppData) {
       await supabase.from('activities').insert({
         id: added.id, title: added.title, description: added.description, date: added.date,
         day: added.day, month: added.month, location: added.location, institution: added.institution,
-        image_data_url: added.imageDataUrl, published: added.published
+        image_data_url: added.imageDataUrl, published: added.published,
+        category_id: added.categoryId || null
       })
     } else if (removed) {
       await supabase.from('activities').delete().eq('id', removed.id)
@@ -208,7 +213,8 @@ export async function syncToSupabase(prev: AppData, next: AppData) {
       await supabase.from('activities').update({
         title: updated.title, description: updated.description, date: updated.date,
         day: updated.day, month: updated.month, location: updated.location, institution: updated.institution,
-        image_data_url: updated.imageDataUrl, published: updated.published
+        image_data_url: updated.imageDataUrl, published: updated.published,
+        category_id: updated.categoryId || null
       }).eq('id', updated.id)
     }
   }

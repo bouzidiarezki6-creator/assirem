@@ -5,6 +5,7 @@ import { LocationFilterProvider } from "./context/LocationFilterProvider"
 import AppLayout from "./components/layout/AppLayout"
 import Home from "./pages/Home"
 import News from "./pages/News"
+import NewsDetails from "./pages/NewsDetails"
 import Activities from "./pages/Activities"
 import Institutions from "./pages/Institutions"
 import Inscription from "./pages/Inscription"
@@ -26,6 +27,7 @@ function App() {
                 <Route index element={<Home />} />
                 <Route path="institutions" element={<Institutions />} />
                 <Route path="news" element={<News />} />
+                <Route path="news/:id" element={<NewsDetails />} />
                 <Route path="activities" element={<Activities />} />
                 <Route path="activities/:id" element={<ActivityDetails />} />
                 <Route path="events/:id" element={<EventDetails />} />

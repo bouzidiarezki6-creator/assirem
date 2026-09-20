@@ -230,9 +230,18 @@
   },
   "news": {
     "title": "News & updates",
-    "subtitle": "Follow the latest news from youth institutions.",
+    "subtitle": "Follow the latest news and community initiatives.",
     "all": "All news",
-    "empty": "No news in this category"
+    "empty": "No news in this category",
+    "readArticle": "Read article",
+    "backNews": "Back to news",
+    "readingTime": "{{min}} min read",
+    "publishedOn": "Published on {{date}}",
+    "notFound": "News not found",
+    "notFoundHint": "This article does not exist or has been moved.",
+    "share": "Share",
+    "copied": "Link copied!",
+    "otherNews": "Other news"
   },
   "events": {
     "details": "View details",

@@ -239,9 +239,18 @@
   },
   "news": {
     "title": "Actualités et activités",
-    "subtitle": "Suivez les dernières nouvelles des institutions de jeunesse.",
+    "subtitle": "Suivez les dernières nouvelles et initiatives solidaires.",
     "all": "Toutes les actualités",
-    "empty": "Aucune actualité dans cette catégorie"
+    "empty": "Aucune actualité dans cette catégorie",
+    "readArticle": "Lire l'article",
+    "backNews": "Retour aux actualités",
+    "readingTime": "{{min}} min de lecture",
+    "publishedOn": "Publié le {{date}}",
+    "notFound": "Actualité introuvable",
+    "notFoundHint": "Cet article n'existe pas ou a été déplacé.",
+    "share": "Partager",
+    "copied": "Lien copié !",
+    "otherNews": "Autres actualités"
   },
   "events": {
     "details": "Voir les détails",

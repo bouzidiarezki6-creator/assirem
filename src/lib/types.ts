@@ -67,6 +67,7 @@ export type NewsArticle = {
   id: string
   title: string
   description: string
+  content?: string
   category: string
   categoryId?: CategoryId
   date: string

@@ -2,7 +2,6 @@ import { useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import { Search, Calendar, CalendarDays } from "lucide-react"
 import ActivityCard from "../components/shared/ActivityCard"
-import EventAnnouncement from "@/components/events/EventAnnouncement"
 import EmptyState from "@/components/shared/EmptyState"
 import PageHeader from "@/components/shared/PageHeader"
 import { useAppData } from "@/context/DataProvider"
@@ -10,31 +9,38 @@ import { useI18n } from "@/context/I18nProvider"
 import CategoryFilter from "@/components/shared/CategoryFilter"
 import type { CategoryId } from "@/lib/categories"
 
+function parseEventDate(dateStr: string, locale: string) {
+  const d = new Date(dateStr.length === 10 ? `${dateStr}T12:00:00` : dateStr)
+  if (isNaN(d.getTime())) {
+    return { day: "—", month: "" }
+  }
+  const intlLocale = locale === "ar" ? "ar-DZ" : locale === "fr" ? "fr-FR" : "en-GB"
+  const day = d.toLocaleDateString(intlLocale, { day: "numeric" })
+  const month = d.toLocaleDateString(intlLocale, { month: "short" })
+  return { day, month }
+}
+
 export default function Activities() {
   const { data } = useAppData()
-  const { t, dir } = useI18n()
+  const { t, dir, locale } = useI18n()
   const [query, setQuery] = useState("")
+  const [activeCategory, setActiveCategory] = useState<CategoryId | "all">("all")
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list")
+
   const iconPos = dir === "rtl" ? "right-3" : "left-3"
   const inputPad = dir === "rtl" ? "px-9" : "pl-9 pr-3"
 
-  const [activeCategory, setActiveCategory] = useState<CategoryId | "all">("all")
-
-  const activities = useMemo(() => {
-    let published = data.activities.filter((a) => a.published)
+  const events = useMemo(() => {
+    let list = data.events.filter((e) => e.published).sort((a, b) => a.date.localeCompare(b.date))
     if (activeCategory !== "all") {
-      published = published.filter((a) => a.categoryId === activeCategory)
+      list = list.filter((e) => e.categoryId === activeCategory)
     }
     const needle = query.trim().toLowerCase()
-    if (!needle) return published
-    return published.filter((a) =>
-      [a.title, a.description, a.location, a.institution].join(" ").toLowerCase().includes(needle)
+    if (!needle) return list
+    return list.filter((e) =>
+      [e.title, e.description, e.location, e.institution].join(" ").toLowerCase().includes(needle)
     )
-  }, [data.activities, query, activeCategory])
-
-  const events = useMemo(
-    () => data.events.filter((e) => e.published).sort((a, b) => a.date.localeCompare(b.date)),
-    [data.events]
-  )
+  }, [data.events, query, activeCategory])
 
   return (
     <div className="page-shell section-gap">
@@ -43,17 +49,6 @@ export default function Activities() {
         description={t("activities.subtitle")}
         hint={t("activities.registerHint")}
       />
-
-      {events.length > 0 && (
-        <section className="space-y-6">
-          <h2 className="type-h2 text-center">{t("activities.eventsTitle")}</h2>
-          <div className="grid w-full gap-5 md:grid-cols-2">
-            {events.map((ev) => (
-              <EventAnnouncement key={ev.id} event={ev} />
-            ))}
-          </div>
-        </section>
-      )}
 
       <div className="flex justify-center my-6">
         <CategoryFilter
@@ -66,14 +61,24 @@ export default function Activities() {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="flex items-center gap-2 bg-white border border-border px-4 py-2.5 rounded-full text-sm font-semibold text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors"
+            onClick={() => setViewMode("calendar")}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold transition-colors ${
+              viewMode === "calendar"
+                ? "bg-primary text-primary-foreground shadow-soft"
+                : "bg-white border border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+            }`}
           >
             <Calendar className="w-4 h-4" />
             {t("activities.calendar")}
           </button>
           <button
             type="button"
-            className="bg-primary text-primary-foreground px-4 py-2.5 rounded-full text-sm font-semibold shadow-soft"
+            onClick={() => setViewMode("list")}
+            className={`px-4 py-2.5 rounded-full text-sm font-semibold transition-colors ${
+              viewMode === "list"
+                ? "bg-primary text-primary-foreground shadow-soft"
+                : "bg-white border border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+            }`}
           >
             {t("activities.list")}
           </button>
@@ -91,7 +96,7 @@ export default function Activities() {
         </div>
       </div>
 
-      {activities.length === 0 ? (
+      {events.length === 0 ? (
         <EmptyState
           icon={CalendarDays}
           title={t("activities.empty")}
@@ -101,23 +106,26 @@ export default function Activities() {
         />
       ) : (
         <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
-          {activities.map((act) => (
-            <Link
-              key={act.id}
-              to={`/activities/${act.id}`}
-              className="block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-3xl"
-            >
-              <ActivityCard
-                day={act.day}
-                month={act.month}
-                title={act.title}
-                description={act.description}
-                location={act.location}
-                institution={act.institution}
-                image={act.imageDataUrl || undefined}
-              />
-            </Link>
-          ))}
+          {events.map((ev) => {
+            const { day, month } = parseEventDate(ev.date, locale)
+            return (
+              <Link
+                key={ev.id}
+                to={`/events/${ev.id}`}
+                className="block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-3xl"
+              >
+                <ActivityCard
+                  day={day}
+                  month={month}
+                  title={ev.title}
+                  description={ev.description}
+                  location={ev.location}
+                  institution={ev.institution}
+                  image={ev.imageDataUrl || undefined}
+                />
+              </Link>
+            )
+          })}
         </div>
       )}
     </div>

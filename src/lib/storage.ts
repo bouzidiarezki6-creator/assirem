@@ -14,6 +14,7 @@ import type {
 } from "./types"
 import { CAGNOTTE_TYPES } from "./cagnottes"
 import { seedAssociationsFromCatalog } from "./associations"
+import type { CategoryId } from "./categories"
 
 const STORAGE_KEY = "yfy-akbou-data-v3"
 const AUTH_KEY = "yfy-akbou-admin"
@@ -47,22 +48,72 @@ const seedData: AppData = {
     {
       id: uid(),
       title: "يوم شباب ولاية بجاية",
-      description: "تظاهرة شبابية تجمع المؤسسات الشبانية لولاية بجاية.",
+      description: "تظاهرة شبابية تجمع المؤسسات والجمعيات الشبانية لولاية بجاية.",
       date: "2026-06-25",
       location: "بجاية",
       institution: "يد في يد",
       imageDataUrl: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&q=80",
+      categoryId: "evenementiel",
       requiresRegistration: true,
       published: true,
     },
     {
       id: uid(),
-      title: "ملتقى الابتكار الشبابي",
-      description: "عرض مشاريع مبتكرة من شباب المؤسسات.",
+      title: "ملتقى الابتكار والبرمجة",
+      description: "ورشات تدريبية وعرض مشاريع رقمية مبتكرة لشباب المنطقة.",
       date: "2026-07-10",
       location: "أميزور",
       institution: "بيت الشباب أميزور",
       imageDataUrl: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&q=80",
+      categoryId: "educatif",
+      requiresRegistration: false,
+      published: true,
+    },
+    {
+      id: uid(),
+      title: "حملة تشجير وحماية الغابات",
+      description: "مبادرة بيئية كبرى لإعادة تشجير المناطق الغابية وحمايتها.",
+      date: "2026-07-18",
+      location: "أقبو",
+      institution: "يد في يد",
+      imageDataUrl: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&q=80",
+      categoryId: "environnemental",
+      requiresRegistration: true,
+      published: true,
+    },
+    {
+      id: uid(),
+      title: "مخيم صيفي وأنشطة كشفية",
+      description: "مخيم تدريبي وتطوعي للشباب على شاطئ توجة مع أنشطة استكشافية.",
+      date: "2026-08-01",
+      location: "توجة",
+      institution: "مخيم الشباب توجة",
+      imageDataUrl: "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?w=800&q=80",
+      categoryId: "scoutisme",
+      requiresRegistration: true,
+      published: true,
+    },
+    {
+      id: uid(),
+      title: "قافلة التضامن والصحة الجوارية",
+      description: "فحوصات طبية واستشارات وقائية وتوزيع طرود للمحتاجين.",
+      date: "2026-08-15",
+      location: "سيدي عيش",
+      institution: "يد في يد",
+      imageDataUrl: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
+      categoryId: "sante",
+      requiresRegistration: false,
+      published: true,
+    },
+    {
+      id: uid(),
+      title: "توزيع المساعدات للأسر المعوزة",
+      description: "مبادرة خيرية للتكفل بالعائلات وتوزيع الاحتياجات الأساسية.",
+      date: "2026-08-22",
+      location: "بجاية وسط",
+      institution: "يد في يد",
+      imageDataUrl: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&q=80",
+      categoryId: "social",
       requiresRegistration: false,
       published: true,
     },
@@ -442,7 +493,7 @@ function load(): AppData {
       return next
     })
 
-    const events = (parsed.events ?? seedData.events).map((e) => {
+    const events = (parsed.events && parsed.events.length >= 4 ? parsed.events : seedData.events).map((e, idx) => {
       let next = { ...e }
       if (next.imageDataUrl === undefined) {
         next = { ...next, imageDataUrl: null }
@@ -450,6 +501,11 @@ function load(): AppData {
       }
       if (typeof next.requiresRegistration !== "boolean") {
         next = { ...next, requiresRegistration: false }
+        changed = true
+      }
+      if (!next.categoryId) {
+        const cats: CategoryId[] = ["evenementiel", "educatif", "environnemental", "scoutisme", "sante", "social"]
+        next = { ...next, categoryId: cats[idx % cats.length] }
         changed = true
       }
       return next

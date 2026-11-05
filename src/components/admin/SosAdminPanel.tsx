@@ -1,5 +1,17 @@
 import { useMemo, useState, type FormEvent, type ReactNode } from "react"
-import { ExternalLink, House, MapPinned, Plus, Search, Trash2 } from "lucide-react"
+import {
+  AlertTriangle,
+  Briefcase,
+  ExternalLink,
+  House,
+  LayoutDashboard,
+  MapPinned,
+  Package,
+  Plus,
+  Search,
+  Trash2,
+  Users,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import SosGpsFields from "@/components/sos/SosGpsFields"
@@ -16,16 +28,74 @@ import type { SosAidCategoryId, SosRequestStatus } from "@/lib/types"
 import { padWilayaCode } from "@/lib/wilayas"
 import { cn } from "@/lib/utils"
 
-type SubTab = "collectionSites" | "damagedSites"
+import SosDashboardSection from "@/components/admin/sos/SosDashboardSection"
+import SosMaterialAdminSection from "@/components/admin/sos/SosMaterialAdminSection"
+import SosCallsAdminSection from "@/components/admin/sos/SosCallsAdminSection"
+import SosApplicationsAdminSection from "@/components/admin/sos/SosApplicationsAdminSection"
+import SosInterventionsAdminSection from "@/components/admin/sos/SosInterventionsAdminSection"
+
+type AdminSosTab =
+  | "dashboard"
+  | "needs"
+  | "calls"
+  | "applications"
+  | "interventions"
+  | "legacySites"
+
+type LegacySubTab = "collectionSites" | "damagedSites"
 
 const STATUSES: SosRequestStatus[] = ["pending", "validated", "rejected", "closed"]
 
 export default function SosAdminPanel() {
   const { t } = useI18n()
   const { data } = useAppData()
-  const [sub, setSub] = useState<SubTab>("collectionSites")
+  const [tab, setTab] = useState<AdminSosTab>("dashboard")
+  const [legacySub, setLegacySub] = useState<LegacySubTab>("collectionSites")
 
-  const tabs: { id: SubTab; label: string; count: number; icon: typeof MapPinned }[] = [
+  const tabs: {
+    id: AdminSosTab
+    label: string
+    count?: number
+    icon: typeof LayoutDashboard
+  }[] = [
+    {
+      id: "dashboard",
+      label: t("admin.sosCrm.tabs.dashboard"),
+      icon: LayoutDashboard,
+    },
+    {
+      id: "needs",
+      label: t("admin.sosCrm.tabs.needs"),
+      count: (data.sosMaterialNeeds || []).length,
+      icon: Package,
+    },
+    {
+      id: "calls",
+      label: t("admin.sosCrm.tabs.calls"),
+      count: (data.sosCalls || []).length,
+      icon: Briefcase,
+    },
+    {
+      id: "applications",
+      label: t("admin.sosCrm.tabs.applications"),
+      count: (data.sosApplications || []).length,
+      icon: Users,
+    },
+    {
+      id: "interventions",
+      label: t("admin.sosCrm.tabs.interventions"),
+      count: (data.sosInterventions || []).length,
+      icon: AlertTriangle,
+    },
+    {
+      id: "legacySites",
+      label: t("admin.sosCrm.tabs.legacy"),
+      count: data.sosCollectionSites.length + data.sosDamagedSites.length,
+      icon: MapPinned,
+    },
+  ]
+
+  const legacyTabs: { id: LegacySubTab; label: string; count: number; icon: typeof MapPinned }[] = [
     {
       id: "collectionSites",
       label: t("sos.collectionSites.title"),
@@ -47,45 +117,91 @@ export default function SosAdminPanel() {
         <p className="type-caption mt-1">{t("admin.sosCrm.subtitle")}</p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <StatCard
-          label={t("admin.sosCrm.pendingCollection")}
-          value={String(data.sosCollectionSites.filter((r) => r.status === "pending").length)}
-        />
-        <StatCard
-          label={t("admin.sosCrm.pendingDamaged")}
-          value={String(data.sosDamagedSites.filter((r) => r.status === "pending").length)}
-        />
-      </div>
-
+      {/* Tabs navigation */}
       <div className="flex flex-wrap gap-2 rounded-2xl border border-border/60 bg-white p-1.5 shadow-soft">
-        {tabs.map((tab) => (
+        {tabs.map((tb) => (
           <button
-            key={tab.id}
+            key={tb.id}
             type="button"
-            onClick={() => setSub(tab.id)}
+            onClick={() => setTab(tb.id)}
             className={cn(
-              "inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors sm:flex-none",
-              sub === tab.id
+              "inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold transition-colors sm:flex-none",
+              tab === tb.id
                 ? "bg-primary text-primary-foreground shadow-soft"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             )}
           >
-            <tab.icon className="h-4 w-4" aria-hidden />
-            {tab.label}
-            <span
-              className={cn(
-                "rounded-full px-2 py-0.5 text-[11px] font-bold",
-                sub === tab.id ? "bg-white/20" : "bg-muted"
-              )}
-            >
-              {tab.count}
-            </span>
+            <tb.icon className="h-4 w-4" aria-hidden />
+            {tb.label}
+            {tb.count !== undefined && (
+              <span
+                className={cn(
+                  "rounded-full px-2 py-0.5 text-[10px] font-bold",
+                  tab === tb.id ? "bg-white/20 text-white" : "bg-muted text-muted-foreground"
+                )}
+              >
+                {tb.count}
+              </span>
+            )}
           </button>
         ))}
       </div>
 
-      {sub === "collectionSites" ? <CollectionSitesSection /> : <DamagedSitesSection />}
+      {/* Tab Contents */}
+      {tab === "dashboard" && <SosDashboardSection />}
+      {tab === "needs" && <SosMaterialAdminSection />}
+      {tab === "calls" && <SosCallsAdminSection />}
+      {tab === "applications" && <SosApplicationsAdminSection />}
+      {tab === "interventions" && <SosInterventionsAdminSection />}
+
+      {/* Legacy Collection & Damaged Sites tab (100% preserved) */}
+      {tab === "legacySites" && (
+        <div className="space-y-6">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <StatCard
+              label={t("admin.sosCrm.pendingCollection")}
+              value={String(data.sosCollectionSites.filter((r) => r.status === "pending").length)}
+            />
+            <StatCard
+              label={t("admin.sosCrm.pendingDamaged")}
+              value={String(data.sosDamagedSites.filter((r) => r.status === "pending").length)}
+            />
+          </div>
+
+          <div className="flex flex-wrap gap-2 rounded-2xl border border-border/60 bg-white p-1.5 shadow-soft">
+            {legacyTabs.map((tb) => (
+              <button
+                key={tb.id}
+                type="button"
+                onClick={() => setLegacySub(tb.id)}
+                className={cn(
+                  "inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs sm:text-sm font-semibold transition-colors sm:flex-none",
+                  legacySub === tb.id
+                    ? "bg-primary text-primary-foreground shadow-soft"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                )}
+              >
+                <tb.icon className="h-4 w-4" aria-hidden />
+                {tb.label}
+                <span
+                  className={cn(
+                    "rounded-full px-2 py-0.5 text-[11px] font-bold",
+                    legacySub === tb.id ? "bg-white/20" : "bg-muted"
+                  )}
+                >
+                  {tb.count}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {legacySub === "collectionSites" ? (
+            <CollectionSitesSection />
+          ) : (
+            <DamagedSitesSection />
+          )}
+        </div>
+      )}
     </div>
   )
 }

@@ -85,8 +85,8 @@ export default function WilayaSelector({ className, variant = "navbar" }: Props)
         className={cn(
           "flex w-full items-center gap-1.5 rounded-full text-sm font-medium transition-colors",
           isPanel
-            ? "border border-border bg-muted/50 px-3 py-2.5 hover:bg-muted"
-            : "border border-border bg-muted/40 px-2.5 py-1.5 hover:bg-muted"
+            ? "border border-emerald-500/30 bg-[#041d13] px-3 py-2.5 text-white hover:bg-[#062c1d]"
+            : "border border-emerald-500/25 bg-[#031c11]/80 px-2.5 py-1.5 text-white hover:bg-[#052718]"
         )}
       >
         <MapPin className="h-4 w-4 shrink-0 text-primary" aria-hidden />
@@ -102,17 +102,17 @@ export default function WilayaSelector({ className, variant = "navbar" }: Props)
       {open && (
         <div
           className={cn(
-            "absolute z-[60] mt-2 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-border bg-white text-foreground shadow-card",
+            "absolute z-[60] mt-2 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-emerald-500/30 bg-[#031c12] text-white shadow-card backdrop-blur-xl",
             dir === "rtl" ? "left-0" : "right-0",
             isPanel && "left-0 right-0 w-full"
           )}
           role="listbox"
         >
-          <div className="border-b border-border p-2">
+          <div className="border-b border-emerald-500/20 p-2">
             <div className="relative">
               <Search
                 className={cn(
-                  "pointer-events-none absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground",
+                  "pointer-events-none absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/50",
                   dir === "rtl" ? "right-2.5" : "left-2.5"
                 )}
               />
@@ -123,7 +123,7 @@ export default function WilayaSelector({ className, variant = "navbar" }: Props)
                 onChange={(e) => setFilter(e.target.value)}
                 placeholder={t("nav.wilayaSearch")}
                 className={cn(
-                  "h-9 w-full rounded-xl border border-border bg-muted/40 py-1 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary",
+                  "h-9 w-full rounded-xl border border-emerald-500/30 bg-[#02130c] py-1 text-sm text-white placeholder:text-white/40 outline-none focus:border-primary focus:ring-1 focus:ring-primary",
                   dir === "rtl" ? "pr-8 pl-3" : "pl-8 pr-3"
                 )}
               />
@@ -138,8 +138,8 @@ export default function WilayaSelector({ className, variant = "navbar" }: Props)
                 aria-selected={selectedCode === null}
                 onClick={() => choose(null)}
                 className={cn(
-                  "flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-primary/5",
-                  selectedCode === null && "bg-primary/10 font-semibold text-primary"
+                  "flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-primary/20 hover:text-emerald-300",
+                  selectedCode === null && "bg-primary/20 font-semibold text-emerald-300"
                 )}
               >
                 <span className="flex-1 text-start">{t("nav.allAlgeria")}</span>
@@ -157,8 +157,8 @@ export default function WilayaSelector({ className, variant = "navbar" }: Props)
                     aria-selected={active}
                     onClick={() => choose(w.code)}
                     className={cn(
-                      "flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-primary/5",
-                      active && "bg-primary/10 font-semibold text-primary"
+                      "flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-primary/20 hover:text-emerald-300",
+                      active && "bg-primary/20 font-semibold text-emerald-300"
                     )}
                   >
                     <span className="w-7 shrink-0 font-mono text-xs text-muted-foreground">

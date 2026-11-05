@@ -66,7 +66,7 @@ export default function InstitutionsOsmMap({ institutions, wilaya, className }: 
 
   return (
     <div className={cn("space-y-3", className)}>
-      <div className="relative h-[320px] md:h-[380px] overflow-hidden rounded-xl border border-green-100">
+      <div className="relative h-[380px] md:h-[460px] overflow-hidden rounded-2xl border border-emerald-500/30">
         <MapContainer
           center={center}
           zoom={zoom}
@@ -85,14 +85,14 @@ export default function InstitutionsOsmMap({ institutions, wilaya, className }: 
               icon={kindIcon(inst.structureKind ?? "autre")}
             >
               <Popup>
-                <div className="space-y-1 text-sm min-w-[160px]">
-                  <p className="font-bold text-primary">{inst.name}</p>
-                  <p className="text-gray-600">
+                <div className="space-y-1 text-sm min-w-[170px]">
+                  <p className="font-bold text-emerald-300">{inst.name}</p>
+                  <p className="text-white/80 text-xs">
                     {t(STRUCTURE_KIND_I18N[inst.structureKind ?? "autre"])}
                     {inst.authority ? ` · ${inst.authority}` : ""}
                   </p>
-                  <p className="text-gray-500">{inst.location}</p>
-                  {inst.phone && <p className="text-gray-500">{inst.phone}</p>}
+                  <p className="text-white/60 text-xs">{inst.location}</p>
+                  {inst.phone && <p className="text-emerald-400 text-xs font-mono">{inst.phone}</p>}
                 </div>
               </Popup>
             </Marker>
@@ -100,17 +100,22 @@ export default function InstitutionsOsmMap({ institutions, wilaya, className }: 
         </MapContainer>
 
         {withCoords.length === 0 && (
-          <div className="absolute inset-x-0 bottom-3 mx-3 rounded-md bg-white/95 px-3 py-2 text-xs text-gray-600 border shadow-sm z-[400]">
+          <div className="absolute inset-x-0 bottom-4 mx-4 rounded-xl bg-[#02130c]/90 px-3.5 py-2 text-xs text-white/70 border border-emerald-500/30 shadow-lg z-[400] backdrop-blur-md">
             {t("map.noMarkers")}
           </div>
         )}
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs text-gray-500 inline-flex items-center gap-1">
-          <Building2 className="h-3.5 w-3.5" />
+      <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+        <span className="text-xs text-emerald-300/80 inline-flex items-center gap-1.5 font-medium">
+          <Building2 className="h-3.5 w-3.5 text-primary" />
           {t("map.markerCount", { count: withCoords.length })}
         </span>
+        {wilaya && (
+          <span className="text-xs text-white/50">
+            خط العرض: {wilaya.latitude.toFixed(2)} · خط الطول: {wilaya.longitude.toFixed(2)}
+          </span>
+        )}
       </div>
     </div>
   )

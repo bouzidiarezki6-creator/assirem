@@ -119,3 +119,120 @@ function extractLatLngPair(raw: string): { lat: number; lng: number } | null {
   if (isValidGps(b, a)) return { lat: b, lng: a }
   return null
 }
+
+/** =========================================================================
+ * EXTENSION DU MODULE SOS : BESOINS MATÉRIELS & PROFESSIONS
+ * ========================================================================= */
+
+import type {
+  SosMaterialCategory,
+  SosPriorityLevel,
+  SosProfessionCategory,
+  SosCall,
+  SosMaterialNeed,
+} from "./sosTypes"
+
+export const SOS_MATERIAL_CATEGORIES: {
+  id: SosMaterialCategory
+  labelKey: string
+  iconName: string
+}[] = [
+  { id: "food_water", labelKey: "sos.material.food_water", iconName: "UtensilsCrossed" },
+  { id: "clothing_blankets", labelKey: "sos.material.clothing_blankets", iconName: "Shirt" },
+  { id: "medical_supplies", labelKey: "sos.material.medical_supplies", iconName: "Pill" },
+  { id: "hygiene_products", labelKey: "sos.material.hygiene_products", iconName: "Sparkles" },
+  { id: "construction_materials", labelKey: "sos.material.construction_materials", iconName: "Hammer" },
+  { id: "technical_equipment", labelKey: "sos.material.technical_equipment", iconName: "Wrench" },
+  { id: "shelter_housing", labelKey: "sos.material.shelter_housing", iconName: "Tent" },
+  { id: "other", labelKey: "sos.material.other", iconName: "Package" },
+]
+
+export type SosProfessionDef = {
+  id: string
+  category: SosProfessionCategory
+  labelKey: string
+  requiresLicense?: boolean
+}
+
+export const SOS_PROFESSIONS: SosProfessionDef[] = [
+  // SANTÉ
+  { id: "doctor", category: "health", labelKey: "sos.professions.doctor", requiresLicense: true },
+  { id: "nurse", category: "health", labelKey: "sos.professions.nurse", requiresLicense: true },
+  { id: "psychologist", category: "health", labelKey: "sos.professions.psychologist", requiresLicense: true },
+  { id: "veterinarian", category: "health", labelKey: "sos.professions.veterinarian", requiresLicense: true },
+  { id: "pharmacist", category: "health", labelKey: "sos.professions.pharmacist", requiresLicense: true },
+  { id: "first_aid", category: "health", labelKey: "sos.professions.first_aid", requiresLicense: false },
+
+  // CONSTRUCTION ET TECHNIQUE
+  { id: "mason", category: "construction_technical", labelKey: "sos.professions.mason" },
+  { id: "electrician", category: "construction_technical", labelKey: "sos.professions.electrician" },
+  { id: "plumber", category: "construction_technical", labelKey: "sos.professions.plumber" },
+  { id: "carpenter", category: "construction_technical", labelKey: "sos.professions.carpenter" },
+  { id: "welder", category: "construction_technical", labelKey: "sos.professions.welder" },
+  { id: "technician", category: "construction_technical", labelKey: "sos.professions.technician" },
+
+  // TRANSPORT
+  { id: "driver", category: "transport", labelKey: "sos.professions.driver" },
+  { id: "truck_driver", category: "transport", labelKey: "sos.professions.truck_driver" },
+  { id: "heavy_machinery_driver", category: "transport", labelKey: "sos.professions.heavy_machinery_driver" },
+  { id: "transporter", category: "transport", labelKey: "sos.professions.transporter" },
+
+  // ACCOMPAGNEMENT SOCIAL
+  { id: "social_worker", category: "social", labelKey: "sos.professions.social_worker" },
+  { id: "educator", category: "social", labelKey: "sos.professions.educator" },
+  { id: "teacher", category: "social", labelKey: "sos.professions.teacher" },
+  { id: "translator", category: "social", labelKey: "sos.professions.translator" },
+  { id: "chaperone", category: "social", labelKey: "sos.professions.chaperone" },
+
+  // AUTRES
+  { id: "other", category: "other", labelKey: "sos.professions.other" },
+]
+
+export const SOS_PROFESSION_CATEGORIES: {
+  id: SosProfessionCategory
+  labelKey: string
+}[] = [
+  { id: "health", labelKey: "sos.professionCategories.health" },
+  { id: "construction_technical", labelKey: "sos.professionCategories.construction_technical" },
+  { id: "transport", labelKey: "sos.professionCategories.transport" },
+  { id: "social", labelKey: "sos.professionCategories.social" },
+  { id: "other", labelKey: "sos.professionCategories.other" },
+]
+
+export const SOS_PRIORITIES: {
+  id: SosPriorityLevel
+  labelKey: string
+  color: string
+}[] = [
+  { id: "critical", labelKey: "sos.priorities.critical", color: "text-rose-700 bg-rose-50 border-rose-200" },
+  { id: "high", labelKey: "sos.priorities.high", color: "text-amber-700 bg-amber-50 border-amber-200" },
+  { id: "medium", labelKey: "sos.priorities.medium", color: "text-blue-700 bg-blue-50 border-blue-200" },
+  { id: "low", labelKey: "sos.priorities.low", color: "text-emerald-700 bg-emerald-50 border-emerald-200" },
+]
+
+export function getProfessionMeta(id?: string): SosProfessionDef | undefined {
+  if (!id) return undefined
+  return SOS_PROFESSIONS.find((p) => p.id === id)
+}
+
+export function getMaterialCategoryMeta(id: SosMaterialCategory) {
+  return SOS_MATERIAL_CATEGORIES.find((m) => m.id === id)
+}
+
+export function calculateRemainingSlots(call: Pick<SosCall, "requiredSlots" | "acceptedCount">): number {
+  return Math.max(0, call.requiredSlots - (call.acceptedCount || 0))
+}
+
+export function calculateRemainingMaterial(need: Pick<SosMaterialNeed, "requiredQuantity" | "receivedQuantity">): number {
+  return Math.max(0, need.requiredQuantity - (need.receivedQuantity || 0))
+}
+
+export function isCallFull(call: Pick<SosCall, "requiredSlots" | "acceptedCount">): boolean {
+  return (call.acceptedCount || 0) >= call.requiredSlots
+}
+
+export function generateSosReference(prefix: string, seed: string): string {
+  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "")
+  const suffix = seed.replace(/-/g, "").slice(0, 6).toUpperCase()
+  return `SOS-${prefix}-${dateStr}-${suffix}`
+}

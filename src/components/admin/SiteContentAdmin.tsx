@@ -7,15 +7,18 @@ import InstitutionCard from "@/components/shared/InstitutionCard"
 import ActivityCard from "@/components/shared/ActivityCard"
 import NewsCard from "@/components/shared/NewsCard"
 import { useAppData } from "@/context/DataProvider"
+import { useGovernance } from "@/context/GovernanceContext"
 import { useI18n } from "@/context/I18nProvider"
 import { processAnnouncementImage } from "@/lib/eventImage"
 import { arabicMonthParts } from "@/lib/dates"
 import { ACTIVITY_CATEGORIES, type CategoryId } from "@/lib/categories"
+import { isDemoRecord } from "@/lib/storage"
 import type {
   Activity,
   Announcement,
   Institution,
   NewsArticle,
+  EventParticipationStatus,
 } from "@/lib/types"
 
 /* ───────── shared shell ───────── */
@@ -167,9 +170,17 @@ const emptyInst: Omit<Institution, "id"> = {
 export function InstitutionAdminPanel() {
   const { t } = useI18n()
   const { data, addInstitution, updateInstitution, deleteInstitution } = useAppData()
+  const { currentUser } = useGovernance()
   const [mode, setMode] = useState<"list" | "form">("list")
   const [editId, setEditId] = useState<string | null>(null)
   const [form, setForm] = useState(emptyInst)
+
+  const isTerritorialScoped =
+    currentUser.role === "wilaya_admin" || currentUser.role === "local_coordinator"
+
+  const scopedInstitutions = isTerritorialScoped && currentUser.wilayaCode
+    ? data.institutions.filter((item) => item.wilayaCode === currentUser.wilayaCode)
+    : data.institutions
 
   if (mode === "form") {
     return (
@@ -241,7 +252,7 @@ export function InstitutionAdminPanel() {
         }}
       />
       <div className="space-y-3">
-        {data.institutions.map((item) => (
+        {scopedInstitutions.map((item) => (
           <Row
             key={item.id}
             title={item.name}
@@ -280,15 +291,38 @@ const emptyAct = {
   categoryId: "social" as CategoryId,
   imageDataUrl: null as string | null,
   published: true,
+  status: "open" as EventParticipationStatus,
+  hours: "09:00 - 15:00",
+  capacity: 100,
+  registeredCount: 0,
+  wilayaCode: 6,
+  commune: "Béjaïa",
+  conditions: "",
+  isDemo: false,
 }
+
+const DEMO_WILAYAS_ACT = [
+  { code: 6, name: "06 — Béjaïa (بجاية)", communes: ["Béjaïa", "Akbou"] },
+  { code: 19, name: "19 — Sétif (سطيف)", communes: ["Sétif", "El Eulma"] },
+]
 
 export function ActivityAdminPanel() {
   const { t, locale } = useI18n()
   const { data, addActivity, updateActivity, deleteActivity } = useAppData()
+  const { currentUser } = useGovernance()
   const [mode, setMode] = useState<"list" | "form">("list")
   const [editId, setEditId] = useState<string | null>(null)
   const [form, setForm] = useState(emptyAct)
   const parts = arabicMonthParts(form.date)
+
+  const isTerritorialScoped =
+    currentUser.role === "wilaya_admin" || currentUser.role === "local_coordinator"
+
+  const scopedActivities = isTerritorialScoped && currentUser.wilayaCode
+    ? data.activities.filter((item) => !item.wilayaCode || item.wilayaCode === currentUser.wilayaCode)
+    : data.activities
+
+  const selectedWilaya = DEMO_WILAYAS_ACT.find((w) => w.code === (form.wilayaCode || 6)) || DEMO_WILAYAS_ACT[0]
 
   function toActivity(): Omit<Activity, "id"> {
     return {
@@ -323,26 +357,85 @@ export function ActivityAdminPanel() {
               <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
             </Field>
 
-            <Field label={t("categories.title") || "Catégorie"}>
-              <select
-                className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                value={form.categoryId}
-                onChange={(e) => setForm({ ...form, categoryId: e.target.value as CategoryId })}
-              >
-                {ACTIVITY_CATEGORIES.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.labelFr} / {cat.labelAr}
-                  </option>
-                ))}
-              </select>
-            </Field>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Field label={t("categories.title") || "Catégorie"}>
+                <select
+                  className="w-full h-10 rounded-md border border-input bg-transparent px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  value={form.categoryId}
+                  onChange={(e) => setForm({ ...form, categoryId: e.target.value as CategoryId })}
+                >
+                  {ACTIVITY_CATEGORIES.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.labelFr} / {cat.labelAr}
+                    </option>
+                  ))}
+                </select>
+              </Field>
 
-            <Field label={t("admin.fields.date")}>
-              <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} required />
-            </Field>
+              <Field label="Statut de l'activité">
+                <select
+                  className="w-full h-10 rounded-md border border-input bg-transparent px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  value={form.status || "open"}
+                  onChange={(e) => setForm({ ...form, status: e.target.value as EventParticipationStatus })}
+                >
+                  <option value="open">Ouvert</option>
+                  <option value="upcoming">À venir</option>
+                  <option value="full">Complet</option>
+                  <option value="in_progress">En cours</option>
+                  <option value="completed">Terminé</option>
+                  <option value="cancelled">Annulé</option>
+                </select>
+              </Field>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Field label={t("admin.fields.date")}>
+                <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} required />
+              </Field>
+
+              <Field label="Horaires (ex: 09:00 - 15:00)">
+                <Input value={form.hours || ""} onChange={(e) => setForm({ ...form, hours: e.target.value })} placeholder="09:00 - 15:00" />
+              </Field>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Field label="Wilaya (Périmètre officiel)">
+                <select
+                  className="w-full h-10 rounded-md border border-input bg-transparent px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  value={form.wilayaCode || 6}
+                  onChange={(e) => {
+                    const code = Number(e.target.value)
+                    const w = DEMO_WILAYAS_ACT.find((x) => x.code === code)
+                    setForm({
+                      ...form,
+                      wilayaCode: code,
+                      commune: w ? w.communes[0] : "Béjaïa",
+                    })
+                  }}
+                >
+                  {DEMO_WILAYAS_ACT.map((w) => (
+                    <option key={w.code} value={w.code}>{w.name}</option>
+                  ))}
+                </select>
+              </Field>
+
+              <Field label="Commune">
+                <select
+                  className="w-full h-10 rounded-md border border-input bg-transparent px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  value={form.commune || selectedWilaya.communes[0]}
+                  onChange={(e) => setForm({ ...form, commune: e.target.value })}
+                >
+                  {selectedWilaya.communes.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </Field>
+            </div>
+
             <Field label={t("admin.fields.location")}>
               <Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} required />
             </Field>
+
             <Field label={t("admin.fields.institution")}>
               <Input
                 value={form.institution}
@@ -350,6 +443,27 @@ export function ActivityAdminPanel() {
                 required
               />
             </Field>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Field label="Capacité d'accueil">
+                <Input
+                  type="number"
+                  min="1"
+                  value={form.capacity || 100}
+                  onChange={(e) => setForm({ ...form, capacity: Number(e.target.value) })}
+                />
+              </Field>
+
+              <Field label="Inscrits actuels">
+                <Input
+                  type="number"
+                  min="0"
+                  value={form.registeredCount || 0}
+                  onChange={(e) => setForm({ ...form, registeredCount: Number(e.target.value) })}
+                />
+              </Field>
+            </div>
+
             <Field label={t("admin.fields.description")}>
               <textarea
                 className="w-full min-h-[100px] rounded-md border px-3 py-2 text-sm"
@@ -358,15 +472,38 @@ export function ActivityAdminPanel() {
                 required
               />
             </Field>
-            <ImageField value={form.imageDataUrl} onChange={(v) => setForm({ ...form, imageDataUrl: v })} />
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={form.published}
-                onChange={(e) => setForm({ ...form, published: e.target.checked })}
+
+            <Field label="Conditions de participation (matériel, âge, consignes)">
+              <textarea
+                className="w-full min-h-[70px] rounded-md border px-3 py-2 text-sm"
+                value={form.conditions || ""}
+                onChange={(e) => setForm({ ...form, conditions: e.target.value })}
+                placeholder="Ex: Accessible à partir de 16 ans. Équipement fourni sur place."
               />
-              {t("admin.fields.published")}
-            </label>
+            </Field>
+
+            <ImageField value={form.imageDataUrl} onChange={(v) => setForm({ ...form, imageDataUrl: v })} />
+
+            <div className="flex flex-wrap items-center gap-6 pt-2">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={form.published}
+                  onChange={(e) => setForm({ ...form, published: e.target.checked })}
+                />
+                {t("admin.fields.published")}
+              </label>
+
+              <label className="flex items-center gap-2 text-sm text-emerald-800 font-semibold">
+                <input
+                  type="checkbox"
+                  checked={form.isDemo ?? false}
+                  onChange={(e) => setForm({ ...form, isDemo: e.target.checked })}
+                />
+                Donnée DEMO
+              </label>
+            </div>
+
             <Button type="submit" className="bg-primary hover:bg-primary/90">
               {t("admin.common.save")}
             </Button>
@@ -402,14 +539,16 @@ export function ActivityAdminPanel() {
         }}
       />
       <div className="space-y-3">
-        {data.activities.map((item) => {
+        {scopedActivities.map((item) => {
           const itemCat = ACTIVITY_CATEGORIES.find((c) => c.id === item.categoryId)
           const catText = itemCat ? (locale === "ar" ? itemCat.labelAr : itemCat.labelFr) : ""
+          const isDemo = isDemoRecord(item)
+
           return (
             <Row
               key={item.id}
               title={item.title}
-              meta={`${item.date} · ${item.location}${catText ? ` · ${catText}` : ""} · ${item.published ? t("admin.common.published") : t("admin.common.hidden")}`}
+              meta={`${item.date} · ${item.commune || item.location}${catText ? ` · ${catText}` : ""}${isDemo ? " · [DEMO]" : ""} · ${item.published ? t("admin.common.published") : t("admin.common.hidden")}`}
               thumb={item.imageDataUrl}
               onEdit={() => {
                 setEditId(item.id)
@@ -422,6 +561,14 @@ export function ActivityAdminPanel() {
                   categoryId: item.categoryId || "social",
                   imageDataUrl: item.imageDataUrl,
                   published: item.published,
+                  status: item.status || "open",
+                  hours: item.hours || "",
+                  capacity: item.capacity || 100,
+                  registeredCount: item.registeredCount || 0,
+                  wilayaCode: item.wilayaCode || 6,
+                  commune: item.commune || "Béjaïa",
+                  conditions: item.conditions || "",
+                  isDemo: item.isDemo ?? isDemo,
                 })
                 setMode("form")
               }}

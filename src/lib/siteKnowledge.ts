@@ -2,7 +2,7 @@
 export const SITE_ASSISTANT_SYSTEM = `Tu es l’assistant officiel du site « Yed fel yed » (يد في يد — main dans la main), plateforme de jeunesse et de solidarité en Algérie (ancrage Béjaïa, couverture 69 wilayas).
 
 RÈGLES STRICTES :
-1. Réponds UNIQUEMENT aux questions sur ce site, ses pages, modules, inscriptions, cagnottes, SOS, institutions, actualités, admin, langues, navigation.
+1. Réponds UNIQUEMENT aux questions sur ce site, ses pages, modules, inscriptions, SOS, institutions, actualités, admin, langues, navigation.
 2. Si la question est hors sujet (politique, devoirs scolaires, code générique, autres sites, blagues hors contexte, etc.), refuse poliment en 1–2 phrases et propose de recentrer sur Yed fel yed.
 3. N’invente pas de fonctionnalités absentes. Si tu ne sais pas, dis-le clairement.
 4. Réponses courtes, claires, utiles (3–8 phrases max). Utilise la langue de l’utilisateur (français, arabe ou anglais).
@@ -14,15 +14,13 @@ CONTENU DU SITE :
 - Institutions (/institutions) : annuaire filtrable (recherche, type, wilaya).
 - Activités (/activities) et détails (/activities/:id, /events/:id) : événements/activités publiés, inscription.
 - Inscription (/inscription) : formulaire adhérent avec NIN (18 chiffres) → badge QR (YFY-…). Tableau public des niveaux & reconnaissance bénévolat (paliers de points et avantages).
-- Cagnottes (/cagnottes) : dons solidaires par wilaya (Aïd el-Adha, Aïd el-Fitr, Couffin Ramadan, Associations) ; dons simulés (démo) ; associations avec CCP.
 - SOS (/sos) : lieux de collecte et lieux endommagés validés, GPS, filtres wilaya.
 - Actualités (/news) : articles, à la une, catégories.
-- Admin (/admin) : back-office (contenu, CRM inscrits, dons, SOS, scanner QR) — réservé aux administrateurs.
+- Admin (/admin) : back-office (contenu, CRM inscrits, SOS, scanner QR) — réservé aux administrateurs.
 - Transversal : FR / AR / EN (RTL pour l’arabe), filtre wilaya, recherche globale, navigation mobile.
 
 GUIDE RAPIDE UTILISATEUR :
 - S’inscrire à un événement : ouvrir l’événement → Inscription → remplir le formulaire (NIN) → recevoir un QR.
-- Soutenir : page Cagnottes → choisir wilaya/type → don (simulation).
 - Aide urgence : page SOS → consulter les lieux validés (carte / Google Maps).
 - Trouver une structure : Institutions ou carte sur l’accueil + filtre wilaya.
 `
@@ -32,7 +30,6 @@ export type SiteChatSnapshotInput = {
   events: { title: string; location?: string; date?: string; published?: boolean }[]
   activities: { title: string; published?: boolean }[]
   news: { title: string; published?: boolean; featured?: boolean }[]
-  cagnottes: { title: string; wilayaCode?: number }[]
   associations: { name: string; published?: boolean }[]
   sosCollection: { name: string; status?: string; wilayaCode?: number }[]
   sosDamaged: { name: string; status?: string; wilayaCode?: number }[]
@@ -64,9 +61,6 @@ export function buildLiveSiteSnapshot(data: SiteChatSnapshotInput): string {
     }`,
     `Actualités (${pubNews.length}) : ${
       pubNews.map((n) => n.title).join(" · ") || "aucune"
-    }`,
-    `Cagnottes (${data.cagnottes.length}) : ${
-      data.cagnottes.map((c) => c.title).join(" · ") || "aucune"
     }`,
     `Associations (${assocs.length}) : ${
       assocs.map((a) => a.name).join(" · ") || "aucune"

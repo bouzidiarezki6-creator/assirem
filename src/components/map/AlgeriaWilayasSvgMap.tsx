@@ -104,20 +104,20 @@ export default function AlgeriaWilayasSvgMap({
       const isSelected = selectedCode === code
       const isHovered = hoveredCode === code
       if (isSelected) {
-        el.style.fill = "#1B7D67"
+        el.style.fill = "#00ff88"
         el.style.stroke = "#ffffff"
-        el.style.strokeWidth = "14"
-        el.style.filter = "drop-shadow(0 0 10px rgba(27,125,103,0.45))"
+        el.style.strokeWidth = "12"
+        el.style.filter = "drop-shadow(0 0 20px rgba(0,255,136,1)) drop-shadow(0 0 6px #00ff88)"
       } else if (isHovered) {
-        el.style.fill = "#4DB6A0"
-        el.style.stroke = "#146B58"
-        el.style.strokeWidth = "10"
-        el.style.filter = "drop-shadow(0 0 8px rgba(27,125,103,0.35))"
+        el.style.fill = "#059669"
+        el.style.stroke = "#ffffff"
+        el.style.strokeWidth = "8"
+        el.style.filter = "drop-shadow(0 0 14px rgba(0,255,136,0.85))"
       } else {
-        el.style.fill = "#A8D5C8"
-        el.style.stroke = "#1B7D67"
-        el.style.strokeWidth = "4"
-        el.style.filter = "none"
+        el.style.fill = "rgba(4, 45, 26, 0.75)"
+        el.style.stroke = "#00ff88"
+        el.style.strokeWidth = "2"
+        el.style.filter = "drop-shadow(0 0 1px rgba(0,255,136,0.2))"
       }
     })
   }, [selectedCode, hoveredCode, ready, activeCode])
@@ -135,23 +135,23 @@ export default function AlgeriaWilayasSvgMap({
     <div className={cn("relative w-full", className)}>
       <div
         ref={hostRef}
-        className="aspect-[1/0.97] w-full overflow-hidden rounded-xl bg-primary/10 border border-green-100 [&_svg]:h-full [&_svg]:w-full"
+        className="aspect-[1/0.97] w-full overflow-hidden rounded-2xl bg-black/15 backdrop-blur-xl border border-emerald-400/20 p-2 sm:p-4 shadow-inner [&_svg]:h-full [&_svg]:w-full"
         aria-label={t("home.mapPlaceholder")}
       />
       {!ready && !error && (
-        <div className="absolute inset-0 flex items-center justify-center text-sm text-gray-500">
+        <div className="absolute inset-0 flex items-center justify-center text-sm text-emerald-400">
           {t("common.loading")}
         </div>
       )}
       {error && (
-        <div className="absolute inset-0 flex items-center justify-center text-sm text-red-600">
+        <div className="absolute inset-0 flex items-center justify-center text-sm text-red-400">
           {t("map.loadError")}
         </div>
       )}
       {tip && (
-        <div className="pointer-events-none absolute start-3 top-3 rounded-md bg-white/95 px-3 py-1.5 text-sm font-semibold text-primary shadow-sm border border-green-100">
+        <div className="pointer-events-none absolute start-4 top-4 rounded-xl bg-[#02140c]/90 px-3.5 py-1.5 text-sm font-bold text-emerald-300 shadow-xl border border-emerald-500/40 backdrop-blur-md">
           {tip}
-          <span className="ms-2 text-xs font-normal text-gray-500">
+          <span className="ms-2 text-xs font-normal text-white/60">
             {padWilayaCode(activeCode!)}
           </span>
         </div>

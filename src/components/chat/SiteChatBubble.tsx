@@ -6,7 +6,6 @@ import { useI18n } from "@/context/I18nProvider"
 import { Button } from "@/components/ui/button"
 import { askSiteAssistant, isGeminiConfigured, type ChatTurn } from "@/lib/geminiChat"
 import { buildLiveSiteSnapshot } from "@/lib/siteKnowledge"
-import { CAGNOTTE_TYPES } from "@/lib/cagnottes"
 import { motion as motionTokens } from "@/lib/motion"
 import { cn } from "@/lib/utils"
 
@@ -49,10 +48,6 @@ export default function SiteChatBubble() {
           title: n.title,
           published: n.published,
           featured: n.featured,
-        })),
-        cagnottes: data.cagnottes.map((c) => ({
-          title: CAGNOTTE_TYPES.find((t) => t.id === c.typeId)?.id ?? c.typeId,
-          wilayaCode: c.wilayaCode,
         })),
         associations: data.associations.map((a) => ({
           name: a.name,
@@ -163,9 +158,9 @@ export default function SiteChatBubble() {
               </button>
             </header>
 
-            <div ref={listRef} className="flex-1 space-y-3 overflow-y-auto bg-surface/80 px-3 py-3">
+            <div ref={listRef} className="flex-1 space-y-3 overflow-y-auto bg-[#02130c]/90 px-3 py-3">
               {messages.length === 0 && (
-                <div className="rounded-2xl bg-white px-3 py-2.5 text-sm text-muted-foreground shadow-soft">
+                <div className="rounded-2xl bg-[#041d13] border border-emerald-500/25 px-3 py-2.5 text-sm text-emerald-300/80 shadow-soft">
                   {t("chat.welcome")}
                 </div>
               )}
@@ -175,22 +170,22 @@ export default function SiteChatBubble() {
                   className={cn(
                     "max-w-[92%] rounded-2xl px-3 py-2 text-sm leading-relaxed shadow-soft",
                     m.role === "user"
-                      ? "ms-auto bg-primary text-primary-foreground"
-                      : "me-auto bg-white text-foreground"
+                      ? "ms-auto bg-primary text-primary-foreground font-semibold"
+                      : "me-auto bg-[#042416] text-white border border-emerald-500/25"
                   )}
                 >
                   {m.text}
                 </div>
               ))}
               {busy && (
-                <div className="me-auto flex items-center gap-2 rounded-2xl bg-white px-3 py-2 text-sm text-muted-foreground shadow-soft">
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                <div className="me-auto flex items-center gap-2 rounded-2xl bg-[#042416] px-3 py-2 text-sm text-emerald-300 shadow-soft">
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
                   {t("chat.thinking")}
                 </div>
               )}
             </div>
 
-            <form onSubmit={onSubmit} className="border-t border-border/60 bg-white p-2.5">
+            <form onSubmit={onSubmit} className="border-t border-emerald-500/20 bg-[#031c12] p-2.5">
               <div className="flex items-end gap-2">
                 <label className="sr-only" htmlFor="site-chat-input">
                   {t("chat.placeholder")}
@@ -201,7 +196,7 @@ export default function SiteChatBubble() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder={t("chat.placeholder")}
-                  className="max-h-24 min-h-10 flex-1 resize-none rounded-2xl border border-border bg-surface px-3 py-2.5 text-sm outline-none ring-primary focus:ring-2"
+                  className="max-h-24 min-h-10 flex-1 resize-none rounded-2xl border border-emerald-500/30 bg-[#02140d] px-3 py-2.5 text-sm text-white placeholder:text-white/40 outline-none ring-primary focus:ring-2"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault()
@@ -214,6 +209,7 @@ export default function SiteChatBubble() {
                   size="icon"
                   disabled={busy || !input.trim()}
                   aria-label={t("chat.send")}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
                 >
                   {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 </Button>
@@ -231,8 +227,8 @@ export default function SiteChatBubble() {
         whileHover={{ scale: 1.04 }}
         whileTap={{ scale: 0.96 }}
         className={cn(
-          "flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-elevated",
-          "ring-2 ring-white/80 transition hover:bg-primary/92"
+          "flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-green-600 text-white shadow-elevated",
+          "ring-2 ring-emerald-300/40 shadow-[0_0_20px_rgba(0,255,136,0.4)] transition hover:brightness-110"
         )}
       >
         {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}

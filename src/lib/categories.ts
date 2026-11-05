@@ -3,7 +3,6 @@ import {
   HeartHandshake,
   HeartPulse,
   Leaf,
-  PartyPopper,
   Siren,
   Tent,
   type LucideIcon,
@@ -61,13 +60,6 @@ export const ACTIVITY_CATEGORIES: Category[] = [
     labelAr: "طوارئ",
     description: "Intervention et aide d'urgence",
     icon: Siren,
-  },
-  {
-    id: "evenementiel",
-    labelFr: "Événementiel",
-    labelAr: "تظاهرات",
-    description: "Organisation d'événements jeunes",
-    icon: PartyPopper,
   },
   {
     id: "scoutisme",

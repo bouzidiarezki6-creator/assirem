@@ -1,8 +1,46 @@
 import type { AssociationSectorId } from "./associations"
 import type { CategoryId } from "./categories"
-import type { CagnotteTypeId } from "./cagnottes"
 import type { InstitutionAuthority, StructureKind } from "./wilayas"
 import type { ActivityTypeId, DurationId, ResponsibilityId } from "./volunteerPoints"
+import type {
+  SosMaterialCategory,
+  SosPriorityLevel,
+  SosMaterialStatus,
+  SosMaterialNeed,
+  SosDonationPledge,
+  SosCallType,
+  SosProfessionCategory,
+  SosCallUrgency,
+  SosCallStatus,
+  SosCall,
+  SosApplicationStatus,
+  SosApplication,
+  SosInterventionStatus,
+  SosTeamMember,
+  SosTeam,
+  SosIntervention,
+  SosTrackingStatus,
+  SosUnifiedTrackableItem,
+} from "./sosTypes"
+import type {
+  InstitutionalUser,
+  InstitutionalOperation,
+  InstitutionalRole,
+  AuditRegistryEntry,
+} from "./governanceTypes"
+import type {
+  VolunteerChallenge,
+  SpecialAwardNomination,
+  SeasonArchive,
+} from "./rewardsGamification"
+
+export type EventParticipationStatus =
+  | "upcoming"
+  | "open"
+  | "full"
+  | "in_progress"
+  | "completed"
+  | "cancelled"
 
 export type EventItem = {
   id: string
@@ -15,6 +53,15 @@ export type EventItem = {
   categoryId?: CategoryId
   requiresRegistration: boolean
   published: boolean
+  /** 6 explicit participation states */
+  status?: EventParticipationStatus
+  hours?: string
+  conditions?: string
+  capacity?: number
+  registeredCount?: number
+  wilayaCode?: number
+  commune?: string
+  isDemo?: boolean
   /** Optional future multilingual CMS fields — never auto-invented */
   title_fr?: string
   title_en?: string
@@ -32,6 +79,7 @@ export type Announcement = {
   openUntil: string
   maxSlots: number
   active: boolean
+  isDemo?: boolean
 }
 
 export type Activity = {
@@ -46,6 +94,15 @@ export type Activity = {
   categoryId?: CategoryId
   imageDataUrl: string | null
   published: boolean
+  /** 6 explicit participation states */
+  status?: EventParticipationStatus
+  hours?: string
+  conditions?: string
+  capacity?: number
+  registeredCount?: number
+  wilayaCode?: number
+  commune?: string
+  isDemo?: boolean
 }
 
 export type Institution = {
@@ -58,10 +115,16 @@ export type Institution = {
   published: boolean
   /** Wilaya code 1–69 */
   wilayaCode?: number
+  commune?: string
   lat?: number
   lng?: number
   structureKind?: StructureKind
   authority?: InstitutionAuthority
+  isVerified?: boolean
+  email?: string
+  hours?: string
+  domains?: string[]
+  isDemo?: boolean
 }
 
 export type NewsArticle = {
@@ -75,6 +138,12 @@ export type NewsArticle = {
   imageDataUrl: string | null
   featured: boolean
   published: boolean
+  author?: string
+  source?: string
+  relatedArticleIds?: string[]
+  wilayaCode?: number
+  commune?: string
+  isDemo?: boolean
 }
 
 export type Registrant = {
@@ -90,6 +159,7 @@ export type Registrant = {
   eventId?: string | null
   activityId?: string | null
   registeredAt: string
+  isDemo?: boolean
 }
 
 export type ParticipationStatus = "validated" | "cancelled"
@@ -117,9 +187,76 @@ export type VolunteerParticipation = {
   pointsAwarded: number
   originalPoints: number
   status: ParticipationStatus
+  authorId?: string
+  authorName?: string
+  authorRole?: InstitutionalRole
+  authorWilayaCode?: number
   createdAt: string
   updatedAt: string
   changes: ParticipationPointChange[]
+  isDemo?: boolean
+}
+
+export type VolunteerSkill =
+  | "first_aid"
+  | "health"
+  | "psychology"
+  | "logistics"
+  | "transport"
+  | "construction"
+  | "it"
+  | "education"
+  | "communication"
+  | "environment"
+  | "distribution"
+  | "other"
+
+export type VolunteerAccount = {
+  id: string
+  email: string
+  passwordHash?: string // For local auth fallback when Supabase Auth is offline
+  firstName: string
+  lastName: string
+  phone: string
+  wilayaCode: number
+  commune: string
+  birthDate?: string
+  skills: VolunteerSkill[]
+  interests: string[]
+  volunteerCode: string // Public safe code e.g. YFY-VOL-20261104-9B3E
+  points: number
+  status: "active" | "suspended"
+  isVerified: boolean
+  acceptedTermsAt: string
+  publicProfileConsent?: boolean // Consent to appear in public Hall of Honor / Leaderboards
+  showWilayaInLeaderboard?: boolean
+  completedChallenges?: string[] // IDs of completed challenges
+  specialAwards?: string[] // IDs of special awards received
+  earnedBadges?: EarnedBadge[] // Automatically awarded badges
+  createdAt: string
+  updatedAt: string
+  avatarUrl?: string
+  bio?: string
+  isDemo?: boolean
+}
+
+export type VolunteerPointTransaction = {
+  id: string
+  volunteerId: string
+  amount: number
+  balanceAfter: number
+  reason: string
+  missionTitle?: string
+  participationId?: string
+  correctedTransactionId?: string
+  adminNote?: string
+  authorId?: string
+  authorName?: string
+  authorRole?: InstitutionalRole
+  authorWilayaCode?: number
+  status?: "validated" | "corrected" | "cancelled"
+  createdAt: string
+  isDemo?: boolean
 }
 
 export type AppData = {
@@ -130,20 +267,136 @@ export type AppData = {
   news: NewsArticle[]
   registrants: Registrant[]
   participations: VolunteerParticipation[]
-  cagnottes: Cagnotte[]
-  donations: Donation[]
+
+  // Volunteer Accounts for Rewards Program
+  volunteerAccounts: VolunteerAccount[]
+  volunteerPointTransactions: VolunteerPointTransaction[]
+
+  // Associations & SOS Sites
   associations: Association[]
   sosCollectionSites: SosCollectionSite[]
   sosDamagedSites: SosDamagedSite[]
+
+  // Extended SOS Module
+  sosMaterialNeeds: SosMaterialNeed[]
+  sosDonationPledges: SosDonationPledge[]
+  sosCalls: SosCall[]
+  sosApplications: SosApplication[]
+  sosInterventions: SosIntervention[]
+
+  // Institutional Governance & Traceability
+  institutionalUsers: InstitutionalUser[]
+  institutionalOperations: InstitutionalOperation[]
+  auditRegistry: AuditRegistryEntry[]
+
+  // Rewards, Challenges, Saisons & Gamification
+  customChallenges?: VolunteerChallenge[]
+  awardNominations?: SpecialAwardNomination[]
+  seasonArchives?: SeasonArchive[]
+
+  // Connected Volunteer Ecosystem
+  notifications?: AppNotification[]
+  presenceRecords?: PresenceRecord[]
+  missionReports?: MissionReport[]
+  pointRulesConfig?: PointRulesConfig
 }
 
-export type Cagnotte = {
+export type EarnedBadge = {
+  badgeId: string
+  unlockedAt: string
+  isDemo?: boolean
+}
+
+export type NotificationType =
+  | "points_awarded"
+  | "badge_unlocked"
+  | "tier_promoted"
+  | "presence_confirmed"
+  | "mission_completed"
+  | "report_submitted"
+  | "report_validated"
+  | "report_rejected"
+  | "registration_confirmed"
+  | "admin_message"
+
+export type AppNotification = {
   id: string
-  typeId: CagnotteTypeId
+  volunteerId: string
+  type: NotificationType
+  title: string
+  message: string
+  points?: number
+  badgeId?: string
+  tierId?: string
+  read: boolean
+  createdAt: string
+  link?: string
+  isDemo?: boolean
+}
+
+export type PresenceStatus = "checked_in" | "checked_out" | "manual_validated" | "excused"
+
+export type PresenceRecord = {
+  id: string
+  volunteerId: string
+  volunteerName: string
+  volunteerCode: string
+  targetType: "event" | "activity" | "sos_call" | "sos_intervention"
+  targetId: string
+  targetTitle: string
   wilayaCode: number
-  goalAmount: number
-  raisedAmount: number
-  published: boolean
+  commune: string
+  checkInAt: string
+  checkOutAt?: string
+  durationHours?: number
+  status: PresenceStatus
+  scannedByRole?: InstitutionalRole
+  scannedById?: string
+  scannedByName?: string
+  manualValidationReason?: string
+  pointsAwarded?: number
+  createdAt: string
+  isDemo?: boolean
+}
+
+export type MissionReportStatus = "draft" | "submitted" | "validated" | "rejected"
+
+export type MissionReport = {
+  id: string
+  missionId: string
+  missionType: "event" | "activity" | "sos_call" | "sos_intervention"
+  title: string
+  wilayaCode: number
+  commune: string
+  missionDate: string
+  authorId: string
+  authorName: string
+  authorRole: InstitutionalRole
+  attendeesCount: number
+  hoursCompleted: number
+  summary: string
+  achievements: string[]
+  challengesFaced?: string
+  status: MissionReportStatus
+  reviewedAt?: string
+  reviewedById?: string
+  reviewedByName?: string
+  reviewNote?: string
+  pointsDistributed?: boolean
+  createdAt: string
+  updatedAt: string
+  isDemo?: boolean
+}
+
+export type PointRulesConfig = {
+  registrationValidated: number // default 5
+  presenceConfirmed: number // default 10
+  missionCompleted: number // default 30
+  reportAccepted: number // default 15
+  criticalMissionBonus: number // default 10
+  exceptionalMissionBonus: number // default 20
+  lastUpdated?: string
+  updatedBy?: string
 }
 
 export type Association = {
@@ -156,29 +409,7 @@ export type Association = {
   published: boolean
   createdAt: string
   updatedAt: string
-}
-
-export type DonationStatus = "completed" | "cancelled"
-
-export type Donation = {
-  id: string
-  /** Human-readable ledger reference for strict audit */
-  reference: string
-  cagnotteId: string
-  /** Snapshots at donation time — never mutate after create */
-  cagnotteTypeId: CagnotteTypeId
-  wilayaCode: number
-  associationId: string | null
-  associationName: string | null
-  associationCcp: string | null
-  amount: number
-  donorName: string
-  /** Only last 4 digits — never store full PAN/CVV */
-  cardLast4: string
-  status: DonationStatus
-  createdAt: string
-  cancelledAt: string | null
-  cancelReason: string | null
+  isDemo?: boolean
 }
 
 export type SosRequestStatus = "pending" | "validated" | "rejected" | "closed"
@@ -205,6 +436,7 @@ export type SosCollectionSite = {
   adminNote: string
   createdAt: string
   updatedAt: string
+  isDemo?: boolean
 }
 
 /** Lieu endommagé */
@@ -221,4 +453,52 @@ export type SosDamagedSite = {
   adminNote: string
   createdAt: string
   updatedAt: string
+  isDemo?: boolean
 }
+
+export type {
+  SosMaterialCategory,
+  SosPriorityLevel,
+  SosMaterialStatus,
+  SosMaterialNeed,
+  SosDonationPledge,
+  SosCallType,
+  SosProfessionCategory,
+  SosCallUrgency,
+  SosCallStatus,
+  SosCall,
+  SosApplicationStatus,
+  SosApplication,
+  SosInterventionStatus,
+  SosTeamMember,
+  SosTeam,
+  SosIntervention,
+  SosTrackingStatus,
+  SosUnifiedTrackableItem,
+}
+
+export type {
+  InstitutionalRole,
+  InstitutionalUserStatus,
+  InstitutionalUser,
+  OperationWorkflowStatus,
+  OperationCategory,
+  OperationRiskLevel,
+  OperationValidationLevel,
+  VerificationStage,
+  DigitalAttestation,
+  InstitutionalOperation,
+  AuditRegistryEntry,
+  InstitutionalKpis,
+} from "./governanceTypes"
+
+export type {
+  VolunteerChallenge,
+  SpecialAwardNomination,
+  SeasonArchive,
+  PerkStatus,
+  TierPerkItem,
+  LeaderboardEntry,
+  TeamLeaderboardEntry,
+  HallOfHonorData,
+} from "./rewardsGamification"

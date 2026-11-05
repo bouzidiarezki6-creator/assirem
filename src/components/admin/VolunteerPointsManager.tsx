@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from "react"
-import { Award, CheckCircle2, History, Search, PlusCircle, X, AlertCircle, Trash2, Edit3 } from "lucide-react"
+import { Award, CheckCircle2, History, Search, PlusCircle, X, AlertCircle, Trash2, Edit3, ShieldAlert, Sliders } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -7,6 +7,8 @@ import PointsLevelInfo from "@/components/shared/PointsLevelInfo"
 import LevelProgressBar from "@/components/shared/LevelProgressBar"
 import { useAppData } from "@/context/DataProvider"
 import { useI18n } from "@/context/I18nProvider"
+import { useGovernance } from "@/context/GovernanceContext"
+import { DEFAULT_POINT_RULES } from "@/lib/pointsEngine"
 import { ACTIVITY_CATEGORIES, type CategoryId } from "@/lib/categories"
 import {
   ACTIVITY_TYPES,
@@ -49,6 +51,9 @@ export default function VolunteerPointsManager({
   onClose,
 }: Props) {
   const { t, dir } = useI18n()
+  const { currentUser } = useGovernance()
+  const isAuditor = currentUser?.role === "national_auditor"
+
   const {
     data,
     previewParticipationPoints,
@@ -57,12 +62,25 @@ export default function VolunteerPointsManager({
     modifyParticipationPoints,
     getVolunteerParticipations,
     getVolunteerStats,
+    updatePointRulesConfig,
   } = useAppData()
 
   const [query, setQuery] = useState("")
   const [volunteerId, setVolunteerId] = useState<string | null>(initialVolunteerId)
   const [form, setForm] = useState(emptyForm)
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null)
+
+  // Point rules configuration modal state
+  const currentRules = data.pointRulesConfig || DEFAULT_POINT_RULES
+  const [rulesModalOpen, setRulesModalOpen] = useState(false)
+  const [rulesForm, setRulesForm] = useState({
+    registrationValidated: String(currentRules.registrationValidated),
+    presenceConfirmed: String(currentRules.presenceConfirmed),
+    missionCompleted: String(currentRules.missionCompleted),
+    reportAccepted: String(currentRules.reportAccepted),
+    criticalMissionBonus: String(currentRules.criticalMissionBonus),
+    exceptionalMissionBonus: String(currentRules.exceptionalMissionBonus),
+  })
 
   const volunteers = useMemo(() => {
     const needle = query.trim().toLowerCase()
@@ -161,6 +179,14 @@ export default function VolunteerPointsManager({
   }
 
   function onValidate() {
+    if (isAuditor) {
+      setMessage({
+        type: "err",
+        text: "Accès refusé : l'auditeur national est en lecture seule stricte et ne peut pas valider de participation.",
+      })
+      return
+    }
+
     if (!volunteerId) {
       setMessage({ type: "err", text: t("admin.points.selectRequired") })
       return
@@ -182,6 +208,10 @@ export default function VolunteerPointsManager({
       responsibilityId: form.responsibilityId,
       customPoints: form.useCustomPoints ? Number(form.customPoints) : undefined,
       adminNote: form.adminNote.trim() || undefined,
+      authorId: currentUser?.id,
+      authorName: currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : undefined,
+      authorRole: currentUser?.role,
+      authorWilayaCode: currentUser?.wilayaCode,
     })
 
     if (!res.ok) {
@@ -215,13 +245,48 @@ export default function VolunteerPointsManager({
           </p>
         </div>
 
-        {onClose && (
-          <Button type="button" variant="outline" size="sm" onClick={onClose} className="self-start sm:self-auto">
-            <X className="h-4 w-4 mr-1" />
-            {t("common.close")}
-          </Button>
-        )}
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          {!isAuditor && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const r = data.pointRulesConfig || DEFAULT_POINT_RULES
+                setRulesForm({
+                  registrationValidated: String(r.registrationValidated),
+                  presenceConfirmed: String(r.presenceConfirmed),
+                  missionCompleted: String(r.missionCompleted),
+                  reportAccepted: String(r.reportAccepted),
+                  criticalMissionBonus: String(r.criticalMissionBonus),
+                  exceptionalMissionBonus: String(r.exceptionalMissionBonus),
+                })
+                setRulesModalOpen(true)
+              }}
+              className="text-xs font-bold gap-1.5 border-border/80"
+            >
+              <Sliders className="h-4 w-4 text-primary" />
+              Configurer les barèmes
+            </Button>
+          )}
+
+          {onClose && (
+            <Button type="button" variant="outline" size="sm" onClick={onClose}>
+              <X className="h-4 w-4 mr-1" />
+              {t("common.close")}
+            </Button>
+          )}
+        </div>
       </div>
+
+      {isAuditor && (
+        <div className="flex items-center gap-2.5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-xs font-semibold text-amber-900 shadow-xs">
+          <ShieldAlert className="h-5 w-5 shrink-0 text-amber-700" />
+          <p className="flex-1">
+            Mode Consultation — <strong>Auditeur National</strong> : la validation de présence et la modification de points sont verrouillées (lecture seule stricte pour traçabilité et indépendance de contrôle).
+          </p>
+        </div>
+      )}
 
       {message && (
         <div
@@ -326,20 +391,20 @@ export default function VolunteerPointsManager({
               </CardHeader>
               <CardContent className="space-y-3 pt-1">
                 <div>
-                  <p className="text-base font-bold text-foreground">
+                  <p className="text-base font-black text-slate-900">
                     {selected.lastName} {selected.firstName}
                   </p>
-                  <p className="font-mono text-xs text-muted-foreground">
+                  <p className="font-mono text-xs text-slate-600 font-semibold">
                     NIN : {selected.nationalId}
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-border/60 bg-white p-3 space-y-2">
+                <div className="rounded-xl border border-slate-200 bg-white p-3 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground font-medium">
+                    <span className="text-xs text-slate-600 font-bold">
                       {t("admin.points.totalPoints")}
                     </span>
-                    <span className="text-xl font-extrabold text-primary tabular-nums">
+                    <span className="text-xl font-black text-emerald-700 tabular-nums">
                       {selected.points ?? 0} pts
                     </span>
                   </div>
@@ -347,19 +412,19 @@ export default function VolunteerPointsManager({
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-center text-xs">
-                  <div className="rounded-lg bg-white border border-border/60 p-2">
-                    <p className="text-muted-foreground text-[10px] uppercase">
+                  <div className="rounded-lg bg-white border border-slate-200 p-2">
+                    <p className="text-slate-600 text-[10px] uppercase font-bold">
                       {t("admin.points.activities")}
                     </p>
-                    <p className="text-base font-bold text-foreground mt-0.5">
+                    <p className="text-base font-black text-slate-900 mt-0.5">
                       {stats?.activityCount ?? 0}
                     </p>
                   </div>
-                  <div className="rounded-lg bg-white border border-border/60 p-2">
-                    <p className="text-muted-foreground text-[10px] uppercase">
+                  <div className="rounded-lg bg-white border border-slate-200 p-2">
+                    <p className="text-slate-600 text-[10px] uppercase font-bold">
                       {t("admin.points.duration")}
                     </p>
-                    <p className="text-base font-bold text-foreground mt-0.5">
+                    <p className="text-base font-black text-slate-900 mt-0.5">
                       {stats?.hoursVolunteered ?? 0} h
                     </p>
                   </div>
@@ -396,7 +461,7 @@ export default function VolunteerPointsManager({
                       onChange={(e) => handlePresetChange(e.target.value)}
                       className="flex h-10 w-full rounded-xl border border-input bg-white px-3 py-2 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-medium"
                     >
-                      <option value="custom">✏️ Saisie personnalisée / Autre activité</option>
+                      <option value="custom">Saisie personnalisée / Autre activité</option>
                       <optgroup label="Activités & Événements au programme">
                         {availablePresets.map((p) => (
                           <option key={p.value} value={p.value}>
@@ -584,7 +649,8 @@ export default function VolunteerPointsManager({
                       type="button"
                       size="lg"
                       onClick={onValidate}
-                      className="flex-1 bg-primary hover:bg-primary/90 text-white font-bold gap-2 rounded-xl"
+                      disabled={isAuditor}
+                      className="flex-1 bg-primary hover:bg-primary/90 text-white font-bold gap-2 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Award className="h-5 w-5" />
                       <span>{t("admin.points.validate")}</span>
@@ -654,6 +720,11 @@ export default function VolunteerPointsManager({
                               </td>
                               <td className="py-3 px-3.5 font-medium text-foreground">
                                 <div>{p.activityTitle}</div>
+                                {p.authorName && (
+                                  <div className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5 font-mono">
+                                    <span>Validé par : {p.authorName} ({p.authorRole || "admin"})</span>
+                                  </div>
+                                )}
                                 {p.changes.length > 0 && (
                                   <div className="text-[10px] text-muted-foreground no-underline mt-0.5">
                                     {p.changes[p.changes.length - 1].adminNote}
@@ -681,7 +752,7 @@ export default function VolunteerPointsManager({
                                 </span>
                               </td>
                               <td className="py-3 px-3.5 text-end whitespace-nowrap">
-                                {p.status === "validated" && (
+                                {!isAuditor && p.status === "validated" && (
                                   <div className="inline-flex items-center gap-1">
                                     <Button
                                       type="button"
@@ -692,9 +763,9 @@ export default function VolunteerPointsManager({
                                       onClick={() => {
                                         const next = window.prompt(t("admin.points.newPoints"), String(p.pointsAwarded))
                                         if (next === null || next.trim() === "") return
-                                        const reason = window.prompt(t("admin.points.reason"), "Correction admin")
+                                        const reason = window.prompt(t("admin.points.reason"), "Correction administrative")
                                         if (!reason) return
-                                        const res = modifyParticipationPoints(p.id, Number(next), reason)
+                                        const res = modifyParticipationPoints(p.id, Number(next), reason, currentUser)
                                         if (!res.ok) {
                                           setMessage({ type: "err", text: displayError(res.error, t) })
                                         } else {
@@ -714,7 +785,7 @@ export default function VolunteerPointsManager({
                                       onClick={() => {
                                         const reason = window.prompt(t("admin.points.cancelReasonPrompt"))
                                         if (!reason) return
-                                        const res = cancelParticipation(p.id, reason)
+                                        const res = cancelParticipation(p.id, reason, currentUser)
                                         if (!res.ok) {
                                           setMessage({ type: "err", text: displayError(res.error, t) })
                                         } else {
@@ -739,6 +810,142 @@ export default function VolunteerPointsManager({
           )}
         </div>
       </div>
+
+      {/* Point Rules Configuration Modal */}
+      {rulesModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
+          <div className="w-full max-w-lg rounded-3xl border border-border/70 bg-card p-6 shadow-elevated space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-border/50">
+              <h3 className="text-base font-bold text-foreground flex items-center gap-2">
+                <Sliders className="h-5 w-5 text-primary" />
+                Configuration des Barèmes Officiels de Points
+              </h3>
+              <button
+                type="button"
+                onClick={() => setRulesModalOpen(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              Ces barèmes définissent le montant de points crédité automatiquement aux bénévoles lors de chaque étape validée. Toute modification est tracée au registre d'audit.
+            </p>
+
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="space-y-1">
+                <label className="font-bold text-foreground">Inscription validée (pts)</label>
+                <Input
+                  type="number"
+                  value={rulesForm.registrationValidated}
+                  onChange={(e) =>
+                    setRulesForm((prev) => ({ ...prev, registrationValidated: e.target.value }))
+                  }
+                  className="h-10 rounded-xl bg-card border-input"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-foreground">Présence confirmée (pts)</label>
+                <Input
+                  type="number"
+                  value={rulesForm.presenceConfirmed}
+                  onChange={(e) =>
+                    setRulesForm((prev) => ({ ...prev, presenceConfirmed: e.target.value }))
+                  }
+                  className="h-10 rounded-xl bg-card border-input"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-foreground">Mission terminée (pts)</label>
+                <Input
+                  type="number"
+                  value={rulesForm.missionCompleted}
+                  onChange={(e) =>
+                    setRulesForm((prev) => ({ ...prev, missionCompleted: e.target.value }))
+                  }
+                  className="h-10 rounded-xl bg-card border-input"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-foreground">Rapport accepté (pts)</label>
+                <Input
+                  type="number"
+                  value={rulesForm.reportAccepted}
+                  onChange={(e) =>
+                    setRulesForm((prev) => ({ ...prev, reportAccepted: e.target.value }))
+                  }
+                  className="h-10 rounded-xl bg-card border-input"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-foreground">Bonus mission critique (pts)</label>
+                <Input
+                  type="number"
+                  value={rulesForm.criticalMissionBonus}
+                  onChange={(e) =>
+                    setRulesForm((prev) => ({ ...prev, criticalMissionBonus: e.target.value }))
+                  }
+                  className="h-10 rounded-xl bg-card border-input"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-foreground">Bonus exceptionnel (pts)</label>
+                <Input
+                  type="number"
+                  value={rulesForm.exceptionalMissionBonus}
+                  onChange={(e) =>
+                    setRulesForm((prev) => ({ ...prev, exceptionalMissionBonus: e.target.value }))
+                  }
+                  className="h-10 rounded-xl bg-card border-input"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-border/50">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setRulesModalOpen(false)}
+                className="rounded-xl text-xs"
+              >
+                Annuler
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => {
+                  updatePointRulesConfig(
+                    {
+                      registrationValidated: Number(rulesForm.registrationValidated) || 5,
+                      presenceConfirmed: Number(rulesForm.presenceConfirmed) || 10,
+                      missionCompleted: Number(rulesForm.missionCompleted) || 30,
+                      reportAccepted: Number(rulesForm.reportAccepted) || 15,
+                      criticalMissionBonus: Number(rulesForm.criticalMissionBonus) || 10,
+                      exceptionalMissionBonus: Number(rulesForm.exceptionalMissionBonus) || 20,
+                    },
+                    currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : undefined
+                  )
+                  setMessage({
+                    type: "ok",
+                    text: "Barèmes officiels de points mis à jour avec succès.",
+                  })
+                  setRulesModalOpen(false)
+                }}
+                className="rounded-xl bg-primary text-primary-foreground text-xs font-bold"
+              >
+                Enregistrer les nouveaux barèmes
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

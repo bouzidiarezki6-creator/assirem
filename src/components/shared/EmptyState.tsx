@@ -25,25 +25,25 @@ export default function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center rounded-3xl border border-dashed border-border/80 bg-white/70 px-6 py-16 text-center shadow-soft",
+        "flex flex-col items-center justify-center rounded-3xl border border-dashed border-emerald-500/30 bg-[#041d13]/85 backdrop-blur-md px-6 py-16 text-center shadow-soft",
         className
       )}
       role="status"
     >
-      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/20 text-primary border border-primary/30 shadow-inner">
         <Icon className="h-7 w-7" strokeWidth={1.5} aria-hidden />
       </div>
-      <h3 className="type-h3 mb-2">{title}</h3>
+      <h3 className="text-lg md:text-xl font-bold text-white mb-2">{title}</h3>
       {description && (
-        <p className="type-body max-w-sm mb-6">{description}</p>
+        <p className="text-sm text-emerald-300/70 max-w-sm mb-6 leading-relaxed">{description}</p>
       )}
       {actionLabel && actionTo && (
-        <Button asChild>
+        <Button asChild className="bg-primary text-primary-foreground font-bold shadow-md shadow-primary/25 rounded-full hover:bg-primary/90">
           <Link to={actionTo}>{actionLabel}</Link>
         </Button>
       )}
       {actionLabel && onAction && !actionTo && (
-        <Button type="button" onClick={onAction}>
+        <Button type="button" onClick={onAction} className="bg-primary text-primary-foreground font-bold shadow-md shadow-primary/25 rounded-full hover:bg-primary/90">
           {actionLabel}
         </Button>
       )}

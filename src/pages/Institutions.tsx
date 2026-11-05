@@ -151,6 +151,10 @@ export default function Institutions() {
               type={inst.type}
               location={inst.location}
               phone={inst.phone || undefined}
+              email={inst.email || undefined}
+              hours={inst.hours || undefined}
+              isVerified={inst.isVerified !== false}
+              domains={inst.domains}
               image={inst.imageDataUrl || undefined}
             />
           ))}

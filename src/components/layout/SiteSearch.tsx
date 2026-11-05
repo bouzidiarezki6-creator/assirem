@@ -191,14 +191,14 @@ export default function SiteSearch({
       {open && query.trim().length >= 2 && (
         <div
           className={cn(
-            "absolute z-[60] mt-2 overflow-hidden rounded-lg border border-gray-200 bg-white text-gray-900 shadow-lg",
+            "absolute z-[60] mt-2 overflow-hidden rounded-2xl border border-emerald-500/30 bg-[#031c12] text-white shadow-2xl backdrop-blur-xl",
             variant === "desktop"
               ? cn("w-[min(22rem,calc(100vw-2rem))]", dir === "rtl" ? "left-0" : "right-0")
               : "left-0 right-0 w-full"
           )}
         >
           {hits.length === 0 ? (
-            <p className="px-3 py-4 text-center text-sm text-gray-400">{t("nav.searchEmpty")}</p>
+            <p className="px-3 py-4 text-center text-sm text-white/50">{t("nav.searchEmpty")}</p>
           ) : (
             <ul className="max-h-72 overflow-y-auto py-1">
               {hits.map((hit) => (
@@ -209,12 +209,12 @@ export default function SiteSearch({
                       setOpen(false)
                       setQuery("")
                     }}
-                    className="flex items-start gap-2.5 px-3 py-2.5 text-sm hover:bg-primary/5"
+                    className="flex items-start gap-2.5 px-3 py-2.5 text-sm transition-colors hover:bg-primary/20 hover:text-emerald-300"
                   >
                     <KindIcon kind={hit.kind} />
                     <span className="min-w-0 flex-1 text-start">
-                      <span className="block truncate font-medium text-gray-900">{hit.title}</span>
-                      <span className="mt-0.5 block text-xs text-gray-500">
+                      <span className="block truncate font-medium text-white">{hit.title}</span>
+                      <span className="mt-0.5 block text-xs text-white/60">
                         {kindLabel(hit.kind)}
                         {hit.subtitle ? ` · ${hit.subtitle}` : ""}
                       </span>
@@ -227,7 +227,7 @@ export default function SiteSearch({
           <button
             type="button"
             onClick={() => submit()}
-            className="w-full border-t border-gray-100 px-3 py-2.5 text-start text-sm font-medium text-primary hover:bg-primary/5"
+            className="w-full border-t border-emerald-500/20 px-3 py-2.5 text-start text-sm font-semibold text-primary hover:bg-primary/15"
           >
             {t("nav.searchAll", { query: query.trim() })}
           </button>

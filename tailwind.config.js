@@ -7,7 +7,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Cairo", "ui-sans-serif", "system-ui", "sans-serif"],
+        sans: ["'Vesterbro'", "'Avalon'", "Cairo", "ui-sans-serif", "system-ui", "sans-serif"],
+        arabic: ["'Vesterbro'", "Cairo", "sans-serif"],
+        latin: ["'Avalon'", "'Avalon Bold T.'", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

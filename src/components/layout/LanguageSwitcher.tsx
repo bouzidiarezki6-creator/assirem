@@ -43,8 +43,8 @@ export default function LanguageSwitcher({ variant = "navbar" }: Props) {
         className={cn(
           "flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-sm font-semibold transition-colors",
           variant === "navbar"
-            ? "text-foreground hover:bg-muted"
-            : "border border-border bg-white text-foreground hover:bg-muted"
+            ? "text-white/90 hover:bg-white/10 hover:text-white"
+            : "border border-emerald-500/30 bg-[#041a10] text-white hover:bg-white/10"
         )}
       >
         <span className="text-base leading-none" aria-hidden>
@@ -60,7 +60,7 @@ export default function LanguageSwitcher({ variant = "navbar" }: Props) {
           id={listId}
           role="listbox"
           aria-label={t("common.language")}
-          className="absolute end-0 z-50 mt-2 min-w-[200px] overflow-hidden rounded-2xl border border-border bg-white py-1 text-foreground shadow-card"
+          className="absolute end-0 z-50 mt-2 min-w-[200px] overflow-hidden rounded-2xl border border-emerald-500/30 bg-[#031c12] py-1 text-white shadow-card backdrop-blur-xl"
         >
           {LOCALES.map((l) => (
             <li key={l.code}>
@@ -69,8 +69,8 @@ export default function LanguageSwitcher({ variant = "navbar" }: Props) {
                 role="option"
                 aria-selected={locale === l.code}
                 className={cn(
-                  "flex w-full items-center justify-between gap-3 px-3 py-2.5 text-sm hover:bg-primary/5 focus-visible:outline-none focus-visible:bg-primary/5",
-                  locale === l.code && "bg-primary/10 font-semibold text-primary"
+                  "flex w-full items-center justify-between gap-3 px-3 py-2.5 text-sm transition-colors hover:bg-primary/20 hover:text-emerald-300 focus-visible:outline-none focus-visible:bg-primary/20",
+                  locale === l.code && "bg-primary/20 font-semibold text-emerald-300"
                 )}
                 onClick={() => {
                   setLocale(l.code as Locale)
@@ -82,8 +82,8 @@ export default function LanguageSwitcher({ variant = "navbar" }: Props) {
                     {l.flag}
                   </span>
                   <span>
-                    <span className="font-medium">{l.nativeLabel}</span>
-                    <span className="ms-2 text-xs text-muted-foreground">{l.label}</span>
+                    <span className="font-medium text-white">{l.nativeLabel}</span>
+                    <span className="ms-2 text-xs text-white/50">{l.label}</span>
                   </span>
                 </span>
                 {locale === l.code ? (

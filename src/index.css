@@ -2,51 +2,210 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Vesterbro';
+  src: url('/fonts/Vesterbro_Trial_Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Vesterbro';
+  src: url('/fonts/Vesterbro_Trial_Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Vesterbro';
+  src: url('/fonts/Vesterbro_Trial_Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Vesterbro';
+  src: url('/fonts/Vesterbro_Trial_Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Vesterbro';
+  src: url('/fonts/Vesterbro_Trial_Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:lang(ar),
+[dir="rtl"],
+html[lang="ar"],
+html[dir="rtl"] {
+  font-family: 'Vesterbro', 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 500;
+}
+
+html[lang="ar"] body,
+[dir="rtl"] body {
+  font-family: 'Vesterbro', 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+html[lang="ar"] button,
+html[lang="ar"] input,
+html[lang="ar"] select,
+html[lang="ar"] textarea,
+[dir="rtl"] button,
+[dir="rtl"] input,
+[dir="rtl"] select,
+[dir="rtl"] textarea {
+  font-family: 'Vesterbro', 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+html[lang="ar"] h1,
+html[lang="ar"] h2,
+html[lang="ar"] h3,
+html[lang="ar"] h4,
+html[lang="ar"] h5,
+html[lang="ar"] h6,
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] h5,
+[dir="rtl"] h6 {
+  font-family: 'Vesterbro', 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: 'Avalon';
+  src: url('/fonts/Avalon_Bold_T.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Avalon';
+  src: url('/fonts/Avalon_Bold_T.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Avalon Bold T.';
+  src: url('/fonts/Avalon_Bold_T.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:lang(fr),
+:lang(en),
+html[lang="fr"],
+html[lang="en"],
+html[dir="ltr"],
+[dir="ltr"] {
+  font-family: 'Avalon', 'Avalon Bold T.', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+html[lang="fr"] body,
+html[lang="en"] body,
+html[dir="ltr"] body,
+[dir="ltr"] body {
+  font-family: 'Avalon', 'Avalon Bold T.', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+html[lang="fr"] button,
+html[lang="fr"] input,
+html[lang="fr"] select,
+html[lang="fr"] textarea,
+html[lang="en"] button,
+html[lang="en"] input,
+html[lang="en"] select,
+html[lang="en"] textarea,
+[dir="ltr"] button,
+[dir="ltr"] input,
+[dir="ltr"] select,
+[dir="ltr"] textarea {
+  font-family: 'Avalon', 'Avalon Bold T.', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+html[lang="fr"] h1,
+html[lang="fr"] h2,
+html[lang="fr"] h3,
+html[lang="fr"] h4,
+html[lang="fr"] h5,
+html[lang="fr"] h6,
+html[lang="en"] h1,
+html[lang="en"] h2,
+html[lang="en"] h3,
+html[lang="en"] h4,
+html[lang="en"] h5,
+html[lang="en"] h6,
+[dir="ltr"] h1,
+[dir="ltr"] h2,
+[dir="ltr"] h3,
+[dir="ltr"] h4,
+[dir="ltr"] h5,
+[dir="ltr"] h6 {
+  font-family: 'Avalon', 'Avalon Bold T.', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
 @layer base {
   :root {
-    /* Soft off-white canvas */
-    --background: 150 20% 98%;
-    --foreground: 200 25% 12%;
+    /* Cyber Emerald Dark Canvas — matches hero aesthetic */
+    --background: 166 45% 4.5%;
+    --foreground: 150 25% 96%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 200 25% 12%;
+    --card: 166 38% 8.5%;
+    --card-foreground: 150 25% 96%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 200 25% 12%;
+    --popover: 166 38% 8.5%;
+    --popover-foreground: 150 25% 96%;
 
-    /* Teal primary — #1B7D67 */
-    --primary: 166 65% 30%;
-    --primary-foreground: 0 0% 100%;
+    /* Neon Emerald Primary — glowing green matching photo neon arc */
+    --primary: 153 100% 43%;
+    --primary-foreground: 166 50% 6%;
 
-    /* Soft lime / mint accent */
-    --secondary: 145 45% 94%;
-    --secondary-foreground: 166 65% 26%;
+    /* Dark emerald accents */
+    --secondary: 166 30% 13%;
+    --secondary-foreground: 150 25% 96%;
 
-    --muted: 150 14% 95%;
-    --muted-foreground: 200 10% 42%;
+    --muted: 166 26% 12%;
+    --muted-foreground: 150 15% 68%;
 
-    --accent: 145 40% 92%;
-    --accent-foreground: 166 65% 26%;
+    --accent: 166 35% 15%;
+    --accent-foreground: 150 25% 98%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 152 60% 40%;
+    --success: 153 100% 43%;
     --warning: 38 92% 50%;
     --info: 199 89% 48%;
 
-    --border: 160 12% 88%;
-    --input: 160 12% 88%;
-    --ring: 166 65% 30%;
+    --border: 166 28% 16%;
+    --input: 166 28% 16%;
+    --ring: 153 100% 45%;
 
     /* Soft rounded UI */
     --radius: 1rem;
 
-    --surface: 150 16% 97%;
-    --footer: 166 70% 18%;
-    --shadow-soft: 0 2px 12px -2px rgb(27 125 103 / 0.06), 0 1px 4px -1px rgb(0 0 0 / 0.04);
-    --shadow-card: 0 8px 28px -10px rgb(27 125 103 / 0.1), 0 2px 8px -4px rgb(0 0 0 / 0.04);
-    --shadow-elevated: 0 16px 40px -12px rgb(27 125 103 / 0.14), 0 4px 12px -4px rgb(0 0 0 / 0.05);
+    --surface: 166 40% 6.5%;
+    --footer: 166 50% 3.5%;
+    --shadow-soft: 0 2px 16px -2px rgba(0, 255, 128, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.6);
+    --shadow-card: 0 8px 32px -8px rgba(0, 255, 128, 0.12), 0 4px 16px -2px rgba(0, 0, 0, 0.7);
+    --shadow-elevated: 0 16px 48px -12px rgba(0, 255, 128, 0.18), 0 6px 20px -4px rgba(0, 0, 0, 0.8);
 
     /* Motion tokens */
     --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -58,27 +217,68 @@
   }
 
   .dark {
-    --background: 166 30% 8%;
-    --foreground: 150 20% 96%;
-    --card: 166 25% 11%;
-    --card-foreground: 150 20% 96%;
-    --popover: 166 25% 11%;
-    --popover-foreground: 150 20% 96%;
-    --primary: 166 55% 42%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 166 20% 18%;
-    --secondary-foreground: 150 20% 96%;
-    --muted: 166 18% 16%;
-    --muted-foreground: 150 10% 65%;
-    --accent: 166 20% 18%;
-    --accent-foreground: 150 20% 96%;
+    --background: 166 45% 4.5%;
+    --foreground: 150 25% 96%;
+    --card: 166 38% 8.5%;
+    --card-foreground: 150 25% 96%;
+    --popover: 166 38% 8.5%;
+    --popover-foreground: 150 25% 96%;
+    --primary: 153 100% 43%;
+    --primary-foreground: 166 50% 6%;
+    --secondary: 166 30% 13%;
+    --secondary-foreground: 150 25% 96%;
+    --muted: 166 26% 12%;
+    --muted-foreground: 150 15% 68%;
+    --accent: 166 35% 15%;
+    --accent-foreground: 150 25% 98%;
     --destructive: 0 62% 40%;
     --destructive-foreground: 0 0% 100%;
-    --border: 166 18% 20%;
-    --input: 166 18% 20%;
-    --ring: 166 55% 42%;
-    --surface: 166 25% 10%;
-    --footer: 166 40% 10%;
+    --border: 166 28% 16%;
+    --input: 166 28% 16%;
+    --ring: 153 100% 45%;
+    --surface: 166 40% 6.5%;
+    --footer: 166 50% 3.5%;
+  }
+
+  .admin-theme {
+    /* Institutional Clear Light Theme for Admin Workspace */
+    --background: 150 20% 98%;
+    --foreground: 200 25% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 200 25% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 25% 12%;
+
+    --primary: 166 65% 30%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 145 45% 94%;
+    --secondary-foreground: 166 65% 26%;
+
+    --muted: 150 14% 95%;
+    --muted-foreground: 200 12% 38%;
+
+    --accent: 145 40% 92%;
+    --accent-foreground: 166 65% 26%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 160 12% 84%;
+    --input: 160 12% 84%;
+    --ring: 166 65% 30%;
+
+    --surface: 150 16% 96%;
+    --footer: 166 70% 18%;
+
+    --shadow-soft: 0 2px 12px -2px rgba(27, 125, 103, 0.08), 0 1px 4px -1px rgba(0, 0, 0, 0.05);
+    --shadow-card: 0 8px 28px -10px rgba(27, 125, 103, 0.12), 0 2px 8px -4px rgba(0, 0, 0, 0.05);
+    --shadow-elevated: 0 16px 40px -12px rgba(27, 125, 103, 0.16), 0 4px 12px -4px rgba(0, 0, 0, 0.06);
+
+    background-color: hsl(var(--surface));
+    color: hsl(var(--foreground));
   }
 }
 
@@ -112,12 +312,91 @@
     background-color: hsl(var(--primary) / 0.18);
     color: hsl(var(--foreground));
   }
+
+  .admin-theme input,
+  .admin-theme select,
+  .admin-theme textarea {
+    color: #0f172a;
+    background-color: #ffffff;
+  }
+
+  .admin-theme .type-h1,
+  .admin-theme .type-h2,
+  .admin-theme .type-h3 {
+    color: #0f172a;
+  }
+
+  .admin-theme .type-body,
+  .admin-theme .type-caption {
+    color: #475569;
+  }
 }
 
 @layer components {
   /* Full-bleed content with comfortable side padding */
   .content-width {
     @apply mx-auto w-full max-w-[100rem] px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12;
+  }
+
+  /* Seamless Hero Edge Mask — soft horizontal fade with zero rectangular borders */
+  .hero-edge-mask {
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(0, 0, 0, 0.06) 2%,
+      rgba(0, 0, 0, 0.25) 4%,
+      rgba(0, 0, 0, 0.65) 7%,
+      rgba(0, 0, 0, 0.92) 10%,
+      black 12%,
+      black 88%,
+      rgba(0, 0, 0, 0.92) 90%,
+      rgba(0, 0, 0, 0.65) 93%,
+      rgba(0, 0, 0, 0.25) 96%,
+      rgba(0, 0, 0, 0.06) 98%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(0, 0, 0, 0.06) 2%,
+      rgba(0, 0, 0, 0.25) 4%,
+      rgba(0, 0, 0, 0.65) 7%,
+      rgba(0, 0, 0, 0.92) 10%,
+      black 12%,
+      black 88%,
+      rgba(0, 0, 0, 0.92) 90%,
+      rgba(0, 0, 0, 0.65) 93%,
+      rgba(0, 0, 0, 0.25) 96%,
+      rgba(0, 0, 0, 0.06) 98%,
+      transparent 100%
+    );
+  }
+
+  @media (max-width: 640px) {
+    .hero-edge-mask {
+      mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(0, 0, 0, 0.2) 2%,
+        rgba(0, 0, 0, 0.8) 5%,
+        black 8%,
+        black 92%,
+        rgba(0, 0, 0, 0.8) 95%,
+        rgba(0, 0, 0, 0.2) 98%,
+        transparent 100%
+      );
+      -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(0, 0, 0, 0.2) 2%,
+        rgba(0, 0, 0, 0.8) 5%,
+        black 8%,
+        black 92%,
+        rgba(0, 0, 0, 0.8) 95%,
+        rgba(0, 0, 0, 0.2) 98%,
+        transparent 100%
+      );
+    }
   }
 
   .page-shell {
@@ -226,6 +505,154 @@
     background-color: hsl(var(--footer));
   }
 
+  /* Universal dark cyber card & text cohesion */
+  .bg-white {
+    background-color: hsl(var(--card)) !important;
+  }
+
+  /* Gradient stops cohesion */
+  .from-white {
+    --tw-gradient-from: hsl(var(--card)) var(--tw-gradient-from-position) !important;
+    --tw-gradient-to: hsl(var(--card) / 0) var(--tw-gradient-to-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+  }
+
+  .via-white {
+    --tw-gradient-to: hsl(var(--card) / 0) var(--tw-gradient-to-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), hsl(var(--card)) var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+  }
+
+  .to-white {
+    --tw-gradient-to: hsl(var(--card)) var(--tw-gradient-to-position) !important;
+  }
+
+  /* Slate & Gray text cohesion */
+  .text-gray-950,
+  .text-gray-900,
+  .text-gray-800,
+  .text-gray-700,
+  .text-slate-950,
+  .text-slate-900,
+  .text-slate-800,
+  .text-slate-700 {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .text-gray-600,
+  .text-gray-500,
+  .text-slate-600,
+  .text-slate-500 {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  /* Borders cohesion */
+  .border-gray-300,
+  .border-gray-200,
+  .border-gray-100,
+  .border-slate-300,
+  .border-slate-200,
+  .border-slate-100,
+  .border-green-100 {
+    border-color: hsl(var(--border)) !important;
+  }
+
+  /* Light backgrounds cohesion */
+  .bg-slate-50,
+  .bg-slate-100,
+  .bg-gray-50,
+  .bg-gray-100 {
+    background-color: hsl(var(--muted) / 0.6) !important;
+  }
+
+  /* Alert / Badge cyber tints cohesion */
+  .bg-rose-50,
+  .bg-rose-100 {
+    background-color: rgba(244, 63, 94, 0.16) !important;
+  }
+  .text-rose-700,
+  .text-rose-800,
+  .text-rose-900 {
+    color: #fda4af !important;
+  }
+  .border-rose-200,
+  .border-rose-300 {
+    border-color: rgba(244, 63, 94, 0.35) !important;
+  }
+
+  .bg-emerald-50,
+  .bg-emerald-100 {
+    background-color: rgba(16, 185, 129, 0.16) !important;
+  }
+  .text-emerald-700,
+  .text-emerald-800,
+  .text-emerald-900 {
+    color: #6ee7b7 !important;
+  }
+  .border-emerald-200,
+  .border-emerald-300 {
+    border-color: rgba(16, 185, 129, 0.35) !important;
+  }
+
+  .bg-amber-50,
+  .bg-amber-100 {
+    background-color: rgba(245, 158, 11, 0.16) !important;
+  }
+  .text-amber-700,
+  .text-amber-800,
+  .text-amber-900 {
+    color: #fcd34d !important;
+  }
+  .border-amber-200,
+  .border-amber-300 {
+    border-color: rgba(245, 158, 11, 0.35) !important;
+  }
+
+  .bg-sky-50,
+  .bg-sky-100,
+  .bg-blue-50,
+  .bg-blue-100 {
+    background-color: rgba(14, 165, 233, 0.16) !important;
+  }
+  .text-sky-700,
+  .text-sky-800,
+  .text-blue-700,
+  .text-blue-800 {
+    color: #7dd3fc !important;
+  }
+  .border-sky-200,
+  .border-sky-300,
+  .border-blue-200 {
+    border-color: rgba(14, 165, 233, 0.35) !important;
+  }
+
+  /* Leaflet Map Cyber Theme */
+  .leaflet-container {
+    background-color: #03140c !important;
+    font-family: inherit !important;
+  }
+
+  .leaflet-tile {
+    filter: brightness(0.68) invert(0.92) hue-rotate(170deg) saturate(1.6) contrast(1.25);
+  }
+
+  .leaflet-popup-content-wrapper,
+  .leaflet-popup-tip {
+    background: #041c12 !important;
+    color: #f0fdf4 !important;
+    border: 1px solid rgba(0, 255, 136, 0.3) !important;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 255, 136, 0.2) !important;
+    border-radius: 1rem !important;
+  }
+
+  .leaflet-popup-content {
+    margin: 12px 14px !important;
+  }
+
+  .leaflet-container a.leaflet-popup-close-button {
+    color: #a7f3d0 !important;
+    padding: 6px !important;
+  }
+
   .text-balance {
     text-wrap: balance;
   }
@@ -271,6 +698,26 @@
   from {
     opacity: 0;
     transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-glow {
+  0%, 100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@keyframes float-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
   to {
     opacity: 1;

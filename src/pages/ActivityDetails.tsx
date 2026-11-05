@@ -1,6 +1,18 @@
 import { useState } from "react"
 import { Link, useParams } from "react-router-dom"
-import { ArrowLeft, ArrowRight, Building2, Check, ImageIcon, MapPin, Share2 } from "lucide-react"
+import {
+  ArrowLeft,
+  ArrowRight,
+  Building2,
+  Check,
+  Clock,
+  ImageIcon,
+  MapPin,
+  Share2,
+  Users,
+  ShieldCheck,
+  AlertCircle,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import PointsLevelTable from "@/components/shared/PointsLevelTable"
 import { useAppData } from "@/context/DataProvider"
@@ -18,17 +30,27 @@ function parseEventDate(dateStr: string, locale: string) {
   return { day, month }
 }
 
+const statusBadges: Record<string, { labelFr: string; labelAr: string; color: string }> = {
+  open: { labelFr: "Inscriptions ouvertes", labelAr: "التسجيل مفتوح", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  upcoming: { labelFr: "À venir", labelAr: "قريباً", color: "bg-sky-50 text-sky-700 border-sky-200" },
+  full: { labelFr: "Complet — Inscriptions closes", labelAr: "مكتمل — التسجيل مغلق", color: "bg-amber-50 text-amber-700 border-amber-200" },
+  in_progress: { labelFr: "En cours", labelAr: "جارٍ حالياً", color: "bg-indigo-50 text-indigo-700 border-indigo-200" },
+  completed: { labelFr: "Terminé", labelAr: "منتهي", color: "bg-muted text-muted-foreground border-border" },
+  cancelled: { labelFr: "Annulé", labelAr: "ملغى", color: "bg-rose-50 text-rose-700 border-rose-200" },
+}
+
 export default function ActivityDetails() {
   const { id } = useParams<{ id: string }>()
   const { data } = useAppData()
   const { t, dir, locale } = useI18n()
+  const isAr = locale === "ar"
   const [copied, setCopied] = useState(false)
 
   const activity = data.activities.find((a) => a.id === id && a.published)
 
   if (!activity) {
     return (
-      <div className="page-shell text-center space-y-4">
+      <div className="page-shell text-center space-y-4" dir={dir}>
         <h1 className="type-h2">{t("activities.notFound")}</h1>
         <p className="type-body mx-auto max-w-md">{t("activities.notFoundHint")}</p>
         <Button asChild>
@@ -46,6 +68,13 @@ export default function ActivityDetails() {
   const displayDay = parsedDate?.day || activity.day || "—"
   const displayMonth = parsedDate?.month || activity.month || ""
 
+  const statusKey = activity.status || "open"
+  const statusInfo = statusBadges[statusKey] || statusBadges.open
+  const isFull =
+    statusKey === "full" ||
+    (activity.capacity !== undefined && (activity.registeredCount || 0) >= activity.capacity)
+  const isClosed = statusKey === "completed" || statusKey === "cancelled"
+
   const handleShare = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(window.location.href)
@@ -55,7 +84,7 @@ export default function ActivityDetails() {
   }
 
   return (
-    <div className="min-h-screen bg-surface">
+    <div className="min-h-screen bg-surface" dir={dir}>
       <div className="relative w-full aspect-[16/9] max-h-[420px] md:max-h-[480px] bg-muted overflow-hidden">
         {activity.imageDataUrl ? (
           <img
@@ -114,6 +143,9 @@ export default function ActivityDetails() {
                 {displayDay} {displayMonth}
                 {activity.date ? ` · ${activity.date}` : ""}
               </span>
+              <span className={`inline-flex items-center rounded-full border px-3.5 py-1 text-xs font-bold ${statusInfo.color}`}>
+                {isAr ? statusInfo.labelAr : statusInfo.labelFr}
+              </span>
             </div>
 
             <h1 className="text-3xl md:text-4xl font-extrabold text-foreground leading-tight text-balance">
@@ -129,9 +161,44 @@ export default function ActivityDetails() {
                 <Building2 className="h-4 w-4 text-primary" aria-hidden />
                 {activity.institution}
               </span>
+              {activity.hours && (
+                <span className="inline-flex items-center gap-1.5">
+                  <Clock className="h-4 w-4 text-primary" aria-hidden />
+                  {activity.hours}
+                </span>
+              )}
             </div>
           </div>
 
+          {/* Capacity Progress Bar if capacity is set */}
+          {activity.capacity && (
+            <div className="rounded-2xl border border-border/70 bg-muted/20 p-4 space-y-2">
+              <div className="flex justify-between items-center text-xs font-semibold">
+                <span className="flex items-center gap-1.5 text-muted-foreground">
+                  <Users className="w-4 h-4 text-primary" />
+                  <span>{isAr ? "طاقة الاستيعاب والمشاركين" : "Capacité d'accueil"}</span>
+                </span>
+                <span className="font-mono text-foreground font-bold">
+                  {activity.registeredCount || 0} / {activity.capacity} {isAr ? "مسجل" : "inscrits"}
+                </span>
+              </div>
+              <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all ${
+                    isFull ? "bg-amber-500" : "bg-primary"
+                  }`}
+                  style={{
+                    width: `${Math.min(
+                      100,
+                      Math.round(((activity.registeredCount || 0) / activity.capacity) * 100)
+                    )}%`,
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Description */}
           <div className="border-t border-border/60 pt-6 space-y-3">
             <h2 className="text-lg font-bold text-foreground">{t("events.description")}</h2>
             <div className="text-muted-foreground leading-relaxed whitespace-pre-line text-base">
@@ -139,15 +206,47 @@ export default function ActivityDetails() {
             </div>
           </div>
 
+          {/* Conditions of Participation */}
+          {activity.conditions && (
+            <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 space-y-1.5 text-start">
+              <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-primary" />
+                {isAr ? "شروط المشاركة" : "Conditions de participation"}
+              </h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {activity.conditions}
+              </p>
+            </div>
+          )}
+
+          {/* Registration Action */}
           <div className="flex flex-col sm:flex-row gap-3 pt-4 justify-center md:justify-start">
-            <Button asChild size="lg" className="rounded-full shadow-soft bg-primary hover:bg-primary/90 font-bold px-8">
-              <Link to={`/inscription?activity=${activity.id}`}>
-                {t("activities.register")}
-                <ArrowRight
-                  className={`h-4 w-4 ${dir === "rtl" ? "rotate-180" : ""}`}
-                />
-              </Link>
-            </Button>
+            {isFull ? (
+              <div className="inline-flex items-center gap-2 rounded-full bg-amber-50 border border-amber-200 px-6 py-3 text-sm font-bold text-amber-800">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>
+                  {isAr
+                    ? "عذراً، استنفدت جميع المقاعد لهذا النشاط"
+                    : "Inscriptions closes — Capacité maximale atteinte"}
+                </span>
+              </div>
+            ) : isClosed ? (
+              <div className="inline-flex items-center gap-2 rounded-full bg-muted border border-border px-6 py-3 text-sm font-bold text-muted-foreground">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>
+                  {isAr ? "هذا النشاط منتهي أو ملغى" : "Cette activité est clôturée ou archivée"}
+                </span>
+              </div>
+            ) : (
+              <Button asChild size="lg" className="rounded-full shadow-soft bg-primary hover:bg-primary/90 font-bold px-8">
+                <Link to={`/inscription?activity=${activity.id}`}>
+                  {t("activities.register")}
+                  <ArrowRight
+                    className={`h-4 w-4 ${dir === "rtl" ? "rotate-180" : ""}`}
+                  />
+                </Link>
+              </Button>
+            )}
             <Button asChild variant="outline" size="lg" className="rounded-full">
               <Link to="/activities">{t("activities.backList")}</Link>
             </Button>
@@ -161,4 +260,3 @@ export default function ActivityDetails() {
     </div>
   )
 }
-

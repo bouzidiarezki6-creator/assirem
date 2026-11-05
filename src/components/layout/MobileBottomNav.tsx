@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom"
-import { CalendarDays, HeartHandshake, Home, Siren } from "lucide-react"
+import { CalendarDays, Home, Newspaper, Siren } from "lucide-react"
 import { useI18n } from "@/context/I18nProvider"
 import { cn } from "@/lib/utils"
 
@@ -9,14 +9,14 @@ export default function MobileBottomNav() {
 
   const items = [
     { name: t("nav.home"), path: "/", icon: Home },
-    { name: t("nav.activities"), path: "/activities", icon: CalendarDays },
-    { name: t("nav.cagnottes"), path: "/cagnottes", icon: HeartHandshake },
+    { name: t("nav.activities"), path: "/#activities", icon: CalendarDays },
     { name: t("nav.sos"), path: "/sos", icon: Siren },
+    { name: t("nav.news"), path: "/news", icon: Newspaper },
   ]
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-border/60 bg-white/85 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_-12px_rgb(27_125_103_/0.12)] backdrop-blur-xl lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-emerald-500/20 bg-[#02140d]/90 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_-12px_rgba(0,255,136,0.15)] backdrop-blur-2xl lg:hidden"
       aria-label="Mobile"
     >
       <ul className="mx-auto flex h-[4.25rem] max-w-lg items-stretch justify-around px-1">

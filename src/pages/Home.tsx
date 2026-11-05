@@ -1,10 +1,10 @@
-import { Link } from "react-router-dom"
-import { MapPin, Building2, Users, Activity, ArrowLeft, HandHeart } from "lucide-react"
+import { MapPin, Building2, Users, Activity } from "lucide-react"
 import { useI18n } from "@/context/I18nProvider"
 import AlgeriaMapExplorer from "@/components/map/AlgeriaMapExplorer"
+import ActivitiesHomeSection from "@/components/home/ActivitiesHomeSection"
 
 export default function Home() {
-  const { t, dir } = useI18n()
+  const { t } = useI18n()
 
   const stats = [
     { icon: Building2, label: t("home.youthHouses"), count: t("home.countInstitutions", { count: 12 }) },
@@ -15,130 +15,136 @@ export default function Home() {
   ]
 
   return (
-    <div className="flex flex-col bg-surface">
-      <section className="relative overflow-hidden">
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 70% 55% at 50% 0%, hsl(145 50% 90% / 0.95), transparent 70%), linear-gradient(180deg, hsl(150 30% 97%) 0%, hsl(166 28% 95%) 100%)",
-          }}
-        />
+    <div className="flex flex-col bg-background text-foreground min-h-screen">
+      {/* ══════════════════════════════════════════════════════════
+          HERO & VISUAL SHOWCASE
+          Centered background image with optimal scale (NO 300% ZOOM)
+         ══════════════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden bg-background">
+        {/* ══════════════════════════════════════════════════════════
+            HERO BACKGROUND (Isolated to background layer z-0)
+            Soft horizontal edge dissolution via CSS mask.
+            Zero rectangular borders or vertical hard edges.
+           ══════════════════════════════════════════════════════════ */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden select-none z-0">
+          {/* Base canvas background */}
+          <div className="absolute inset-0 bg-background" />
 
+          {/* Centered Hero Image Layer with horizontal fade mask */}
+          <div className="absolute inset-0 flex justify-center">
+            <div
+              className="hero-edge-mask relative w-full max-w-[880px] h-full"
+              style={{
+                backgroundImage: "url('/hero-bg.jpg')",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center top",
+                backgroundSize: "100% auto",
+              }}
+            />
+          </div>
+
+          {/* Ambient lighting & vertical fade into site background */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse 90% 40% at 50% 25%, rgba(0,255,100,0.10), transparent 70%), linear-gradient(180deg, rgba(2,17,10,0.85) 0%, rgba(2,17,10,0.20) 18%, transparent 40%, rgba(2,17,10,0.45) 65%, hsl(var(--background)) 98%)",
+            }}
+          />
+        </div>
+
+        {/* ── 1. Top Content (Sky & Skyscrapers Area) ── */}
         <div
-          className="content-width relative z-10 py-16 md:py-20 lg:py-24"
+          className="content-width relative z-10 pt-6 sm:pt-8 md:pt-10 pb-2"
           style={{ animation: "fade-up var(--duration-complex) var(--ease-out) both" }}
         >
-          <div className="mx-auto flex max-w-4xl w-full flex-col items-center text-center gap-7">
-            <div className="flex h-20 w-20 items-center justify-center rounded-[1.5rem] bg-primary text-primary-foreground shadow-soft md:h-24 md:w-24">
-              <HandHeart className="h-10 w-10 md:h-12 md:w-12" strokeWidth={1.5} aria-hidden />
-            </div>
-
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3.5 py-1.5 text-sm font-semibold text-primary">
-              {t("home.badge")}
-            </div>
-
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-[1.15] text-foreground text-balance">
-              {t("home.titleLine1")}
-              <br />
-              <span className="text-primary">{t("home.titleLine2")}</span>
+          <div className="mx-auto flex max-w-3xl w-full flex-col items-center text-center gap-2 sm:gap-3">
+            {/* Main Brand Title */}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.12] drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
+              {t("home.platformTitle")}
             </h1>
 
-            <p className="text-base md:text-lg max-w-xl text-muted-foreground leading-relaxed">
+            {/* Tagline under Title */}
+            <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold bg-gradient-to-r from-emerald-300 via-green-400 to-emerald-300 bg-clip-text text-transparent leading-relaxed max-w-xl text-balance drop-shadow-[0_0_25px_rgba(0,255,136,0.4)]">
+              {t("home.tagline")}
+            </h2>
+
+            {/* Subtitle */}
+            <p className="text-xs sm:text-sm md:text-base max-w-lg text-white/75 leading-relaxed drop-shadow">
               {t("home.subtitle")}
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1 w-full sm:w-auto">
-              <Link
-                to="/activities"
-                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-soft transition-all hover:bg-primary/90 active:scale-[0.98]"
+            {/* Single CTA button positioned right above the high-fiving hands */}
+            <div className="pt-2 sm:pt-3">
+              <a
+                href="#activities"
+                onClick={(e) => {
+                  e.preventDefault()
+                  document.getElementById("activities")?.scrollIntoView({ behavior: "smooth" })
+                }}
+                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-500 via-emerald-600 to-green-600 px-8 sm:px-10 py-3 sm:py-3.5 text-sm sm:text-base font-extrabold text-white shadow-[0_0_28px_rgba(0,255,136,0.45),_0_6px_20px_rgba(0,0,0,0.6)] transition-all duration-300 hover:shadow-[0_0_40px_rgba(0,255,136,0.7)] hover:scale-105 active:scale-95 cursor-pointer"
               >
                 {t("home.ctaActivities")}
-                <ArrowLeft className={`h-4 w-4 ${dir === "ltr" ? "rotate-180" : ""}`} aria-hidden />
-              </Link>
-              <Link
-                to="/institutions"
-                className="inline-flex w-full sm:w-auto items-center justify-center rounded-full px-5 py-3.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
-              >
-                {t("home.ctaInstitutions")}
-              </Link>
+              </a>
             </div>
           </div>
         </div>
-      </section>
 
-      <section className="content-width relative z-20 -mt-2 md:-mt-4 pb-4">
-        <div className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 rounded-3xl border border-border/70 bg-white p-4 md:p-5 shadow-soft">
-          {stats.map((stat, i) => (
-            <div
-              key={i}
-              className="flex flex-col items-center gap-2.5 rounded-2xl p-3 text-center transition-colors hover:bg-primary/5"
-            >
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <stat.icon className="h-5 w-5" aria-hidden />
-              </div>
-              <div className="min-w-0">
-                <p className="text-sm font-bold text-foreground leading-snug">{stat.label}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{stat.count}</p>
+        {/* ── 2. Visual Stage for the 4 People & Neon Arc ── */}
+        {/* Shows the 4 youth high-fiving directly beneath the button and the glowing curved neon arc */}
+        <div className="relative z-0 h-48 sm:h-60 md:h-72 lg:h-[320px] w-full pointer-events-none" />
+
+        {/* ── 3. MAP SECTION — CENTERED UNDER THE PEOPLE WITH FROSTED GLASS (BLUR / FLOU) ── */}
+        <div className="relative z-10 pb-16 sm:pb-20 px-3 sm:px-4 md:px-0">
+          <div className="mx-auto w-full max-w-[860px]">
+            <div className="text-center space-y-2 mb-6 sm:mb-8 px-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]">
+                {t("home.mapTitle")}
+              </h2>
+              <div className="space-y-1 sm:space-y-1.5">
+                <p className="text-base sm:text-lg md:text-xl font-bold bg-gradient-to-r from-emerald-300 via-green-400 to-emerald-300 bg-clip-text text-transparent drop-shadow">
+                  {t("home.mapFromHere")}
+                </p>
+                <p className="text-xs sm:text-sm md:text-base text-emerald-100/75 max-w-lg mx-auto leading-relaxed drop-shadow">
+                  {t("home.mapSubtitle")}
+                </p>
               </div>
             </div>
-          ))}
-        </div>
-      </section>
 
-      <section className="section-block">
-        <div className="section-title">
-          <h2 className="type-h1 text-2xl md:text-3xl">{t("home.mapTitle")}</h2>
-          <p className="type-body">{t("home.mapHint")}</p>
-        </div>
-
-        <div className="bg-white p-4 sm:p-6 md:p-8 rounded-3xl border border-border/70 shadow-soft">
-          <AlgeriaMapExplorer />
-        </div>
-      </section>
-
-      <section className="content-width pb-6 md:pb-10">
-        <div className="bg-primary text-primary-foreground rounded-3xl p-8 md:p-12 flex flex-col items-center text-center gap-6 relative overflow-hidden shadow-soft">
-          <div className="absolute inset-0 opacity-10 pointer-events-none">
-            <div className="absolute start-0 bottom-0 w-64 h-64 bg-white rounded-full -translate-x-1/3 translate-y-1/3" />
-            <div className="absolute end-0 top-0 w-40 h-40 bg-white rounded-full translate-x-1/3 -translate-y-1/3" />
-          </div>
-          <div className="relative z-10 space-y-4 max-w-3xl">
-            <h3 className="text-2xl md:text-3xl font-extrabold">{t("home.directorTitle")}</h3>
-            <p className="text-base md:text-lg opacity-90 leading-relaxed">{t("home.directorQuote")}</p>
-            <div className="pt-2">
-              <p className="font-bold text-base md:text-lg">{t("home.directorRole")}</p>
-              <p className="opacity-75 text-sm mt-1">{t("home.directorScope")}</p>
+            {/* Frosted Glass Container (BLUR / FLOU) — Exactly matching 860px hero background image width */}
+            <div className="rounded-3xl border border-emerald-400/25 bg-[#02180f]/20 backdrop-blur-2xl p-4 sm:p-6 md:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.5),_inset_0_1px_0_rgba(255,255,255,0.08)]">
+              <AlgeriaMapExplorer />
             </div>
           </div>
-          <div className="relative z-10 w-full max-w-xl aspect-video bg-white/10 rounded-2xl overflow-hidden flex items-center justify-center text-white/55 border border-white/10 text-sm shadow-inner">
-            <img 
-              src="https://images.unsplash.com/photo-1529390079861-591de354faf5?w=1200&q=80" 
-              alt="Youth engagement" 
-              className="w-full h-full object-cover"
-            />
-          </div>
         </div>
       </section>
 
-      <section className="section-block">
+      {/* ═══════════════════════════════════════════
+          ACTIVITIES SECTION (BELONGS TO HOME PAGE)
+         ═══════════════════════════════════════════ */}
+      <ActivitiesHomeSection />
+
+      {/* ═══════════════════════════════════════════
+          SERVICES
+         ═══════════════════════════════════════════ */}
+      <section className="section-block pb-16">
         <div className="section-title">
-          <h2 className="type-h1 text-2xl md:text-3xl">{t("home.servicesTitle")}</h2>
-          <p className="type-body">{t("home.servicesSubtitle")}</p>
+          <h2 className="type-h1 text-2xl md:text-3xl text-white">{t("home.servicesTitle")}</h2>
+          <p className="type-body text-emerald-300/80">{t("home.servicesSubtitle")}</p>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           {stats.map((stat, i) => (
             <div
               key={i}
-              className="bg-white rounded-3xl p-5 md:p-6 shadow-soft border border-border/60 flex flex-col items-center justify-center gap-3 text-center interactive-lift"
+              className="bg-[#041d13]/85 backdrop-blur-md rounded-3xl p-5 md:p-6 shadow-soft border border-emerald-500/25 flex flex-col items-center justify-center gap-3 text-center interactive-lift hover:border-emerald-400/50 hover:bg-[#062c1d]"
             >
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+              <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center text-primary border border-primary/30">
                 <stat.icon className="w-6 h-6" aria-hidden />
               </div>
               <div>
-                <h4 className="font-bold text-foreground text-sm">{stat.label}</h4>
-                <p className="text-xs text-muted-foreground mt-1">{stat.count}</p>
+                <h4 className="font-bold text-white text-sm">{stat.label}</h4>
+                <p className="text-xs text-emerald-300/70 mt-1">{stat.count}</p>
               </div>
             </div>
           ))}

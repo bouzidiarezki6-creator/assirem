@@ -7,7 +7,29 @@ import PageHeader from "@/components/shared/PageHeader"
 import { useAppData } from "@/context/DataProvider"
 import { useI18n } from "@/context/I18nProvider"
 import CategoryFilter from "@/components/shared/CategoryFilter"
-import type { CategoryId } from "@/lib/categories"
+import { ACTIVITY_CATEGORIES, type CategoryId } from "@/lib/categories"
+import type { NewsArticle } from "@/lib/types"
+
+function matchesCategory(n: NewsArticle, catId: CategoryId | "all"): boolean {
+  if (catId === "all") return true
+  if (n.categoryId === catId) return true
+  if (n.category === catId) return true
+
+  const map: Record<CategoryId, string[]> = {
+    social: ["social", "اجتماعي", "Social"],
+    educatif: ["educatif", "تربوي", "Éducatif", "Educatif"],
+    sante: ["sante", "صحة", "Santé", "Sante"],
+    environnemental: ["environnemental", "بيئي", "Environnemental"],
+    urgences: ["urgences", "طوارئ", "Urgences"],
+    scoutisme: ["scoutisme", "كشافة", "Scoutisme"],
+    evenementiel: ["evenementiel", "تظاهرات", "Événementiel"],
+  }
+  const aliases = map[catId]
+  if (aliases && aliases.some((a) => a.toLowerCase() === (n.category || "").toLowerCase())) {
+    return true
+  }
+  return false
+}
 
 export default function News() {
   const { data } = useAppData()
@@ -21,12 +43,23 @@ export default function News() {
     [data.news]
   )
 
+  // Compute counts per category for category badges
+  const counts = useMemo(() => {
+    const acc: Partial<Record<CategoryId | "all", number>> = { all: published.length }
+    for (const cat of ACTIVITY_CATEGORIES) {
+      acc[cat.id] = published.filter((n) => matchesCategory(n, cat.id)).length
+    }
+    return acc
+  }, [published])
+
   const featured = published.find((n) => n.featured) ?? published[0]
-  const grid = published.filter((n) => {
-    if (featured && n.id === featured.id) return false
-    if (activeCategory === "all") return true
-    return n.category === activeCategory
-  })
+
+  const grid = useMemo(() => {
+    if (activeCategory === "all") {
+      return published.filter((n) => (featured ? n.id !== featured.id : true))
+    }
+    return published.filter((n) => matchesCategory(n, activeCategory))
+  }, [published, activeCategory, featured])
 
   return (
     <div className="page-shell section-gap">
@@ -36,6 +69,7 @@ export default function News() {
         <CategoryFilter
           selected={activeCategory}
           onSelect={setActiveCategory}
+          counts={counts}
         />
       </div>
 
@@ -81,8 +115,9 @@ export default function News() {
           icon={Newspaper}
           title={t("news.empty")}
           description={t("common.noResults")}
-          actionLabel={t("nav.home")}
-          actionTo="/"
+          actionLabel={activeCategory !== "all" ? "عرض جميع الأخبار" : t("nav.home")}
+          actionTo={activeCategory !== "all" ? undefined : "/"}
+          onAction={activeCategory !== "all" ? () => setActiveCategory("all") : undefined}
         />
       ) : grid.length > 0 ? (
         <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">

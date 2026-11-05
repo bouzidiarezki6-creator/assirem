@@ -3,473 +3,182 @@ import type {
   Activity,
   Announcement,
   Association,
-  Cagnotte,
-  Donation,
   EventItem,
   Institution,
   NewsArticle,
   Registrant,
+  VolunteerAccount,
+  VolunteerPointTransaction,
+  VolunteerParticipation,
   SosCollectionSite,
   SosDamagedSite,
+  SosMaterialNeed,
+  SosDonationPledge,
+  SosCall,
+  SosApplication,
+  SosIntervention,
+  InstitutionalUser,
+  InstitutionalOperation,
+  AuditRegistryEntry,
 } from "./types"
-import { CAGNOTTE_TYPES } from "./cagnottes"
-import { seedAssociationsFromCatalog } from "./associations"
-import type { CategoryId } from "./categories"
 
-const STORAGE_KEY = "yfy-akbou-data-v3"
+import { DEFAULT_CHALLENGES } from "./rewardsGamification"
+import { DEFAULT_POINT_RULES } from "./pointsEngine"
+import {
+  DEMO_EVENTS,
+  DEMO_ACTIVITIES,
+  DEMO_ANNOUNCEMENTS,
+  DEMO_INSTITUTIONS,
+  DEMO_NEWS,
+  DEMO_REGISTRANTS,
+  DEMO_PARTICIPATIONS,
+  DEMO_VOLUNTEERS,
+  DEMO_POINT_TRANSACTIONS,
+  DEMO_ASSOCIATIONS,
+  DEMO_SOS_COLLECTION_SITES,
+  DEMO_SOS_DAMAGED_SITES,
+  DEMO_SOS_MATERIAL_NEEDS,
+  DEMO_SOS_DONATION_PLEDGES,
+  DEMO_SOS_CALLS,
+  DEMO_SOS_APPLICATIONS,
+  DEMO_SOS_INTERVENTIONS,
+  DEMO_INSTITUTIONAL_USERS,
+  DEMO_OPERATIONS,
+  DEMO_AUDIT_REGISTRY,
+  DEMO_PRESENCE_RECORDS,
+  DEMO_MISSION_REPORTS,
+  DEMO_NOTIFICATIONS,
+  isDemoRecord,
+  isDemoId,
+  countDemoStats,
+  purgeDemoData,
+  injectDemoData,
+  resetDemoData,
+  type DemoStats,
+} from "./demoData"
+
+const STORAGE_KEY = "yfy-unified-data-v1"
 const AUTH_KEY = "yfy-akbou-admin"
 
 function uid() {
   return crypto.randomUUID()
 }
 
-function buildSeedCagnottes(): Cagnotte[] {
-  const list: Cagnotte[] = []
-  for (let code = 1; code <= 69; code++) {
-    for (const type of CAGNOTTE_TYPES) {
-      const variance = ((code * 17 + type.id.length * 31) % 40) / 100
-      const goal = Math.round(type.defaultGoal * (0.85 + variance))
-      const raised = Math.round(goal * (((code * 13 + type.id.charCodeAt(0)) % 55) / 100))
-      list.push({
-        id: `cag-${String(code).padStart(2, "0")}-${type.id}`,
-        typeId: type.id,
-        wilayaCode: code,
-        goalAmount: goal,
-        raisedAmount: raised,
-        published: true,
-      })
-    }
-  }
-  return list
-}
-
-const seedData: AppData = {
-  events: [
+export const seedData: AppData = {
+  events: DEMO_EVENTS,
+  announcements: DEMO_ANNOUNCEMENTS,
+  activities: DEMO_ACTIVITIES,
+  institutions: DEMO_INSTITUTIONS,
+  news: DEMO_NEWS,
+  registrants: DEMO_REGISTRANTS,
+  participations: DEMO_PARTICIPATIONS,
+  volunteerAccounts: DEMO_VOLUNTEERS,
+  volunteerPointTransactions: DEMO_POINT_TRANSACTIONS,
+  associations: DEMO_ASSOCIATIONS,
+  sosCollectionSites: DEMO_SOS_COLLECTION_SITES,
+  sosDamagedSites: DEMO_SOS_DAMAGED_SITES,
+  sosMaterialNeeds: DEMO_SOS_MATERIAL_NEEDS,
+  sosDonationPledges: DEMO_SOS_DONATION_PLEDGES,
+  sosCalls: DEMO_SOS_CALLS,
+  sosApplications: DEMO_SOS_APPLICATIONS,
+  sosInterventions: DEMO_SOS_INTERVENTIONS,
+  institutionalUsers: DEMO_INSTITUTIONAL_USERS,
+  institutionalOperations: DEMO_OPERATIONS,
+  auditRegistry: DEMO_AUDIT_REGISTRY,
+  customChallenges: DEFAULT_CHALLENGES,
+  awardNominations: [
     {
-      id: uid(),
-      title: "يوم شباب ولاية بجاية",
-      description: "تظاهرة شبابية تجمع المؤسسات والجمعيات الشبانية لولاية بجاية.",
-      date: "2026-06-25",
-      location: "بجاية",
-      institution: "يد في يد",
-      imageDataUrl: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&q=80",
-      categoryId: "evenementiel",
-      requiresRegistration: true,
-      published: true,
+      id: "demo-nom-01",
+      awardType: "best_ambassador",
+      nomineeVolunteerId: "demo-vol-nabila",
+      nomineeName: "Nabila Ait-Ouali",
+      nomineeWilayaCode: 6,
+      proposedByRole: "wilaya_admin",
+      proposedById: "demo-user-wil-06",
+      proposedByName: "Karima Bouzid",
+      justification: "Dévouement exceptionnel sur la vallée de la Soummam et encadrement des jeunes bénévoles.",
+      status: "approved",
+      decisionAt: "2026-11-04T16:00:00.000Z",
+      decisionById: "demo-user-nat-01",
+      decisionByName: "Mustapha Belkacem",
+      decisionReason: "Trophée annuel validé à l'unanimité du comité national.",
+      createdAt: "2026-10-25T09:00:00.000Z",
+      isDemo: true,
     },
     {
-      id: uid(),
-      title: "ملتقى الابتكار والبرمجة",
-      description: "ورشات تدريبية وعرض مشاريع رقمية مبتكرة لشباب المنطقة.",
-      date: "2026-07-10",
-      location: "أميزور",
-      institution: "بيت الشباب أميزور",
-      imageDataUrl: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&q=80",
-      categoryId: "educatif",
-      requiresRegistration: false,
-      published: true,
-    },
-    {
-      id: uid(),
-      title: "حملة تشجير وحماية الغابات",
-      description: "مبادرة بيئية كبرى لإعادة تشجير المناطق الغابية وحمايتها.",
-      date: "2026-07-18",
-      location: "أقبو",
-      institution: "يد في يد",
-      imageDataUrl: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&q=80",
-      categoryId: "environnemental",
-      requiresRegistration: true,
-      published: true,
-    },
-    {
-      id: uid(),
-      title: "مخيم صيفي وأنشطة كشفية",
-      description: "مخيم تدريبي وتطوعي للشباب على شاطئ توجة مع أنشطة استكشافية.",
-      date: "2026-08-01",
-      location: "توجة",
-      institution: "مخيم الشباب توجة",
-      imageDataUrl: "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?w=800&q=80",
-      categoryId: "scoutisme",
-      requiresRegistration: true,
-      published: true,
-    },
-    {
-      id: uid(),
-      title: "قافلة التضامن والصحة الجوارية",
-      description: "فحوصات طبية واستشارات وقائية وتوزيع طرود للمحتاجين.",
-      date: "2026-08-15",
-      location: "سيدي عيش",
-      institution: "يد في يد",
-      imageDataUrl: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
-      categoryId: "sante",
-      requiresRegistration: false,
-      published: true,
-    },
-    {
-      id: uid(),
-      title: "توزيع المساعدات للأسر المعوزة",
-      description: "مبادرة خيرية للتكفل بالعائلات وتوزيع الاحتياجات الأساسية.",
-      date: "2026-08-22",
-      location: "بجاية وسط",
-      institution: "يد في يد",
-      imageDataUrl: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&q=80",
-      categoryId: "social",
-      requiresRegistration: false,
-      published: true,
+      id: "demo-nom-02",
+      awardType: "young_civic_leader",
+      nomineeVolunteerId: "demo-vol-yasmine",
+      nomineeName: "Yasmine Kaci",
+      nomineeWilayaCode: 19,
+      proposedByRole: "wilaya_admin",
+      proposedById: "demo-user-wil-19",
+      proposedByName: "Tarek Mansouri",
+      justification: "Animation d'ateliers de sensibilisation à la santé et coordination des visites aux personnes âgées à Sétif.",
+      status: "pending",
+      createdAt: "2026-11-03T11:00:00.000Z",
+      isDemo: true,
     },
   ],
-  announcements: [
+  seasonArchives: [
     {
-      id: uid(),
-      title: "فتح باب التسجيل — المخيمات الصيفية",
-      description: "التسجيل مفتوح للمنخرطين في مؤسسات الشباب للمشاركة في المخيمات الصيفية.",
-      openFrom: "2026-05-01",
-      openUntil: "2026-06-15",
-      maxSlots: 120,
-      active: true,
-    },
-    {
-      id: uid(),
-      title: "تسجيل ورشات البرمجة",
-      description: "انضم إلى ورشات البرمجة للمبتدئين.",
-      openFrom: "2026-06-01",
-      openUntil: "2026-06-20",
-      maxSlots: 40,
-      active: true,
-    },
-  ],
-  activities: [
-    {
-      id: uid(),
-      title: "ورشة البرمجة للمبتدئين",
-      description: "تعلم أساسيات البرمجة بلغة Python مع مدربين متخصصين.",
-      date: "2026-06-15",
-      day: "15",
-      month: "جوان",
-      location: "بجاية",
-      institution: "بيت الشباب بجاية",
-      categoryId: "educatif",
-      imageDataUrl: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80",
-      published: true,
-    },
-    {
-      id: uid(),
-      title: "يوم رياضي مفتوح",
-      description: "يوم كامل من الأنشطة الرياضية المتنوعة للشباب.",
-      date: "2026-06-20",
-      day: "20",
-      month: "جوان",
-      location: "تيزي وزو",
-      institution: "المركب الرياضي تيزي وزو",
-      categoryId: "social",
-      imageDataUrl: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80",
-      published: true,
-    },
-    {
-      id: uid(),
-      title: "مخيم صيفي للشباب",
-      description: "مخيم لمدة 5 أيام على شاطئ توجة.",
-      date: "2026-07-01",
-      day: "1",
-      month: "جويلية",
-      location: "توجة",
-      institution: "مخيم الشباب توجة",
-      categoryId: "scoutisme",
-      imageDataUrl: "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?w=800&q=80",
-      published: true,
-    },
-    {
-      id: uid(),
-      title: "مسابقة الابتكار العلمي",
-      description: "عرض مشاريع علمية من شباب المؤسسات.",
-      date: "2026-07-08",
-      day: "8",
-      month: "جويلية",
-      location: "أميزور",
-      institution: "بيت الشباب أميزور",
-      categoryId: "educatif",
-      imageDataUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80",
-      published: true,
+      seasonId: "season-2026-q3",
+      year: 2026,
+      quarter: 3,
+      title: "Saison 3 2026 (Juillet – Septembre)",
+      archivedAt: "2026-10-01T00:00:00.000Z",
+      totalPointsDistributed: 14200,
+      totalHoursVolunteered: 2150,
+      totalMissionsCompleted: 284,
+      topVolunteers: [
+        {
+          volunteerId: "demo-vol-nabila",
+          displayName: "Nabila A.",
+          wilayaCode: 6,
+          commune: "Akbou",
+          tier: "ambassadeur",
+          pointsInSeason: 580,
+          rank: 1,
+          awardTitle: "Championne Soummam T3 2026",
+        },
+        {
+          volunteerId: "demo-vol-yasmine",
+          displayName: "Yasmine K.",
+          wilayaCode: 19,
+          commune: "Sétif",
+          tier: "exemplaire",
+          pointsInSeason: 410,
+          rank: 2,
+          awardTitle: "Excellence Hauts Plateaux T3",
+        },
+        {
+          volunteerId: "demo-vol-amine",
+          displayName: "Amine M.",
+          wilayaCode: 6,
+          commune: "Béjaïa",
+          tier: "confirme",
+          pointsInSeason: 280,
+          rank: 3,
+          awardTitle: "Leader Éco-Citoyen Béjaïa",
+        },
+      ],
+      topTeams: [
+        { teamName: "Brigade Verte Gouraya", wilayaCode: 6, points: 1450, rank: 1 },
+        { teamName: "Secours Solidaire Hauts Plateaux", wilayaCode: 19, points: 1180, rank: 2 },
+      ],
     },
   ],
-  institutions: [
-    {
-      id: uid(),
-      name: "بيت الشباب بجاية",
-      type: "بيت الشباب",
-      location: "بجاية وسط",
-      phone: "034 21 00 00",
-      imageDataUrl: "https://images.unsplash.com/photo-1541888090710-530182ce6a7a?w=800&q=80",
-      published: true,
-      wilayaCode: 6,
-      lat: 36.7525,
-      lng: 5.0833,
-      structureKind: "maison_jeunes",
-      authority: "Yed fel yed",
-    },
-    {
-      id: uid(),
-      name: "دار الشباب أميزور",
-      type: "دار الشباب",
-      location: "أميزور، بجاية",
-      phone: "",
-      imageDataUrl: "https://images.unsplash.com/photo-1541888090710-530182ce6a7a?w=800&q=80",
-      published: true,
-      wilayaCode: 6,
-      lat: 36.6431,
-      lng: 4.9069,
-      structureKind: "maison_jeunes",
-      authority: "Yed fel yed",
-    },
-    {
-      id: uid(),
-      name: "مخيم الشباب توجة",
-      type: "مخيم صيفي",
-      location: "توجة، بجاية",
-      phone: "",
-      imageDataUrl: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=800&q=80",
-      published: true,
-      wilayaCode: 6,
-      lat: 36.761,
-      lng: 4.833,
-      structureKind: "camp",
-      authority: "Yed fel yed",
-    },
-    {
-      id: uid(),
-      name: "المركز الثقافي أقبو",
-      type: "مركز ثقافي",
-      location: "أقبو، بجاية",
-      phone: "034 35 00 00",
-      imageDataUrl: "https://images.unsplash.com/photo-1518398046578-8cca57782e17?w=800&q=80",
-      published: true,
-      wilayaCode: 6,
-      lat: 36.62,
-      lng: 4.68,
-      structureKind: "centre_culturel",
-      authority: "DJS",
-    },
-    {
-      id: uid(),
-      name: "ملعب جواري تيشي",
-      type: "ملعب جواري",
-      location: "تيشي، بجاية",
-      phone: "",
-      imageDataUrl: "https://images.unsplash.com/photo-1529900965798-fa561d3106e2?w=800&q=80",
-      published: true,
-      wilayaCode: 6,
-      lat: 36.748,
-      lng: 5.057,
-      structureKind: "terrain",
-      authority: "DJS",
-    },
-    {
-      id: uid(),
-      name: "المركب الرياضي تيزي وزو",
-      type: "مركب رياضي",
-      location: "تيزي وزو",
-      phone: "026 21 00 00",
-      imageDataUrl: "https://images.unsplash.com/photo-1529900965798-fa561d3106e2?w=800&q=80",
-      published: true,
-      wilayaCode: 15,
-      lat: 36.7117,
-      lng: 4.0458,
-      structureKind: "terrain",
-      authority: "DJS",
-    },
-    {
-      id: uid(),
-      name: "Maison de jeunes El Madania",
-      type: "Maison de jeunes",
-      location: "El Madania, Alger",
-      phone: "021 00 00 00",
-      imageDataUrl: "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=800&q=80",
-      published: true,
-      wilayaCode: 16,
-      lat: 36.743,
-      lng: 3.067,
-      structureKind: "maison_jeunes",
-      authority: "Yed fel yed",
-    },
-    {
-      id: uid(),
-      name: "Auberge de jeunesse Bab El Oued",
-      type: "Auberge de jeunesse",
-      location: "Bab El Oued, Alger",
-      phone: "",
-      imageDataUrl: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=800&q=80",
-      published: true,
-      wilayaCode: 16,
-      lat: 36.791,
-      lng: 3.05,
-      structureKind: "auberge",
-      authority: "Yed fel yed",
-    },
-    {
-      id: uid(),
-      name: "Foyer de jeunes Bir Mourad Raïs",
-      type: "Foyer de jeunes",
-      location: "Bir Mourad Raïs, Alger",
-      phone: "",
-      imageDataUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80",
-      published: true,
-      wilayaCode: 16,
-      lat: 36.737,
-      lng: 3.04,
-      structureKind: "foyer",
-      authority: "DJS",
-    },
-    {
-      id: uid(),
-      name: "Maison de jeunes Oran Centre",
-      type: "Maison de jeunes",
-      location: "Oran",
-      phone: "041 00 00 00",
-      imageDataUrl: "https://images.unsplash.com/photo-1541888090710-530182ce6a7a?w=800&q=80",
-      published: true,
-      wilayaCode: 31,
-      lat: 35.697,
-      lng: -0.634,
-      structureKind: "maison_jeunes",
-      authority: "Yed fel yed",
-    },
-    {
-      id: uid(),
-      name: "Auberge de jeunesse Canastel",
-      type: "Auberge de jeunesse",
-      location: "Canastel, Oran",
-      phone: "",
-      imageDataUrl: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=800&q=80",
-      published: true,
-      wilayaCode: 31,
-      lat: 35.74,
-      lng: -0.58,
-      structureKind: "auberge",
-      authority: "Yed fel yed",
-    },
-    {
-      id: uid(),
-      name: "Maison de jeunes Constantine",
-      type: "Maison de jeunes",
-      location: "Constantine",
-      phone: "031 00 00 00",
-      imageDataUrl: "https://images.unsplash.com/photo-1541888090710-530182ce6a7a?w=800&q=80",
-      published: true,
-      wilayaCode: 25,
-      lat: 36.365,
-      lng: 6.6147,
-      structureKind: "maison_jeunes",
-      authority: "Yed fel yed",
-    },
-    {
-      id: uid(),
-      name: "Maison de jeunes Sétif",
-      type: "Maison de jeunes",
-      location: "Sétif",
-      phone: "",
-      imageDataUrl: "https://images.unsplash.com/photo-1541888090710-530182ce6a7a?w=800&q=80",
-      published: true,
-      wilayaCode: 19,
-      lat: 36.1911,
-      lng: 5.4137,
-      structureKind: "maison_jeunes",
-      authority: "DJS",
-    },
-    {
-      id: uid(),
-      name: "Maison de jeunes Annaba",
-      type: "Maison de jeunes",
-      location: "Annaba",
-      phone: "",
-      imageDataUrl: "https://images.unsplash.com/photo-1541888090710-530182ce6a7a?w=800&q=80",
-      published: true,
-      wilayaCode: 23,
-      lat: 36.9,
-      lng: 7.767,
-      structureKind: "maison_jeunes",
-      authority: "Yed fel yed",
-    },
-    {
-      id: uid(),
-      name: "Maison de jeunes Blida",
-      type: "Maison de jeunes",
-      location: "Blida",
-      phone: "",
-      imageDataUrl: "https://images.unsplash.com/photo-1541888090710-530182ce6a7a?w=800&q=80",
-      published: true,
-      wilayaCode: 9,
-      lat: 36.47,
-      lng: 2.828,
-      structureKind: "maison_jeunes",
-      authority: "Yed fel yed",
-    },
-  ],
-  news: [
-    {
-      id: uid(),
-      category: "مقال مميز",
-      date: "2026-09-19",
-      title: "انطلاق برنامج المخيمات الصيفية",
-      description: "ملخص خبر يوم شباب ولاية بجاية - انطلاق برنامج المخيمات الصيفية.",
-      imageDataUrl: "https://images.unsplash.com/photo-1504280390227-351bfb01debc?w=800&q=80",
-      featured: true,
-      published: true,
-    },
-    {
-      id: uid(),
-      category: "أخبار",
-      date: "2026-09-17",
-      title: "تكريم المتطوعين الشباب",
-      description: "ملخص خبر يوم شباب ولاية بجاية - تكريم المتطوعين الشباب.",
-      imageDataUrl: "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?w=800&q=80",
-      featured: false,
-      published: true,
-    },
-    {
-      id: uid(),
-      category: "رياضة",
-      date: "2026-09-16",
-      title: "افتتاح ملعب خماسي جديد",
-      description: "ملخص خبر يوم شباب ولاية بجاية - افتتاح ملعب خماسي جديد.",
-      imageDataUrl: "https://images.unsplash.com/photo-1518605368461-1eb47b8fb62b?w=800&q=80",
-      featured: false,
-      published: true,
-    },
-    {
-      id: uid(),
-      category: "ثقافة",
-      date: "2026-09-15",
-      title: "معرض الكتاب الشبابي",
-      description: "ملخص خبر يوم شباب ولاية بجاية - معرض الكتاب الشبابي.",
-      imageDataUrl: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800&q=80",
-      featured: false,
-      published: true,
-    },
-    {
-      id: uid(),
-      category: "صحة",
-      date: "2026-09-14",
-      title: "حملة التطعيم والوقاية",
-      description: "ملخص خبر يوم شباب ولاية بجاية - حملة التطعيم والوقاية.",
-      imageDataUrl: "https://images.unsplash.com/photo-1584362917165-526a968579e8?w=800&q=80",
-      featured: false,
-      published: true,
-    },
-  ],
-  registrants: [],
-  participations: [],
-  cagnottes: buildSeedCagnottes(),
-  donations: [],
-  associations: seedAssociationsFromCatalog(),
-  sosCollectionSites: [],
-  sosDamagedSites: [],
+  notifications: DEMO_NOTIFICATIONS,
+  presenceRecords: DEMO_PRESENCE_RECORDS,
+  missionReports: DEMO_MISSION_REPORTS,
+  pointRulesConfig: DEFAULT_POINT_RULES,
 }
 
 function load(): AppData {
   try {
     let raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) {
-      raw = localStorage.getItem("odej-akbou-data-v3")
+      raw = localStorage.getItem("yfy-algeria-volunteer-v9") || localStorage.getItem("yfy-akbou-data-v3")
     }
     if (!raw) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(seedData))
@@ -478,202 +187,177 @@ function load(): AppData {
     const parsed = JSON.parse(raw) as Partial<AppData>
     let changed = false
 
-    const registrants = (parsed.registrants ?? []).map((r) => {
-      let next = { ...r }
-      let localChanged = false
-      if (!next.qrCode) {
-        const part = (next.nationalId || next.id).replace(/-/g, "").slice(0, 10).toUpperCase()
-        next = { ...next, qrCode: `YFY-${part}` }
-        localChanged = true
-      }
-      if (typeof next.points !== "number") {
-        next = { ...next, points: 0 }
-        localChanged = true
-      }
-      if (next.nationalId && next.id !== next.nationalId) {
-        next = { ...next, id: next.nationalId }
-        localChanged = true
-      }
-      if (localChanged) changed = true
-      return next
-    })
+    // Identify legacy non-demo non-user items to migrate cleanly
+    const isLegacySeedId = (id: any) =>
+      typeof id === "string" && (
+        id.startsWith("evt-") ||
+        id.startsWith("act-") ||
+        id.startsWith("news-") ||
+        id.startsWith("ann-") ||
+        id.startsWith("vol-seed-") ||
+        id.startsWith("part-seed-") ||
+        id.startsWith("op-alger-") ||
+        id.startsWith("op-akbou-") ||
+        id.startsWith("audit-gen-") ||
+        id.startsWith("audit-00") ||
+        id.startsWith("user-nat-") ||
+        id.startsWith("user-wil-") ||
+        id.startsWith("user-loc-") ||
+        id.startsWith("user-lead-") ||
+        id.startsWith("user-audit-") ||
+        id.startsWith("nom-seed-")
+      )
 
-    const events = (parsed.events && parsed.events.length >= 4 ? parsed.events : seedData.events).map((e, idx) => {
-      let next = { ...e }
-      if (next.imageDataUrl === undefined) {
-        next = { ...next, imageDataUrl: null }
-        changed = true
-      }
-      if (typeof next.requiresRegistration !== "boolean") {
-        next = { ...next, requiresRegistration: false }
-        changed = true
-      }
-      if (!next.categoryId) {
-        const cats: CategoryId[] = ["evenementiel", "educatif", "environnemental", "scoutisme", "sante", "social"]
-        next = { ...next, categoryId: cats[idx % cats.length] }
-        changed = true
-      }
-      return next
-    })
+    // Events: keep user events, remove obsolete seed events, ensure DEMO_EVENTS present
+    const rawEvents = (parsed.events || []).filter((e) => !isLegacySeedId(e.id))
+    const hasDemoEvents = rawEvents.some((e) => isDemoRecord(e))
+    let events: EventItem[] = hasDemoEvents ? rawEvents : [...DEMO_EVENTS, ...rawEvents]
+    if (!hasDemoEvents) changed = true
 
-    const activities = (parsed.activities ?? seedData.activities).map((a, idx) => {
-      let next = { ...a }
-      if (next.imageDataUrl === undefined) {
-        changed = true
-        next = { ...next, imageDataUrl: null }
-      }
-      if (!next.categoryId) {
-        const cats: CategoryId[] = ["educatif", "social", "scoutisme", "environnemental", "sante"]
-        next = { ...next, categoryId: cats[idx % cats.length] }
-        changed = true
-      }
-      return next
-    })
+    // Activities: keep user activities, remove obsolete seed activities, ensure DEMO_ACTIVITIES present
+    const rawActivities = (parsed.activities || []).filter((a) => !isLegacySeedId(a.id))
+    const hasDemoActivities = rawActivities.some((a) => isDemoRecord(a))
+    let activities: Activity[] = hasDemoActivities ? rawActivities : [...DEMO_ACTIVITIES, ...rawActivities]
+    if (!hasDemoActivities) changed = true
 
-    let institutions = parsed.institutions ?? seedData.institutions
-    if (!parsed.institutions) changed = true
-    const geoReady = institutions.some((i) => typeof i.wilayaCode === "number" && typeof i.lat === "number")
-    if (!geoReady) {
-      institutions = structuredClone(seedData.institutions)
-      changed = true
-    }
+    // Announcements
+    const rawAnnouncements = (parsed.announcements || []).filter((a) => !isLegacySeedId(a.id))
+    const hasDemoAnn = rawAnnouncements.some((a) => isDemoRecord(a))
+    let announcements: Announcement[] = hasDemoAnn ? rawAnnouncements : [...DEMO_ANNOUNCEMENTS, ...rawAnnouncements]
+    if (!hasDemoAnn) changed = true
 
-    const news = parsed.news ?? seedData.news
-    if (!parsed.news) changed = true
+    // Institutions (Strictly Béjaïa, Sétif, El Eulma)
+    const rawInst = (parsed.institutions || []).filter((i) => !isLegacySeedId(i.id))
+    const hasDemoInst = rawInst.some((i) => isDemoRecord(i))
+    let institutions: Institution[] = hasDemoInst ? rawInst : [...DEMO_INSTITUTIONS, ...rawInst]
+    if (!hasDemoInst) changed = true
 
-    let cagnottes = parsed.cagnottes ?? []
-    if (!parsed.cagnottes || cagnottes.length < CAGNOTTE_TYPES.length * 69) {
-      cagnottes = structuredClone(seedData.cagnottes)
-      changed = true
-    }
+    // News
+    const rawNews = (parsed.news || []).filter((n) => !isLegacySeedId(n.id))
+    const hasDemoNews = rawNews.some((n) => isDemoRecord(n))
+    let news: NewsArticle[] = hasDemoNews ? rawNews : [...DEMO_NEWS, ...rawNews]
+    if (!hasDemoNews) changed = true
 
-    const donations = (parsed.donations ?? []).map((d) => {
-      let next = { ...d }
-      let localChanged = false
-      if (next.associationId === undefined) {
-        next = { ...next, associationId: null }
-        localChanged = true
-      }
-      if (next.associationName === undefined) {
-        next = { ...next, associationName: null }
-        localChanged = true
-      }
-      if (!next.reference) {
-        next = {
-          ...next,
-          reference: `DON-${next.id.replace(/-/g, "").slice(0, 10).toUpperCase()}`,
-        }
-        localChanged = true
-      }
-      if (!next.cagnotteTypeId || typeof next.wilayaCode !== "number") {
-        const pot = (parsed.cagnottes ?? []).find((c) => c.id === next.cagnotteId)
-        next = {
-          ...next,
-          cagnotteTypeId: next.cagnotteTypeId ?? pot?.typeId ?? "associations",
-          wilayaCode: typeof next.wilayaCode === "number" ? next.wilayaCode : pot?.wilayaCode ?? 0,
-        }
-        localChanged = true
-      }
-      if (next.associationCcp === undefined) {
-        next = { ...next, associationCcp: null }
-        localChanged = true
-      }
-      if (!next.status) {
-        next = { ...next, status: "completed" }
-        localChanged = true
-      }
-      if (next.cancelledAt === undefined) {
-        next = { ...next, cancelledAt: null }
-        localChanged = true
-      }
-      if (next.cancelReason === undefined) {
-        next = { ...next, cancelReason: null }
-        localChanged = true
-      }
-      if (localChanged) changed = true
-      return next
-    })
-    if (!parsed.donations) changed = true
+    // Volunteers
+    const rawVols = (parsed.volunteerAccounts || []).filter((v) => !isLegacySeedId(v.id))
+    const hasDemoVols = rawVols.some((v) => isDemoRecord(v))
+    let volunteerAccounts: VolunteerAccount[] = hasDemoVols ? rawVols : [...DEMO_VOLUNTEERS, ...rawVols]
+    if (!hasDemoVols) changed = true
 
-    let associations = parsed.associations ?? []
-    if (!parsed.associations || associations.length === 0) {
-      associations = seedAssociationsFromCatalog()
-      changed = true
-    } else {
-      associations = associations.map((a) => {
-        let next = { ...a }
-        let localChanged = false
-        if (next.logoDataUrl === undefined) {
-          next = { ...next, logoDataUrl: null }
-          localChanged = true
-        }
-        if (typeof next.ccpAccount !== "string") {
-          next = { ...next, ccpAccount: "" }
-          localChanged = true
-        }
-        if (typeof next.published !== "boolean") {
-          next = { ...next, published: true }
-          localChanged = true
-        }
-        if (!next.createdAt) {
-          next = { ...next, createdAt: new Date().toISOString() }
-          localChanged = true
-        }
-        if (!next.updatedAt) {
-          next = { ...next, updatedAt: next.createdAt }
-          localChanged = true
-        }
-        if (localChanged) changed = true
-        return next
-      })
-    }
+    // Participations
+    const rawParts = (parsed.participations || []).filter((p) => !isLegacySeedId(p.id))
+    const hasDemoParts = rawParts.some((p) => isDemoRecord(p))
+    let participations: VolunteerParticipation[] = hasDemoParts ? rawParts : [...DEMO_PARTICIPATIONS, ...rawParts]
+    if (!hasDemoParts) changed = true
 
-    const sosCollectionSites = (parsed.sosCollectionSites ?? []).map((site) => {
-      if (Array.isArray((site as SosCollectionSite).aidCategories)) return site as SosCollectionSite
-      changed = true
-      return { ...(site as SosCollectionSite), aidCategories: [] }
-    })
-    if (!parsed.sosCollectionSites) changed = true
+    // Registrants
+    const rawRegs = (parsed.registrants || []).filter((r) => !isLegacySeedId(r.id))
+    const hasDemoRegs = rawRegs.some((r) => isDemoRecord(r))
+    let registrants: Registrant[] = hasDemoRegs ? rawRegs : [...DEMO_REGISTRANTS, ...rawRegs]
+    if (!hasDemoRegs) changed = true
 
-    const sosDamagedSites = (parsed.sosDamagedSites ?? []).map((site) => {
-      if (Array.isArray((site as SosDamagedSite).aidCategories)) return site as SosDamagedSite
-      changed = true
-      return { ...(site as SosDamagedSite), aidCategories: [] }
-    })
-    if (!parsed.sosDamagedSites) changed = true
+    // Point Transactions
+    const rawTx = (parsed.volunteerPointTransactions || []).filter((t) => !isLegacySeedId(t.id))
+    const hasDemoTx = rawTx.some((t) => isDemoRecord(t))
+    let volunteerPointTransactions: VolunteerPointTransaction[] = hasDemoTx ? rawTx : [...DEMO_POINT_TRANSACTIONS, ...rawTx]
+    if (!hasDemoTx) changed = true
 
-    const participations = (parsed.participations ?? []).map((p) => ({
-      ...p,
-      changes: Array.isArray(p.changes) ? p.changes : [],
-    }))
+    // Associations
+    const rawAssoc = (parsed.associations || []).filter((a) => !isLegacySeedId(a.id))
+    const hasDemoAssoc = rawAssoc.some((a) => isDemoRecord(a))
+    let associations: Association[] = hasDemoAssoc ? rawAssoc : [...DEMO_ASSOCIATIONS, ...rawAssoc]
+    if (!hasDemoAssoc) changed = true
+
+    // SOS Collections, Damaged, Materials, Pledges, Calls, Applications, Interventions
+    const rawSosCol = (parsed.sosCollectionSites || []).filter((s) => !isLegacySeedId(s.id))
+    const hasDemoSosCol = rawSosCol.some((s) => isDemoRecord(s))
+    let sosCollectionSites = hasDemoSosCol ? rawSosCol : [...DEMO_SOS_COLLECTION_SITES, ...rawSosCol]
+
+    const rawSosDam = (parsed.sosDamagedSites || []).filter((s) => !isLegacySeedId(s.id))
+    const hasDemoSosDam = rawSosDam.some((s) => isDemoRecord(s))
+    let sosDamagedSites = hasDemoSosDam ? rawSosDam : [...DEMO_SOS_DAMAGED_SITES, ...rawSosDam]
+
+    const rawSosMat = (parsed.sosMaterialNeeds || []).filter((m) => !isLegacySeedId(m.id))
+    const hasDemoSosMat = rawSosMat.some((m) => isDemoRecord(m))
+    let sosMaterialNeeds = hasDemoSosMat ? rawSosMat : [...DEMO_SOS_MATERIAL_NEEDS, ...rawSosMat]
+
+    const rawSosPledges = (parsed.sosDonationPledges || []).filter((p) => !isLegacySeedId(p.id))
+    const hasDemoSosPledges = rawSosPledges.some((p) => isDemoRecord(p))
+    let sosDonationPledges = hasDemoSosPledges ? rawSosPledges : [...DEMO_SOS_DONATION_PLEDGES, ...rawSosPledges]
+
+    const rawSosCalls = (parsed.sosCalls || []).filter((c) => !isLegacySeedId(c.id))
+    const hasDemoSosCalls = rawSosCalls.some((c) => isDemoRecord(c))
+    let sosCalls = hasDemoSosCalls ? rawSosCalls : [...DEMO_SOS_CALLS, ...rawSosCalls]
+
+    const rawSosApps = (parsed.sosApplications || []).filter((a) => !isLegacySeedId(a.id))
+    const hasDemoSosApps = rawSosApps.some((a) => isDemoRecord(a))
+    let sosApplications = hasDemoSosApps ? rawSosApps : [...DEMO_SOS_APPLICATIONS, ...rawSosApps]
+
+    const rawSosInterv = (parsed.sosInterventions || []).filter((i) => !isLegacySeedId(i.id))
+    const hasDemoSosInterv = rawSosInterv.some((i) => isDemoRecord(i))
+    let sosInterventions = hasDemoSosInterv ? rawSosInterv : [...DEMO_SOS_INTERVENTIONS, ...rawSosInterv]
+
+    // Institutional Governance
+    const rawInstUsers = (parsed.institutionalUsers || []).filter((u) => !isLegacySeedId(u.id))
+    const hasDemoInstUsers = rawInstUsers.some((u) => isDemoRecord(u))
+    let institutionalUsers = hasDemoInstUsers ? rawInstUsers : [...DEMO_INSTITUTIONAL_USERS, ...rawInstUsers]
+
+    const rawOps = (parsed.institutionalOperations || []).filter((o) => !isLegacySeedId(o.id))
+    const hasDemoOps = rawOps.some((o) => isDemoRecord(o))
+    let institutionalOperations = hasDemoOps ? rawOps : [...DEMO_OPERATIONS, ...rawOps]
+
+    const rawAudit = (parsed.auditRegistry || []).filter((a) => !isLegacySeedId(a.id))
+    const hasDemoAudit = rawAudit.some((a) => isDemoRecord(a))
+    let auditRegistry = hasDemoAudit ? rawAudit : [...DEMO_AUDIT_REGISTRY, ...rawAudit]
+
+    const rawPresence = (parsed.presenceRecords || []).filter((p) => !isLegacySeedId(p.id))
+    const hasDemoPresence = rawPresence.some((p) => isDemoRecord(p))
+    let presenceRecords = hasDemoPresence ? rawPresence : [...DEMO_PRESENCE_RECORDS, ...rawPresence]
+
+    const rawReports = (parsed.missionReports || []).filter((r) => !isLegacySeedId(r.id))
+    const hasDemoReports = rawReports.some((r) => isDemoRecord(r))
+    let missionReports = hasDemoReports ? rawReports : [...DEMO_MISSION_REPORTS, ...rawReports]
+
+    const rawNotifs = (parsed.notifications || []).filter((n) => !isLegacySeedId(n.id))
+    const hasDemoNotifs = rawNotifs.some((n) => isDemoRecord(n))
+    let notifications = hasDemoNotifs ? rawNotifs : [...DEMO_NOTIFICATIONS, ...rawNotifs]
+
+    const pointRulesConfig = parsed.pointRulesConfig ?? DEFAULT_POINT_RULES
+    const customChallenges = parsed.customChallenges ?? DEFAULT_CHALLENGES
+    const awardNominations = parsed.awardNominations ?? seedData.awardNominations
+    const seasonArchives = parsed.seasonArchives ?? seedData.seasonArchives
 
     const next: AppData = {
       events,
-      announcements: parsed.announcements ?? seedData.announcements,
+      announcements,
       activities,
       institutions,
       news,
       registrants,
       participations,
-      cagnottes,
-      donations,
+      volunteerAccounts,
+      volunteerPointTransactions,
       associations,
       sosCollectionSites,
       sosDamagedSites,
+      sosMaterialNeeds,
+      sosDonationPledges,
+      sosCalls,
+      sosApplications,
+      sosInterventions,
+      institutionalUsers,
+      institutionalOperations,
+      auditRegistry,
+      customChallenges,
+      awardNominations,
+      seasonArchives,
+      notifications,
+      presenceRecords,
+      missionReports,
+      pointRulesConfig,
     }
 
-    if (
-      changed ||
-      !parsed.participations ||
-
-      !parsed.institutions ||
-      !parsed.news ||
-      !parsed.cagnottes ||
-      !parsed.donations ||
-      !parsed.associations ||
-      !parsed.sosCollectionSites ||
-      !parsed.sosDamagedSites
-    ) {
+    if (changed || !hasDemoEvents) {
       save(next)
     }
     return next
@@ -683,7 +367,11 @@ function load(): AppData {
 }
 
 function save(data: AppData) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+  } catch (e) {
+    console.warn("Storage save error:", e)
+  }
 }
 
 export function getData(): AppData {
@@ -699,7 +387,10 @@ export function createId() {
 }
 
 export function isAdminAuthenticated(): boolean {
-  return sessionStorage.getItem(AUTH_KEY) === "1" || sessionStorage.getItem("odej-akbou-admin") === "1"
+  return (
+    sessionStorage.getItem(AUTH_KEY) === "1" ||
+    sessionStorage.getItem("odej-akbou-admin") === "1"
+  )
 }
 
 export function loginAdmin(password: string): boolean {
@@ -714,17 +405,35 @@ export function logoutAdmin() {
   sessionStorage.removeItem(AUTH_KEY)
 }
 
+export {
+  isDemoId,
+  isDemoRecord,
+  countDemoStats,
+  purgeDemoData,
+  injectDemoData,
+  resetDemoData,
+  type DemoStats,
+}
+
 export type {
   AppData,
   Activity,
   Announcement,
   Association,
-  Cagnotte,
-  Donation,
   EventItem,
   Institution,
   NewsArticle,
   Registrant,
+  VolunteerAccount,
+  VolunteerPointTransaction,
   SosCollectionSite,
   SosDamagedSite,
+  SosMaterialNeed,
+  SosDonationPledge,
+  SosCall,
+  SosApplication,
+  SosIntervention,
+  InstitutionalUser,
+  InstitutionalOperation,
+  AuditRegistryEntry,
 }

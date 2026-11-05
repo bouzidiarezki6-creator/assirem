@@ -95,8 +95,16 @@ for (const tx of DEMO_POINT_TRANSACTIONS) {
 
 // 9. SOS Calls
 lines.push(`\n-- 9. Appels SOS (${DEMO_SOS_CALLS.length})`)
-for (const c of DEMO_SOS_CALLS) {
-  lines.push(`INSERT INTO public.sos_calls (id, reference, title, description, mission_type, wilaya_code, commune, address, lat, lng, volunteers_needed, volunteers_registered, volunteers_present, start_date, end_date, start_time, end_time, required_skills, urgency, status, supervising_authority, admin_note, is_demo) VALUES (${sqlVal(c.id)}, ${sqlVal(c.reference)}, ${sqlVal(c.title)}, ${sqlVal(c.description)}, ${sqlVal(c.missionType)}, ${sqlVal(c.wilayaCode)}, ${sqlVal(c.commune)}, ${sqlVal(c.address)}, ${sqlVal(c.lat)}, ${sqlVal(c.lng)}, ${sqlVal(c.volunteersNeeded)}, ${sqlVal(c.volunteersRegistered)}, ${sqlVal(c.volunteersPresent)}, ${sqlVal(c.startDate)}, ${sqlVal(c.endDate)}, ${sqlVal(c.startTime)}, ${sqlVal(c.endTime)}, ${sqlArrayText(c.requiredSkills)}, ${sqlVal(c.urgency)}, ${sqlVal(c.status)}, ${sqlVal(c.supervisingAuthority)}, ${sqlVal(c.adminNote)}, TRUE) ON CONFLICT (id) DO NOTHING;`)
+for (const c of DEMO_SOS_CALLS as any[]) {
+  const mMissionType = c.type || c.missionType || 'professional'
+  const mVolNeeded = c.requiredSlots || c.volunteersNeeded || 10
+  const mVolReg = c.acceptedCount || c.volunteersRegistered || 0
+  const mVolPres = c.receivedCount || c.volunteersPresent || 0
+  const mUrgency = c.urgencyLevel || c.urgency || 'medium'
+  const mStatus = c.status || 'open'
+  const mTimeSchedule = c.timeSchedule || c.startTime || '09:00'
+
+  lines.push(`INSERT INTO public.sos_calls (id, reference, title, description, mission_type, wilaya_code, commune, address, lat, lng, volunteers_needed, volunteers_registered, volunteers_present, start_date, end_date, start_time, end_time, required_skills, urgency, status, supervising_authority, admin_note, is_demo) VALUES (${sqlVal(c.id)}, ${sqlVal(c.reference)}, ${sqlVal(c.title)}, ${sqlVal(c.description)}, ${sqlVal(mMissionType)}, ${sqlVal(c.wilayaCode)}, ${sqlVal(c.commune)}, ${sqlVal(c.address)}, ${sqlVal(c.lat)}, ${sqlVal(c.lng)}, ${sqlVal(mVolNeeded)}, ${sqlVal(mVolReg)}, ${sqlVal(mVolPres)}, ${sqlVal(c.startDate)}, ${sqlVal(c.endDate)}, ${sqlVal(mTimeSchedule)}, ${sqlVal(c.endTime || null)}, ${sqlArrayText(c.requiredSkills || [])}, ${sqlVal(mUrgency)}, ${sqlVal(mStatus)}, ${sqlVal(c.supervisingAuthority || 'DJS')}, ${sqlVal(c.adminNote || null)}, TRUE) ON CONFLICT (id) DO NOTHING;`)
 }
 
 // 10. SOS Material Needs
@@ -107,14 +115,18 @@ for (const m of DEMO_SOS_MATERIAL_NEEDS) {
 
 // 11. SOS Collection Sites
 lines.push(`\n-- 11. Sites de collecte SOS (${DEMO_SOS_COLLECTION_SITES.length})`)
-for (const cs of DEMO_SOS_COLLECTION_SITES) {
-  lines.push(`INSERT INTO public.sos_collection_sites (id, name, location, wilaya_code, commune, address, lat, lng, phone, responsible_name, aid_categories, is_active, admin_note, is_demo) VALUES (${sqlVal(cs.id)}, ${sqlVal(cs.name)}, ${sqlVal(cs.location)}, ${sqlVal(cs.wilayaCode)}, ${sqlVal(cs.commune)}, ${sqlVal(cs.address)}, ${sqlVal(cs.lat)}, ${sqlVal(cs.lng)}, ${sqlVal(cs.phone)}, ${sqlVal(cs.responsibleName)}, ${sqlArrayText(cs.aidCategories)}, ${sqlVal(cs.isActive)}, ${sqlVal(cs.adminNote)}, TRUE) ON CONFLICT (id) DO NOTHING;`)
+for (const cs of DEMO_SOS_COLLECTION_SITES as any[]) {
+  const csLocation = cs.location || cs.name || 'Centre de Collecte'
+  const csCommune = cs.commune || (cs.wilayaCode === 6 ? 'Béjaïa' : 'Sétif')
+  lines.push(`INSERT INTO public.sos_collection_sites (id, name, location, wilaya_code, commune, address, lat, lng, phone, responsible_name, aid_categories, is_active, admin_note, is_demo) VALUES (${sqlVal(cs.id)}, ${sqlVal(cs.name)}, ${sqlVal(csLocation)}, ${sqlVal(cs.wilayaCode)}, ${sqlVal(csCommune)}, ${sqlVal(cs.address || csLocation)}, ${sqlVal(cs.lat)}, ${sqlVal(cs.lng)}, ${sqlVal(cs.phone || null)}, ${sqlVal(cs.responsibleName || null)}, ${sqlArrayText(cs.aidCategories)}, ${sqlVal(cs.isActive ?? true)}, ${sqlVal(cs.adminNote)}, TRUE) ON CONFLICT (id) DO NOTHING;`)
 }
 
 // 12. SOS Damaged Sites
 lines.push(`\n-- 12. Sites sinistrés SOS (${DEMO_SOS_DAMAGED_SITES.length})`)
-for (const ds of DEMO_SOS_DAMAGED_SITES) {
-  lines.push(`INSERT INTO public.sos_damaged_sites (id, name, location, wilaya_code, commune, address, lat, lng, damage_type, severity, aid_categories, is_active, admin_note, is_demo) VALUES (${sqlVal(ds.id)}, ${sqlVal(ds.name)}, ${sqlVal(ds.location)}, ${sqlVal(ds.wilayaCode)}, ${sqlVal(ds.commune)}, ${sqlVal(ds.address)}, ${sqlVal(ds.lat)}, ${sqlVal(ds.lng)}, ${sqlVal(ds.damageType)}, ${sqlVal(ds.severity)}, ${sqlArrayText(ds.aidCategories)}, ${sqlVal(ds.isActive)}, ${sqlVal(ds.adminNote)}, TRUE) ON CONFLICT (id) DO NOTHING;`)
+for (const ds of DEMO_SOS_DAMAGED_SITES as any[]) {
+  const dsLocation = ds.location || ds.name || 'Zone sinistrée'
+  const dsCommune = ds.commune || (ds.wilayaCode === 6 ? 'Béjaïa' : 'Sétif')
+  lines.push(`INSERT INTO public.sos_damaged_sites (id, name, location, wilaya_code, commune, address, lat, lng, damage_type, severity, aid_categories, is_active, admin_note, is_demo) VALUES (${sqlVal(ds.id)}, ${sqlVal(ds.name)}, ${sqlVal(dsLocation)}, ${sqlVal(ds.wilayaCode)}, ${sqlVal(dsCommune)}, ${sqlVal(ds.address || dsLocation)}, ${sqlVal(ds.lat)}, ${sqlVal(ds.lng)}, ${sqlVal(ds.damageType || 'Inondation / Chutes de température')}, ${sqlVal(ds.severity || 'high')}, ${sqlArrayText(ds.aidCategories)}, ${sqlVal(ds.isActive ?? true)}, ${sqlVal(ds.adminNote)}, TRUE) ON CONFLICT (id) DO NOTHING;`)
 }
 
 // 13. Institutional Users

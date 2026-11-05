@@ -639,6 +639,11 @@ CREATE POLICY "Public Manage Institutional Users" ON public.institutional_users 
 CREATE POLICY "Public Manage Operations" ON public.institutional_operations FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Public Manage Attestations" ON public.digital_attestations FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Public Manage Audit Registry" ON public.audit_registry FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Public Manage Institutions" ON public.institutions FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Public Manage Associations" ON public.associations FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Public Manage Sos Calls" ON public.sos_calls FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Public Manage Sos Collection Sites" ON public.sos_collection_sites FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Public Manage Sos Damaged Sites" ON public.sos_damaged_sites FOR ALL USING (true) WITH CHECK (true);
 
 -- ============================================================================
 -- 9. SUPABASE STORAGE BUCKETS (AVATARS, EVENTS, REPORTS, ATTESTATIONS)

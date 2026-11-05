@@ -68,7 +68,7 @@ export default function VolunteerBadgeCard({ volunteer, className }: Props) {
       {/* Official Volunteer Badge Card */}
       <div
         ref={cardRef}
-        className="relative mx-auto w-full max-w-md overflow-hidden rounded-3xl border-2 border-primary/30 bg-gradient-to-b from-white via-white to-emerald-50/40 p-6 shadow-card"
+        className="relative mx-auto w-full max-w-md overflow-hidden rounded-3xl border-2 border-primary/40 bg-gradient-to-b from-card via-card/95 to-surface p-6 shadow-card"
       >
         {/* Top Header Stamp */}
         <div className="flex items-center justify-between border-b border-border/60 pb-3">
@@ -83,7 +83,7 @@ export default function VolunteerBadgeCard({ volunteer, className }: Props) {
               </span>
             </div>
           </div>
-          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">
+          <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 text-primary border border-primary/30 px-2.5 py-0.5 text-[10px] font-bold">
             <ShieldCheck className="h-3 w-3" />
             Actif
           </span>

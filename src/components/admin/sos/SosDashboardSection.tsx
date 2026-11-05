@@ -113,16 +113,16 @@ export default function SosDashboardSection() {
   return (
     <div className="space-y-6">
       {/* Editorial Overview Header */}
-      <div className="rounded-3xl border border-slate-200 bg-gradient-to-r from-emerald-50 via-teal-50/70 to-white p-6 shadow-soft">
+      <div className="rounded-3xl border border-border/70 bg-gradient-to-r from-card via-card to-surface p-6 shadow-soft">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 block">
+            <span className="text-xs font-bold uppercase tracking-wider text-primary block">
               Pilotage central SOS
             </span>
-            <h2 className="text-xl sm:text-2xl font-black text-slate-950 mt-0.5">
+            <h2 className="text-xl sm:text-2xl font-black text-foreground mt-0.5">
               Vue d'ensemble de la coordination
             </h2>
-            <p className="text-xs text-slate-600 font-medium mt-1 max-w-xl leading-relaxed">
+            <p className="text-xs text-muted-foreground font-medium mt-1 max-w-xl leading-relaxed">
               Suivi en temps réel des alertes, candidatures de professionnels et de bénévoles, et gestion des interventions terrain.
             </p>
           </div>
@@ -130,16 +130,16 @@ export default function SosDashboardSection() {
           <button
             type="button"
             onClick={() => setShowAllStats(!showAllStats)}
-            className="inline-flex items-center gap-1.5 rounded-2xl border border-slate-300 bg-white px-4 py-2 text-xs font-bold text-slate-800 hover:bg-slate-50 transition-colors shadow-xs"
+            className="inline-flex items-center gap-1.5 rounded-2xl border border-border/70 bg-card px-4 py-2 text-xs font-bold text-foreground hover:bg-muted/40 transition-colors shadow-xs"
           >
             {showAllStats ? (
               <>
-                <ChevronUp className="h-4 w-4 text-slate-600" />
+                <ChevronUp className="h-4 w-4 text-muted-foreground" />
                 Masquer les détails
               </>
             ) : (
               <>
-                <ChevronDown className="h-4 w-4 text-slate-600" />
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 Voir toutes les statistiques
               </>
             )}

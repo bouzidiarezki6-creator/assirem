@@ -166,7 +166,7 @@ export default function HallOfHonorSection() {
               honorData.ambassadors.map((amb) => (
                 <div
                   key={amb.volunteerId}
-                  className="relative rounded-3xl border border-amber-300/80 bg-gradient-to-br from-amber-50/40 via-white to-emerald-50/20 p-5 shadow-sm space-y-4"
+                  className="relative rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-950/40 via-card to-card p-5 shadow-soft space-y-4"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
@@ -178,7 +178,7 @@ export default function HallOfHonorSection() {
                           <h4 className="text-sm font-black text-foreground">
                             {amb.displayName}
                           </h4>
-                          <span className="rounded-full bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 text-[9px] font-black uppercase">
+                          <span className="rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 text-[9px] font-black uppercase">
                             Ambassadeur
                           </span>
                         </div>
@@ -282,10 +282,10 @@ export default function HallOfHonorSection() {
               <div
                 key={ch.volunteerId}
                 className={cn(
-                  "rounded-3xl border p-5 text-center shadow-xs space-y-3 relative overflow-hidden",
+                  "rounded-3xl border p-5 text-center shadow-soft space-y-3 relative overflow-hidden",
                   idx === 0
-                    ? "border-amber-300 bg-gradient-to-b from-amber-50/70 to-white ring-2 ring-amber-400/20"
-                    : "border-border/70 bg-white"
+                    ? "border-amber-500/50 bg-gradient-to-b from-amber-950/40 via-card to-card ring-2 ring-amber-500/20"
+                    : "border-border/70 bg-card"
                 )}
               >
                 <div className="flex justify-center">
@@ -293,10 +293,10 @@ export default function HallOfHonorSection() {
                     className={cn(
                       "flex h-12 w-12 items-center justify-center rounded-2xl font-black text-sm shadow-xs",
                       idx === 0
-                        ? "bg-amber-100 text-amber-900 border border-amber-300"
+                        ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
                         : idx === 1
-                        ? "bg-slate-200 text-slate-800"
-                        : "bg-amber-800/10 text-amber-900"
+                        ? "bg-slate-700/50 text-slate-200 border border-slate-600/50"
+                        : "bg-amber-900/30 text-amber-400 border border-amber-700/30"
                     )}
                   >
                     #{idx + 1}
@@ -311,7 +311,7 @@ export default function HallOfHonorSection() {
                 </div>
 
                 <div className="pt-2 border-t border-border/50">
-                  <span className="text-base font-black text-emerald-800 font-mono">
+                  <span className="text-base font-black text-primary font-mono">
                     +{ch.periodScore} pts ce mois-ci
                   </span>
                 </div>

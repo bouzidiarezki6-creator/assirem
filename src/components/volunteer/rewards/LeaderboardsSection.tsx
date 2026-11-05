@@ -358,10 +358,10 @@ function PodiumCard({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-between rounded-3xl border p-4 text-center transition-all shadow-xs",
+        "flex flex-col items-center justify-between rounded-3xl border p-4 text-center transition-all shadow-soft",
         isFirst
-          ? "border-amber-300 bg-gradient-to-b from-amber-50/60 to-white -translate-y-2 shadow-sm"
-          : "border-border/70 bg-white"
+          ? "border-amber-500/50 bg-gradient-to-b from-amber-950/40 via-card to-card -translate-y-2 ring-2 ring-amber-500/20"
+          : "border-border/70 bg-card"
       )}
     >
       <div className="space-y-1 flex flex-col items-center">
@@ -377,7 +377,7 @@ function PodiumCard({
       </div>
 
       <div className="pt-2 mt-2 border-t border-border/40 w-full">
-        <span className="text-sm font-black text-emerald-800 font-mono">
+        <span className="text-sm font-black text-primary font-mono">
           {entry.periodScore} pts
         </span>
       </div>

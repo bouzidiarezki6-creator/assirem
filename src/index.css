@@ -526,6 +526,61 @@ html[lang="en"] h6,
     --tw-gradient-to: hsl(var(--card)) var(--tw-gradient-to-position) !important;
   }
 
+  /* Pastel gradient stops adapted to dark canvas */
+  .from-rose-50,
+  .from-rose-100 {
+    --tw-gradient-from: rgba(244, 63, 94, 0.22) var(--tw-gradient-from-position) !important;
+    --tw-gradient-to: rgba(244, 63, 94, 0) var(--tw-gradient-to-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+  }
+  .to-rose-50,
+  .to-rose-100 {
+    --tw-gradient-to: hsl(var(--card)) var(--tw-gradient-to-position) !important;
+  }
+
+  .from-amber-50,
+  .from-amber-100 {
+    --tw-gradient-from: rgba(245, 158, 11, 0.18) var(--tw-gradient-from-position) !important;
+    --tw-gradient-to: rgba(245, 158, 11, 0) var(--tw-gradient-to-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+  }
+  .to-amber-50,
+  .to-amber-100 {
+    --tw-gradient-to: hsl(var(--card)) var(--tw-gradient-to-position) !important;
+  }
+
+  .from-emerald-50,
+  .from-emerald-100,
+  .from-teal-50 {
+    --tw-gradient-from: rgba(16, 185, 129, 0.18) var(--tw-gradient-from-position) !important;
+    --tw-gradient-to: rgba(16, 185, 129, 0) var(--tw-gradient-to-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+  }
+  .via-teal-50 {
+    --tw-gradient-to: rgba(16, 185, 129, 0) var(--tw-gradient-to-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), rgba(16, 185, 129, 0.12) var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+  }
+  .to-emerald-50,
+  .to-emerald-100,
+  .to-teal-50 {
+    --tw-gradient-to: hsl(var(--card)) var(--tw-gradient-to-position) !important;
+  }
+
+  .from-slate-50,
+  .from-slate-100,
+  .from-gray-50,
+  .from-gray-100 {
+    --tw-gradient-from: hsl(var(--muted) / 0.6) var(--tw-gradient-from-position) !important;
+    --tw-gradient-to: hsl(var(--muted) / 0) var(--tw-gradient-to-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+  }
+  .to-slate-50,
+  .to-slate-100,
+  .to-gray-50,
+  .to-gray-100 {
+    --tw-gradient-to: hsl(var(--card)) var(--tw-gradient-to-position) !important;
+  }
+
   /* Slate & Gray text cohesion */
   .text-gray-950,
   .text-gray-900,

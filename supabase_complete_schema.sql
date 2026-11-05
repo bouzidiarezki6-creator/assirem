@@ -641,5 +641,410 @@ CREATE POLICY "Public Manage Attestations" ON public.digital_attestations FOR AL
 CREATE POLICY "Public Manage Audit Registry" ON public.audit_registry FOR ALL USING (true) WITH CHECK (true);
 
 -- ============================================================================
+-- 9. SUPABASE STORAGE BUCKETS (AVATARS, EVENTS, REPORTS, ATTESTATIONS)
+-- ============================================================================
+
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES 
+  ('events', 'events', true, 5242880, ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml']),
+  ('avatars', 'avatars', true, 2097152, ARRAY['image/jpeg', 'image/png', 'image/webp']),
+  ('reports', 'reports', false, 10485760, ARRAY['application/pdf', 'image/jpeg', 'image/png']),
+  ('attestations', 'attestations', true, 5242880, ARRAY['application/pdf', 'image/png'])
+ON CONFLICT (id) DO UPDATE SET
+  public = EXCLUDED.public,
+  file_size_limit = EXCLUDED.file_size_limit,
+  allowed_mime_types = EXCLUDED.allowed_mime_types;
+
+-- Politiques de sécurité pour les fichiers Storage
+DO $$ BEGIN
+  CREATE POLICY "Public Read Events Bucket" ON storage.objects FOR SELECT USING (bucket_id IN ('events', 'avatars', 'attestations'));
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+  CREATE POLICY "Public Insert Events Bucket" ON storage.objects FOR INSERT WITH CHECK (bucket_id IN ('events', 'avatars', 'reports'));
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+  CREATE POLICY "Public Update Events Bucket" ON storage.objects FOR UPDATE USING (bucket_id IN ('events', 'avatars'));
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+
+-- ============================================================================
+-- 10. SYNCHRONISATION SUPABASE AUTH -> COMPTES BÉNÉVOLES (TRIGGER)
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger AS $$
+BEGIN
+  INSERT INTO public.volunteer_accounts (
+    id,
+    email,
+    first_name,
+    last_name,
+    phone,
+    wilaya_code,
+    commune,
+    volunteer_code,
+    points,
+    status,
+    is_verified
+  ) VALUES (
+    new.id::text,
+    new.email,
+    COALESCE(new.raw_user_meta_data->>'first_name', split_part(new.email, '@', 1)),
+    COALESCE(new.raw_user_meta_data->>'last_name', 'Bénévole'),
+    COALESCE(new.raw_user_meta_data->>'phone', ''),
+    COALESCE((new.raw_user_meta_data->>'wilaya_code')::int, 6),
+    COALESCE(new.raw_user_meta_data->>'commune', 'Béjaïa'),
+    'YFY-VOL-' || to_char(now(), 'YYYYMMDD') || '-' || upper(substr(md5(random()::text), 1, 4)),
+    0,
+    'active',
+    true
+  )
+  ON CONFLICT (email) DO UPDATE
+  SET id = EXCLUDED.id;
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+-- ============================================================================
+-- 11. PROCÉDURES STOCKÉES SÉCURISÉES (FONCTIONS BACKEND)
+-- ============================================================================
+
+-- 11.1 Attribution atomique et idempotente des points
+CREATE OR REPLACE FUNCTION public.award_volunteer_points(
+    p_volunteer_id TEXT,
+    p_amount INT,
+    p_reason TEXT,
+    p_source TEXT DEFAULT 'manual_adjustment',
+    p_reference_id TEXT DEFAULT NULL,
+    p_mission_title TEXT DEFAULT NULL,
+    p_admin_note TEXT DEFAULT NULL,
+    p_author_id TEXT DEFAULT NULL,
+    p_author_name TEXT DEFAULT NULL,
+    p_author_role TEXT DEFAULT NULL,
+    p_author_wilaya INT DEFAULT NULL
+)
+RETURNS JSONB AS $$
+DECLARE
+    v_current_points INT;
+    v_new_points INT;
+    v_transaction_id TEXT;
+    v_existing_tx TEXT;
+BEGIN
+    -- Idempotence : si une transaction avec cette référence existe déjà, ne rien faire
+    IF p_reference_id IS NOT NULL THEN
+        SELECT id INTO v_existing_tx FROM public.volunteer_point_transactions
+        WHERE volunteer_id = p_volunteer_id AND reference_id = p_reference_id
+        LIMIT 1;
+        
+        IF v_existing_tx IS NOT NULL THEN
+            RETURN jsonb_build_object(
+                'success', false,
+                'error', 'TRANSACTION_ALREADY_EXISTS',
+                'transaction_id', v_existing_tx
+            );
+        END IF;
+    END IF;
+
+    -- Verrouillage de ligne pour mise à jour atomique sans collision
+    SELECT points INTO v_current_points FROM public.volunteer_accounts
+    WHERE id = p_volunteer_id
+    FOR UPDATE;
+
+    IF v_current_points IS NULL THEN
+        RETURN jsonb_build_object('success', false, 'error', 'VOLUNTEER_NOT_FOUND');
+    END IF;
+
+    v_new_points := GREATEST(0, v_current_points + p_amount);
+
+    UPDATE public.volunteer_accounts
+    SET points = v_new_points, updated_at = timezone('utc'::text, now())
+    WHERE id = p_volunteer_id;
+
+    INSERT INTO public.volunteer_point_transactions (
+        volunteer_id,
+        amount,
+        balance_after,
+        reason,
+        source,
+        reference_id,
+        mission_title,
+        admin_note,
+        author_id,
+        author_name,
+        author_role,
+        author_wilaya_code,
+        status
+    ) VALUES (
+        p_volunteer_id,
+        p_amount,
+        v_new_points,
+        p_reason,
+        p_source,
+        p_reference_id,
+        p_mission_title,
+        p_admin_note,
+        p_author_id,
+        p_author_name,
+        p_author_role,
+        p_author_wilaya,
+        'validated'
+    ) RETURNING id INTO v_transaction_id;
+
+    RETURN jsonb_build_object(
+        'success', true,
+        'transaction_id', v_transaction_id,
+        'previous_points', v_current_points,
+        'new_points', v_new_points
+    );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 11.2 Validation serveur du pointage présence QR Code
+CREATE OR REPLACE FUNCTION public.process_qr_attendance(
+    p_volunteer_code TEXT,
+    p_target_type TEXT,
+    p_target_id TEXT,
+    p_target_title TEXT,
+    p_wilaya_code INT,
+    p_commune TEXT,
+    p_action TEXT DEFAULT 'check_in',
+    p_validator_id TEXT DEFAULT NULL,
+    p_validator_name TEXT DEFAULT NULL
+)
+RETURNS JSONB AS $$
+DECLARE
+    v_vol public.volunteer_accounts;
+    v_existing_presence public.presence_records;
+    v_now TIMESTAMPTZ := timezone('utc'::text, now());
+    v_hours NUMERIC(5, 2) := 0;
+    v_points INT := 10;
+    v_rec_id TEXT;
+BEGIN
+    SELECT * INTO v_vol FROM public.volunteer_accounts
+    WHERE volunteer_code = p_volunteer_code OR id = p_volunteer_code
+    LIMIT 1;
+
+    IF v_vol.id IS NULL THEN
+        RETURN jsonb_build_object('success', false, 'error', 'VOLUNTEER_CODE_INVALID');
+    END IF;
+
+    SELECT * INTO v_existing_presence FROM public.presence_records
+    WHERE volunteer_id = v_vol.id AND target_id = p_target_id
+    ORDER BY created_at DESC
+    LIMIT 1;
+
+    IF p_action = 'check_in' THEN
+        IF v_existing_presence.id IS NOT NULL AND v_existing_presence.status = 'checked_in' THEN
+            RETURN jsonb_build_object(
+                'success', false,
+                'error', 'ALREADY_CHECKED_IN',
+                'record_id', v_existing_presence.id,
+                'check_in_at', v_existing_presence.check_in_at
+            );
+        END IF;
+
+        INSERT INTO public.presence_records (
+            volunteer_id,
+            volunteer_name,
+            volunteer_code,
+            target_type,
+            target_id,
+            target_title,
+            wilaya_code,
+            commune,
+            check_in_at,
+            status,
+            points_awarded,
+            validated_by_id,
+            validated_by_name,
+            validation_mode
+        ) VALUES (
+            v_vol.id,
+            v_vol.first_name || ' ' || v_vol.last_name,
+            v_vol.volunteer_code,
+            p_target_type,
+            p_target_id,
+            p_target_title,
+            p_wilaya_code,
+            p_commune,
+            v_now,
+            'checked_in',
+            v_points,
+            p_validator_id,
+            p_validator_name,
+            'qr_scan'
+        ) RETURNING id INTO v_rec_id;
+
+        -- Attribution automatique des 10 points
+        PERFORM public.award_volunteer_points(
+            v_vol.id,
+            v_points,
+            'Présence confirmée par QR : ' || p_target_title,
+            'event_participation',
+            'qr-presence-' || v_rec_id,
+            p_target_title
+        );
+
+        -- Notification automatique
+        INSERT INTO public.notifications (
+            volunteer_id,
+            type,
+            title,
+            message,
+            points,
+            link
+        ) VALUES (
+            v_vol.id,
+            'presence_confirmed',
+            'Présence validée (+10 pts)',
+            'Votre présence à l''action "' || p_target_title || '" a été confirmée avec succès.',
+            v_points,
+            '/mon-espace'
+        );
+
+        RETURN jsonb_build_object(
+            'success', true,
+            'action', 'check_in',
+            'record_id', v_rec_id,
+            'volunteer_name', v_vol.first_name || ' ' || v_vol.last_name,
+            'points_awarded', v_points
+        );
+    ELSE
+        -- Sortie / Check-out
+        IF v_existing_presence.id IS NULL OR v_existing_presence.status != 'checked_in' THEN
+            RETURN jsonb_build_object('success', false, 'error', 'NO_ACTIVE_CHECKIN');
+        END IF;
+
+        v_hours := ROUND(EXTRACT(EPOCH FROM (v_now - v_existing_presence.check_in_at)) / 3600.0, 2);
+
+        UPDATE public.presence_records
+        SET 
+            check_out_at = v_now,
+            hours_calculated = v_hours,
+            status = 'checked_out'
+        WHERE id = v_existing_presence.id;
+
+        RETURN jsonb_build_object(
+            'success', true,
+            'action', 'check_out',
+            'record_id', v_existing_presence.id,
+            'hours', v_hours
+        );
+    END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 11.3 Validation de rapport de mission par l'Auditeur avec attribution de récompenses
+CREATE OR REPLACE FUNCTION public.audit_mission_report(
+    p_report_id TEXT,
+    p_decision TEXT,
+    p_auditor_id TEXT,
+    p_auditor_name TEXT,
+    p_audit_notes TEXT,
+    p_reward_points INT DEFAULT 15
+)
+RETURNS JSONB AS $$
+DECLARE
+    v_report public.mission_reports;
+    v_points_to_grant INT := 0;
+BEGIN
+    SELECT * INTO v_report FROM public.mission_reports
+    WHERE id = p_report_id
+    FOR UPDATE;
+
+    IF v_report.id IS NULL THEN
+        RETURN jsonb_build_object('success', false, 'error', 'REPORT_NOT_FOUND');
+    END IF;
+
+    IF v_report.status != 'pending_audit' THEN
+        RETURN jsonb_build_object('success', false, 'error', 'REPORT_ALREADY_AUDITED', 'current_status', v_report.status);
+    END IF;
+
+    IF p_decision = 'approved' THEN
+        v_points_to_grant := COALESCE(p_reward_points, 15);
+
+        UPDATE public.mission_reports
+        SET 
+            status = 'validated',
+            auditor_id = p_auditor_id,
+            auditor_name = p_auditor_name,
+            audited_at = timezone('utc'::text, now()),
+            audit_notes = p_audit_notes,
+            reward_points_granted = v_points_to_grant,
+            updated_at = timezone('utc'::text, now())
+        WHERE id = p_report_id;
+
+        PERFORM public.award_volunteer_points(
+            v_report.author_id,
+            v_points_to_grant,
+            'Rapport de mission validé par l''audit : ' || v_report.mission_title,
+            'sos_mission',
+            'report-audit-' || p_report_id,
+            v_report.mission_title,
+            p_audit_notes,
+            p_auditor_id,
+            p_auditor_name,
+            'national_auditor',
+            v_report.wilaya_code
+        );
+
+        INSERT INTO public.notifications (
+            volunteer_id,
+            type,
+            title,
+            message,
+            points,
+            link
+        ) VALUES (
+            v_report.author_id,
+            'report_validated',
+            'Rapport validé (+ ' || v_points_to_grant || ' pts)',
+            'Votre rapport pour "' || v_report.mission_title || '" a été approuvé par l''audit.',
+            v_points_to_grant,
+            '/mon-espace'
+        );
+
+        RETURN jsonb_build_object('success', true, 'status', 'validated', 'points_granted', v_points_to_grant);
+    ELSE
+        UPDATE public.mission_reports
+        SET 
+            status = 'rejected',
+            auditor_id = p_auditor_id,
+            auditor_name = p_auditor_name,
+            audited_at = timezone('utc'::text, now()),
+            audit_notes = p_audit_notes,
+            updated_at = timezone('utc'::text, now())
+        WHERE id = p_report_id;
+
+        INSERT INTO public.notifications (
+            volunteer_id,
+            type,
+            title,
+            message,
+            link
+        ) VALUES (
+            v_report.author_id,
+            'report_rejected',
+            'Rapport nécessitant révision',
+            'Remarque de l''auditeur : ' || COALESCE(p_audit_notes, 'Critères non remplis'),
+            '/mon-espace'
+        );
+
+        RETURN jsonb_build_object('success', true, 'status', 'rejected');
+    END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ============================================================================
 -- FIN DE LA MIGRATION COMPLÈTE
 -- ============================================================================
+

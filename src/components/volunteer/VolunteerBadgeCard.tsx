@@ -6,7 +6,7 @@ import { useI18n } from "@/context/I18nProvider"
 import { getLevelProgress } from "@/lib/levels"
 import type { VolunteerAccount } from "@/lib/types"
 import { padWilayaCode } from "@/lib/wilayas"
-import { buildQrPayload } from "@/lib/qr"
+import { buildVolunteerQrPayload } from "@/lib/qr"
 import { cn } from "@/lib/utils"
 
 type Props = {
@@ -21,13 +21,16 @@ export default function VolunteerBadgeCard({ volunteer, className }: Props) {
 
   const progress = getLevelProgress(volunteer.points || 0)
 
-  // Safe QR payload containing NO sensitive personal data (no NIN, no password, no email, no phone)
-  const safeQrPayload = buildQrPayload({
+  // Payload QR officiel enrichi et sécurisé pour pointage instantané
+  const safeQrPayload = buildVolunteerQrPayload({
     id: volunteer.id,
-    qrCode: volunteer.volunteerCode,
-    lastName: volunteer.lastName,
+    volunteerCode: volunteer.volunteerCode,
     firstName: volunteer.firstName,
-    nationalId: volunteer.volunteerCode,
+    lastName: volunteer.lastName,
+    wilayaCode: volunteer.wilayaCode,
+    commune: volunteer.commune,
+    email: volunteer.email,
+    phone: volunteer.phone,
   })
 
   useEffect(() => {

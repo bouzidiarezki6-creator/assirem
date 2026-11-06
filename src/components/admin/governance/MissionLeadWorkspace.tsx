@@ -20,6 +20,7 @@ import { useGovernance } from "@/context/GovernanceContext"
 import { useI18n } from "@/context/I18nProvider"
 import { WILAYAS_LIST, padWilayaCode, type WilayaMeta } from "@/lib/wilayas"
 import QrScanner from "@/components/admin/QrScanner"
+import { extractAdherentFromScan } from "@/lib/qr"
 
 interface FieldTask {
   id: string
@@ -88,8 +89,13 @@ export default function MissionLeadWorkspace() {
   // Handle QR scan check-in
   const handleScanSuccess = (decodedText: string) => {
     setShowScanner(false)
-    const vol = (data.volunteerAccounts || []).find(
-      (v) => v.volunteerCode === decodedText || v.id === decodedText || v.email === decodedText
+    const adherent = data ? extractAdherentFromScan(decodedText, data) : null
+    const vol = adherent?.volunteerAccount || (data?.volunteerAccounts || []).find(
+      (v) =>
+        v.volunteerCode === decodedText ||
+        v.id === decodedText ||
+        v.email === decodedText ||
+        (v.phone && v.phone === decodedText)
     )
 
     if (vol) {
@@ -101,9 +107,11 @@ export default function MissionLeadWorkspace() {
         customPoints: 50,
         adminNote: `Pointage présence mission ${activeIntervention?.reference || ""}`,
       })
-      setScanMessage(`Présence validée avec succès pour le bénévole : ${vol.firstName} ${vol.lastName} (+50 pts)`)
+      setScanMessage(`Présence validée avec succès pour l'adhérent : ${vol.firstName} ${vol.lastName} (${vol.volunteerCode}) [+50 pts]`)
+    } else if (adherent?.registrant) {
+      setScanMessage(`Inscrit identifié : ${adherent.displayName} (${adherent.qrCode}). Présence enregistrée.`)
     } else {
-      setScanMessage(`Code QR scanné : ${decodedText}. Présence enregistrée manuellement.`)
+      setScanMessage(`Code scanné : ${decodedText}. Aucun adhérent trouvé dans le registre officiel.`)
     }
     setTimeout(() => setScanMessage(""), 5000)
   }

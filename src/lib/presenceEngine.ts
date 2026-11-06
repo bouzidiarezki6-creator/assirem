@@ -16,6 +16,7 @@ import { createId } from "./storage"
 import { executeAwardPoints } from "./pointsEngine"
 import { addNotification } from "./notificationEngine"
 import { evaluateAndAwardBadges } from "./badgeEngine"
+import { extractAdherentFromScan } from "./qr"
 
 export type CheckInInput = {
   volunteerCodeOrId: string
@@ -54,34 +55,61 @@ export type CheckInResult = {
 }
 
 /**
- * Retrouve un bénévole par son code public, QR code, NIN ou identifiant
+ * Retrouve un bénévole par son code public, scan QR (JSON, URL ou code brut), NIN ou identifiant
  */
 export function resolveVolunteer(
   currentData: AppData,
   query: string
 ): VolunteerAccount | null {
-  const needle = query.trim().toUpperCase()
-  if (!needle) return null
+  if (!query || !query.trim()) return null
 
-  // Recherche dans les comptes bénévoles
+  // 1. Analyse intelligente via l'extracteur QR universel
+  const adherent = extractAdherentFromScan(query, currentData)
+  if (adherent) {
+    if (adherent.volunteerAccount) return adherent.volunteerAccount
+    if (adherent.registrant) {
+      const byReg = adherent.registrant
+      return {
+        id: byReg.id,
+        email: `${byReg.firstName.toLowerCase()}.${byReg.lastName.toLowerCase()}@demo.dz`,
+        firstName: byByFirstName(byReg.firstName),
+        lastName: byReg.lastName,
+        phone: "0550000000",
+        wilayaCode: 6,
+        commune: byReg.birthPlace || "Béjaïa",
+        skills: ["first_aid"],
+        interests: [],
+        volunteerCode: `YFY-VOL-${byReg.qrCode}`,
+        points: byReg.points || 0,
+        status: "active",
+        isVerified: true,
+        acceptedTermsAt: byReg.registeredAt,
+        createdAt: byReg.registeredAt,
+        updatedAt: byReg.registeredAt,
+      }
+    }
+  }
+
+  const needle = query.trim().toUpperCase()
+
+  // 2. Recherche directe de secours dans les comptes bénévoles
   const byAccount = (currentData.volunteerAccounts || []).find(
     (v) =>
       v.id.toUpperCase() === needle ||
       v.volunteerCode.toUpperCase() === needle ||
       v.email.toUpperCase() === needle ||
-      (v.phone && v.phone === needle)
+      (v.phone && v.phone.replace(/[\s.-]/g, "") === needle.replace(/[\s.-]/g, ""))
   )
   if (byAccount) return byAccount
 
-  // Recherche dans les registrants
-  const byReg = currentData.registrants.find(
+  // 3. Recherche directe de secours dans les registrants
+  const byReg = (currentData.registrants || []).find(
     (r) =>
       r.id.toUpperCase() === needle ||
       r.qrCode.toUpperCase() === needle ||
-      r.nationalId.toUpperCase() === needle
+      (r.nationalId && r.nationalId.toUpperCase() === needle)
   )
   if (byReg) {
-    // Si trouvé dans les registrants mais pas dans volunteerAccounts, mapping
     return {
       id: byReg.id,
       email: `${byReg.firstName.toLowerCase()}.${byReg.lastName.toLowerCase()}@demo.dz`,

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react"
 import {
   CalendarCheck,
+  Camera,
   CheckCircle2,
   Clock,
   PlusCircle,
@@ -17,6 +18,8 @@ import { useAppData } from "@/context/DataProvider"
 import { useI18n } from "@/context/I18nProvider"
 import { useGovernance } from "@/context/GovernanceContext"
 import { cn } from "@/lib/utils"
+import QrScanner from "@/components/admin/QrScanner"
+import { extractAdherentFromScan, type ExtractedAdherent } from "@/lib/qr"
 
 export default function PresenceManager() {
   const { formatDate } = useI18n()
@@ -33,6 +36,28 @@ export default function PresenceManager() {
   const [filterWilaya, setFilterWilaya] = useState<string>("all")
   const [filterStatus, setFilterStatus] = useState<string>("all")
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null)
+  const [showScanner, setShowScanner] = useState(false)
+  const [scannedAdherent, setScannedAdherent] = useState<ExtractedAdherent | null>(null)
+
+  // Scanner QR temps réel avec extraction instantanée de l'adhérent
+  const handleQrScan = (rawText: string) => {
+    setShowScanner(false)
+    const adherent = data ? extractAdherentFromScan(rawText, data) : null
+    if (adherent) {
+      setSearchCode(adherent.volunteerCode || adherent.qrCode || adherent.id)
+      setScannedAdherent(adherent)
+      setMessage({
+        type: "ok",
+        text: `✓ Adhérent identifié avec succès : ${adherent.displayName} (${adherent.commune || `Wilaya ${adherent.wilayaCode}`}) — ${adherent.points} pts`,
+      })
+    } else {
+      setSearchCode(rawText)
+      setMessage({
+        type: "err",
+        text: `Code scanné (${rawText}) mais aucun profil d'adhérent correspondant dans la base.`,
+      })
+    }
+  }
 
   // Manual fallback modal
   const [manualModalOpen, setManualModalOpen] = useState(false)
@@ -307,25 +332,81 @@ export default function PresenceManager() {
                 </select>
               </div>
 
-              {/* Code / QR Input */}
+              {/* Code / QR Input & Scanner Toggle */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-foreground">
-                  Code Bénévole, QR ou NIN
-                </label>
-                <div className="relative">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-foreground">
+                    Code Bénévole, QR ou NIN
+                  </label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowScanner((v) => !v)}
+                    disabled={isAuditor}
+                    className="h-7 px-2 text-[11px] font-bold text-primary hover:bg-primary/10 gap-1"
+                  >
+                    <Camera className="h-3.5 w-3.5" />
+                    {showScanner ? "Fermer la caméra" : "Scanner avec caméra"}
+                  </Button>
+                </div>
+
+                {/* Live Camera Scanner Box */}
+                {showScanner && (
+                  <div className="rounded-2xl border border-primary/30 p-3 bg-muted/20 space-y-2">
+                    <p className="text-[11px] font-semibold text-primary flex items-center gap-1.5">
+                      <Scan className="h-3.5 w-3.5 animate-pulse" />
+                      Placez le QR Code de l'adhérent devant la caméra
+                    </p>
+                    <QrScanner onScan={handleQrScan} active={showScanner} />
+                  </div>
+                )}
+
+                <div className="flex gap-2">
                   <Input
                     value={searchCode}
-                    onChange={(e) => setSearchCode(e.target.value)}
+                    onChange={(e) => {
+                      setSearchCode(e.target.value)
+                      if (scannedAdherent) setScannedAdherent(null)
+                    }}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") handleCheckIn()
                     }}
-                    placeholder="Ex: YFY-VOL-20261105-06AM ou YFY-B3E1"
+                    placeholder="Ex: YFY-VOL-20261105-06AM ou collez le scan QR"
                     className="h-10 rounded-xl text-xs bg-card border-input text-foreground ps-3"
                     disabled={isAuditor}
                   />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowScanner((v) => !v)}
+                    disabled={isAuditor}
+                    className="h-10 px-3 rounded-xl border-input text-foreground hover:bg-muted shrink-0"
+                    title="Activer la caméra"
+                  >
+                    <Camera className="h-4 w-4 text-primary" />
+                  </Button>
                 </div>
+
+                {/* Identified Adherent Live Banner */}
+                {scannedAdherent && (
+                  <div className="mt-2 rounded-xl border border-primary/40 bg-primary/10 p-2.5 flex items-center justify-between text-xs">
+                    <div>
+                      <span className="font-extrabold text-foreground block">
+                        {scannedAdherent.displayName}
+                      </span>
+                      <span className="text-[11px] text-muted-foreground font-mono">
+                        {scannedAdherent.volunteerCode} · {scannedAdherent.commune || `Wilaya ${scannedAdherent.wilayaCode}`} · {scannedAdherent.points} pts
+                      </span>
+                    </div>
+                    <span className="rounded-full bg-primary/20 text-primary border border-primary/30 px-2 py-0.5 text-[10px] font-bold">
+                      {scannedAdherent.type === "volunteer" ? "Bénévole Officiel" : "Inscrit"}
+                    </span>
+                  </div>
+                )}
+
                 <p className="text-[11px] text-muted-foreground">
-                  Saisissez le code ou scannez le QR code généré dans l'espace personnel du bénévole.
+                  Saisissez le code, collez le contenu ou scannez la carte officielle d'adhérent.
                 </p>
               </div>
 

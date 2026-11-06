@@ -43,7 +43,13 @@ import type {
   SosTeamMember,
 } from "@/lib/types"
 import { isValidGps, generateSosReference, isCallFull } from "@/lib/sos"
-import { createQrCode, parseQrScan } from "@/lib/qr"
+import {
+  parseQrScan,
+  generateUniqueVolunteerCode,
+  generateUniqueRegistrantCode,
+  extractAdherentFromScan,
+  type ExtractedAdherent,
+} from "@/lib/qr"
 import type { AssociationSectorId } from "@/lib/associations"
 import { isValidCcp, normalizeCcp } from "@/lib/associations"
 import type { CategoryId } from "@/lib/categories"
@@ -149,6 +155,7 @@ type DataContextValue = {
   ) => Registrant | { error: string }
   deleteRegistrant: (id: string) => void
   findRegistrantByScan: (raw: string) => Registrant | null
+  extractAdherent: (raw: string) => ExtractedAdherent | null
   previewParticipationPoints: (input: PointsInput) => PointsBreakdown | null
   validateParticipation: (input: ValidateParticipationInput) => { ok: true; participation: VolunteerParticipation } | { ok: false; error: string }
   cancelParticipation: (participationId: string, reason: string, author?: InstitutionalUser) => { ok: true } | { ok: false; error: string }
@@ -510,11 +517,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return { error: "errors.ninAlreadyRegistered" }
       }
 
+      const existingCodes = prev.registrants.map((r) => r.qrCode)
+      const qrCode = generateUniqueRegistrantCode({ nin, existingCodes })
+
       const created: Registrant = {
         ...item,
         nationalId: nin,
         id: nin,
-        qrCode: createQrCode(nin),
+        qrCode,
         points: 0,
         registeredAt: new Date().toISOString(),
       }
@@ -571,9 +581,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
       const id = item.id || createId()
       const stamp = new Date().toISOString()
-      const suffix = id.replace(/-/g, "").slice(0, 4).toUpperCase()
-      const datePart = stamp.slice(0, 10).replace(/-/g, "")
-      const volunteerCode = `YFY-VOL-${datePart}-${suffix}`
+      const existingCodes = (prev.volunteerAccounts || []).map((v) => v.volunteerCode)
+      const volunteerCode = generateUniqueVolunteerCode({
+        wilayaCode: item.wilayaCode,
+        firstName: item.firstName,
+        lastName: item.lastName,
+        existingCodes,
+      })
 
       const account: VolunteerAccount = {
         ...item,
@@ -587,7 +601,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       }
 
       // Also ensure an entry exists in registrants so scan and existing CRM can find them
-      const qrCode = `YFY-${suffix}`
+      const qrCode = volunteerCode
       const registrantEntry: Registrant = {
         id,
         qrCode,
@@ -1167,13 +1181,39 @@ export function DataProvider({ children }: { children: ReactNode }) {
     )
   }, [])
 
+  const extractAdherent = useCallback(
+    (raw: string): ExtractedAdherent | null => {
+      if (!data) return null
+      return extractAdherentFromScan(raw, data)
+    },
+    [data]
+  )
+
   const findRegistrantByScan = useCallback(
     (raw: string) => {
+      if (!data) return null
+      const adherent = extractAdherentFromScan(raw, data)
+      if (adherent) {
+        if (adherent.registrant) return adherent.registrant
+        if (adherent.volunteerAccount) {
+          const v = adherent.volunteerAccount
+          return {
+            id: v.id,
+            qrCode: v.volunteerCode,
+            lastName: v.lastName,
+            firstName: v.firstName,
+            birthDate: v.birthDate || "2000-01-01",
+            birthPlace: v.commune,
+            nationalId: v.id,
+            points: v.points || 0,
+            announcementId: null,
+          } as Registrant
+        }
+      }
       const parsed = parseQrScan(raw)
-      if (!parsed || !parsed.code) return null
-      const targetCode = parsed.code.toUpperCase()
+      const targetCode = (parsed?.code || parsed?.volunteerCode || parsed?.id || raw).trim().toUpperCase()
       return (
-        data!.registrants.find(
+        data.registrants.find(
           (r) =>
             r.qrCode.toUpperCase() === targetCode ||
             r.id.toUpperCase() === targetCode
@@ -2572,6 +2612,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       addRegistrant,
       deleteRegistrant,
       findRegistrantByScan,
+      extractAdherent,
       previewParticipationPoints,
       validateParticipation,
       cancelParticipation,
@@ -2664,6 +2705,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       addRegistrant,
       deleteRegistrant,
       findRegistrantByScan,
+      extractAdherent,
       previewParticipationPoints,
       validateParticipation,
       cancelParticipation,
